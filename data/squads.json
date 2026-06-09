@@ -1,0 +1,6530 @@
+[
+  {
+    "code": "MEX",
+    "team": "Mexico",
+    "players": [
+      {
+        "surname": "Rangel",
+        "full_name": "Raúl Rangel",
+        "position": "GK"
+      },
+      {
+        "surname": "Sánchez",
+        "full_name": "Jorge Sánchez",
+        "position": "DF"
+      },
+      {
+        "surname": "Montes",
+        "full_name": "César Montes",
+        "position": "DF"
+      },
+      {
+        "surname": "Álvarez",
+        "full_name": "Edson Álvarez",
+        "position": "DF"
+      },
+      {
+        "surname": "Vásquez",
+        "full_name": "Johan Vásquez",
+        "position": "DF"
+      },
+      {
+        "surname": "Lira",
+        "full_name": "Érik Lira",
+        "position": "MF"
+      },
+      {
+        "surname": "Romo",
+        "full_name": "Luis Romo",
+        "position": "MF"
+      },
+      {
+        "surname": "Fidalgo",
+        "full_name": "Álvaro Fidalgo",
+        "position": "MF"
+      },
+      {
+        "surname": "Jiménez",
+        "full_name": "Raúl Jiménez",
+        "position": "FW"
+      },
+      {
+        "surname": "Vega",
+        "full_name": "Alexis Vega",
+        "position": "FW"
+      },
+      {
+        "surname": "Giménez",
+        "full_name": "Santiago Giménez",
+        "position": "FW"
+      },
+      {
+        "surname": "Acevedo",
+        "full_name": "Carlos Acevedo",
+        "position": "GK"
+      },
+      {
+        "surname": "Ochoa",
+        "full_name": "Guillermo Ochoa",
+        "position": "GK"
+      },
+      {
+        "surname": "González",
+        "full_name": "Armando González",
+        "position": "FW"
+      },
+      {
+        "surname": "Reyes",
+        "full_name": "Israel Reyes",
+        "position": "DF"
+      },
+      {
+        "surname": "Quiñones",
+        "full_name": "Julián Quiñones",
+        "position": "FW"
+      },
+      {
+        "surname": "Pineda",
+        "full_name": "Orbelín Pineda",
+        "position": "MF"
+      },
+      {
+        "surname": "Vargas",
+        "full_name": "Obed Vargas",
+        "position": "MF"
+      },
+      {
+        "surname": "Mora",
+        "full_name": "Gilberto Mora",
+        "position": "MF"
+      },
+      {
+        "surname": "Chávez",
+        "full_name": "Mateo Chávez",
+        "position": "DF"
+      },
+      {
+        "surname": "Huerta",
+        "full_name": "César Huerta",
+        "position": "FW"
+      },
+      {
+        "surname": "Martínez",
+        "full_name": "Guillermo Martínez",
+        "position": "FW"
+      },
+      {
+        "surname": "Gallardo",
+        "full_name": "Jesús Gallardo",
+        "position": "DF"
+      },
+      {
+        "surname": "Chávez",
+        "full_name": "Luis Chávez",
+        "position": "MF"
+      },
+      {
+        "surname": "Alvarado",
+        "full_name": "Roberto Alvarado",
+        "position": "FW"
+      },
+      {
+        "surname": "Gutiérrez",
+        "full_name": "Brian Gutiérrez",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "RSA",
+    "team": "South Africa",
+    "players": [
+      {
+        "surname": "Williams",
+        "full_name": "Ronwen Williams",
+        "position": "GK"
+      },
+      {
+        "surname": "Matuludi",
+        "full_name": "Thabang Matuludi",
+        "position": "DF"
+      },
+      {
+        "surname": "Ndamane",
+        "full_name": "Khulumani Ndamane",
+        "position": "DF"
+      },
+      {
+        "surname": "Mokoena",
+        "full_name": "Teboho Mokoena",
+        "position": "MF"
+      },
+      {
+        "surname": "Mbatha",
+        "full_name": "Thalente Mbatha",
+        "position": "MF"
+      },
+      {
+        "surname": "Modiba",
+        "full_name": "Aubrey Modiba",
+        "position": "DF"
+      },
+      {
+        "surname": "Appollis",
+        "full_name": "Oswin Appollis",
+        "position": "FW"
+      },
+      {
+        "surname": "Moremi",
+        "full_name": "Tshepang Moremi",
+        "position": "FW"
+      },
+      {
+        "surname": "Foster",
+        "full_name": "Lyle Foster",
+        "position": "FW"
+      },
+      {
+        "surname": "Mofokeng",
+        "full_name": "Relebohile Mofokeng",
+        "position": "FW"
+      },
+      {
+        "surname": "Zwane",
+        "full_name": "Themba Zwane",
+        "position": "MF"
+      },
+      {
+        "surname": "Maseko",
+        "full_name": "Thapelo Maseko",
+        "position": "FW"
+      },
+      {
+        "surname": "Sithole",
+        "full_name": "Sphephelo Sithole",
+        "position": "MF"
+      },
+      {
+        "surname": "Mbokazi",
+        "full_name": "Mbekezeli Mbokazi",
+        "position": "DF"
+      },
+      {
+        "surname": "Rayners",
+        "full_name": "Iqraam Rayners",
+        "position": "FW"
+      },
+      {
+        "surname": "Chaine",
+        "full_name": "Sipho Chaine",
+        "position": "GK"
+      },
+      {
+        "surname": "Makgopa",
+        "full_name": "Evidence Makgopa",
+        "position": "FW"
+      },
+      {
+        "surname": "Kabini",
+        "full_name": "Samukele Kabini",
+        "position": "DF"
+      },
+      {
+        "surname": "Sibisi",
+        "full_name": "Nkosinathi Sibisi",
+        "position": "DF"
+      },
+      {
+        "surname": "Mudau",
+        "full_name": "Khuliso Mudau",
+        "position": "DF"
+      },
+      {
+        "surname": "Okon",
+        "full_name": "Ime Okon",
+        "position": "DF"
+      },
+      {
+        "surname": "Goss",
+        "full_name": "Ricardo Goss",
+        "position": "GK"
+      },
+      {
+        "surname": "Adams",
+        "full_name": "Jayden Adams",
+        "position": "MF"
+      },
+      {
+        "surname": "Makhanya",
+        "full_name": "Olwethu Makhanya",
+        "position": "DF"
+      },
+      {
+        "surname": "Sebelebele",
+        "full_name": "Kamogelo Sebelebele",
+        "position": "FW"
+      },
+      {
+        "surname": "Cross",
+        "full_name": "Bradley Cross",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "KOR",
+    "team": "South Korea",
+    "players": [
+      {
+        "surname": "Seung-gyu",
+        "full_name": "Kim Seung-gyu",
+        "position": "GK"
+      },
+      {
+        "surname": "Han-beom",
+        "full_name": "Lee Han-beom",
+        "position": "DF"
+      },
+      {
+        "surname": "Gi-hyuk",
+        "full_name": "Lee Gi-hyuk",
+        "position": "MF"
+      },
+      {
+        "surname": "Min-jae",
+        "full_name": "Kim Min-jae",
+        "position": "DF"
+      },
+      {
+        "surname": "Tae-hyeon",
+        "full_name": "Kim Tae-hyeon",
+        "position": "DF"
+      },
+      {
+        "surname": "In-beom",
+        "full_name": "Hwang In-beom",
+        "position": "MF"
+      },
+      {
+        "surname": "Heung-min",
+        "full_name": "Son Heung-min",
+        "position": "FW"
+      },
+      {
+        "surname": "Seung-ho",
+        "full_name": "Paik Seung-ho",
+        "position": "MF"
+      },
+      {
+        "surname": "Gue-sung",
+        "full_name": "Cho Gue-sung",
+        "position": "FW"
+      },
+      {
+        "surname": "Jae-sung",
+        "full_name": "Lee Jae-sung",
+        "position": "MF"
+      },
+      {
+        "surname": "Hee-chan",
+        "full_name": "Hwang Hee-chan",
+        "position": "MF"
+      },
+      {
+        "surname": "Bum-keun",
+        "full_name": "Song Bum-keun",
+        "position": "GK"
+      },
+      {
+        "surname": "Tae-seok",
+        "full_name": "Lee Tae-seok",
+        "position": "DF"
+      },
+      {
+        "surname": "Wi-je",
+        "full_name": "Cho Wi-je",
+        "position": "DF"
+      },
+      {
+        "surname": "Moon-hwan",
+        "full_name": "Kim Moon-hwan",
+        "position": "DF"
+      },
+      {
+        "surname": "Jin-seob",
+        "full_name": "Park Jin-seob",
+        "position": "DF"
+      },
+      {
+        "surname": "Jun-ho",
+        "full_name": "Bae Jun-ho",
+        "position": "MF"
+      },
+      {
+        "surname": "Hyeon-gyu",
+        "full_name": "Oh Hyeon-gyu",
+        "position": "FW"
+      },
+      {
+        "surname": "Kang-in",
+        "full_name": "Lee Kang-in",
+        "position": "MF"
+      },
+      {
+        "surname": "Hyun-jun",
+        "full_name": "Yang Hyun-jun",
+        "position": "MF"
+      },
+      {
+        "surname": "Hyeon-woo",
+        "full_name": "Jo Hyeon-woo",
+        "position": "GK"
+      },
+      {
+        "surname": "Young-woo",
+        "full_name": "Seol Young-woo",
+        "position": "DF"
+      },
+      {
+        "surname": "Castrop",
+        "full_name": "Jens Castrop",
+        "position": "DF"
+      },
+      {
+        "surname": "Jin-gyu",
+        "full_name": "Kim Jin-gyu",
+        "position": "MF"
+      },
+      {
+        "surname": "Ji-sung",
+        "full_name": "Eom Ji-sung",
+        "position": "MF"
+      },
+      {
+        "surname": "Dong-gyeong",
+        "full_name": "Lee Dong-gyeong",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "CZE",
+    "team": "Czechia",
+    "players": [
+      {
+        "surname": "Kovář",
+        "full_name": "Matěj Kovář",
+        "position": "GK"
+      },
+      {
+        "surname": "Zima",
+        "full_name": "David Zima",
+        "position": "DF"
+      },
+      {
+        "surname": "Holeš",
+        "full_name": "Tomáš Holeš",
+        "position": "DF"
+      },
+      {
+        "surname": "Hranáč",
+        "full_name": "Robin Hranáč",
+        "position": "DF"
+      },
+      {
+        "surname": "Coufal",
+        "full_name": "Vladimír Coufal",
+        "position": "DF"
+      },
+      {
+        "surname": "Chaloupek",
+        "full_name": "Štěpán Chaloupek",
+        "position": "DF"
+      },
+      {
+        "surname": "Krejčí",
+        "full_name": "Ladislav Krejčí",
+        "position": "DF"
+      },
+      {
+        "surname": "Darida",
+        "full_name": "Vladimír Darida",
+        "position": "MF"
+      },
+      {
+        "surname": "Hložek",
+        "full_name": "Adam Hložek",
+        "position": "FW"
+      },
+      {
+        "surname": "Schick",
+        "full_name": "Patrik Schick",
+        "position": "FW"
+      },
+      {
+        "surname": "Kuchta",
+        "full_name": "Jan Kuchta",
+        "position": "FW"
+      },
+      {
+        "surname": "Červ",
+        "full_name": "Lukáš Červ",
+        "position": "MF"
+      },
+      {
+        "surname": "Chytil",
+        "full_name": "Mojmír Chytil",
+        "position": "FW"
+      },
+      {
+        "surname": "Jurásek",
+        "full_name": "David Jurásek",
+        "position": "DF"
+      },
+      {
+        "surname": "Šulc",
+        "full_name": "Pavel Šulc",
+        "position": "FW"
+      },
+      {
+        "surname": "Staněk",
+        "full_name": "Jindřich Staněk",
+        "position": "GK"
+      },
+      {
+        "surname": "Provod",
+        "full_name": "Lukáš Provod",
+        "position": "MF"
+      },
+      {
+        "surname": "Sadílek",
+        "full_name": "Michal Sadílek",
+        "position": "MF"
+      },
+      {
+        "surname": "Chorý",
+        "full_name": "Tomáš Chorý",
+        "position": "FW"
+      },
+      {
+        "surname": "Zelený",
+        "full_name": "Jaroslav Zelený",
+        "position": "DF"
+      },
+      {
+        "surname": "Douděra",
+        "full_name": "David Douděra",
+        "position": "DF"
+      },
+      {
+        "surname": "Souček",
+        "full_name": "Tomáš Souček",
+        "position": "MF"
+      },
+      {
+        "surname": "Horníček",
+        "full_name": "Lukáš Horníček",
+        "position": "GK"
+      },
+      {
+        "surname": "Sojka",
+        "full_name": "Alexandr Sojka",
+        "position": "MF"
+      },
+      {
+        "surname": "Sochůrek",
+        "full_name": "Hugo Sochůrek",
+        "position": "MF"
+      },
+      {
+        "surname": "Višinský",
+        "full_name": "Denis Višinský",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "CAN",
+    "team": "Canada",
+    "players": [
+      {
+        "surname": "St. Clair",
+        "full_name": "Dayne St. Clair",
+        "position": "GK"
+      },
+      {
+        "surname": "Johnston",
+        "full_name": "Alistair Johnston",
+        "position": "DF"
+      },
+      {
+        "surname": "Jones",
+        "full_name": "Alfie Jones",
+        "position": "DF"
+      },
+      {
+        "surname": "Fougerolles",
+        "full_name": "Luc de Fougerolles",
+        "position": "DF"
+      },
+      {
+        "surname": "Waterman",
+        "full_name": "Joel Waterman",
+        "position": "DF"
+      },
+      {
+        "surname": "Choinière",
+        "full_name": "Mathieu Choinière",
+        "position": "MF"
+      },
+      {
+        "surname": "Eustáquio",
+        "full_name": "Stephen Eustáquio",
+        "position": "MF"
+      },
+      {
+        "surname": "Koné",
+        "full_name": "Ismaël Koné",
+        "position": "MF"
+      },
+      {
+        "surname": "Larin",
+        "full_name": "Cyle Larin",
+        "position": "FW"
+      },
+      {
+        "surname": "David",
+        "full_name": "Jonathan David",
+        "position": "FW"
+      },
+      {
+        "surname": "Millar",
+        "full_name": "Liam Millar",
+        "position": "MF"
+      },
+      {
+        "surname": "Oluwaseyi",
+        "full_name": "Tani Oluwaseyi",
+        "position": "FW"
+      },
+      {
+        "surname": "Cornelius",
+        "full_name": "Derek Cornelius",
+        "position": "DF"
+      },
+      {
+        "surname": "Shaffelburg",
+        "full_name": "Jacob Shaffelburg",
+        "position": "MF"
+      },
+      {
+        "surname": "Bombito",
+        "full_name": "Moïse Bombito",
+        "position": "DF"
+      },
+      {
+        "surname": "Crépeau",
+        "full_name": "Maxime Crépeau",
+        "position": "GK"
+      },
+      {
+        "surname": "Buchanan",
+        "full_name": "Tajon Buchanan",
+        "position": "FW"
+      },
+      {
+        "surname": "Goodman",
+        "full_name": "Owen Goodman",
+        "position": "GK"
+      },
+      {
+        "surname": "Davies",
+        "full_name": "Alphonso Davies",
+        "position": "DF"
+      },
+      {
+        "surname": "Ahmed",
+        "full_name": "Ali Ahmed",
+        "position": "FW"
+      },
+      {
+        "surname": "Osorio",
+        "full_name": "Jonathan Osorio",
+        "position": "MF"
+      },
+      {
+        "surname": "Laryea",
+        "full_name": "Richie Laryea",
+        "position": "DF"
+      },
+      {
+        "surname": "Sigur",
+        "full_name": "Niko Sigur",
+        "position": "DF"
+      },
+      {
+        "surname": "David",
+        "full_name": "Promise David",
+        "position": "FW"
+      },
+      {
+        "surname": "Saliba",
+        "full_name": "Nathan Saliba",
+        "position": "MF"
+      },
+      {
+        "surname": "Nelson",
+        "full_name": "Jayden Nelson",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "BIH",
+    "team": "Bosnia and Herzegovina",
+    "players": [
+      {
+        "surname": "Vasilj",
+        "full_name": "Nikola Vasilj",
+        "position": "GK"
+      },
+      {
+        "surname": "Mujakić",
+        "full_name": "Nihad Mujakić",
+        "position": "DF"
+      },
+      {
+        "surname": "Hadžikadunić",
+        "full_name": "Dennis Hadžikadunić",
+        "position": "DF"
+      },
+      {
+        "surname": "Muharemović",
+        "full_name": "Tarik Muharemović",
+        "position": "DF"
+      },
+      {
+        "surname": "Kolašinac",
+        "full_name": "Sead Kolašinac",
+        "position": "DF"
+      },
+      {
+        "surname": "Tahirović",
+        "full_name": "Benjamin Tahirović",
+        "position": "MF"
+      },
+      {
+        "surname": "Dedić",
+        "full_name": "Amar Dedić",
+        "position": "DF"
+      },
+      {
+        "surname": "Gigović",
+        "full_name": "Armin Gigović",
+        "position": "MF"
+      },
+      {
+        "surname": "Baždar",
+        "full_name": "Samed Baždar",
+        "position": "FW"
+      },
+      {
+        "surname": "Demirović",
+        "full_name": "Ermedin Demirović",
+        "position": "FW"
+      },
+      {
+        "surname": "Džeko",
+        "full_name": "Edin Džeko",
+        "position": "FW"
+      },
+      {
+        "surname": "Jurkas",
+        "full_name": "Mladen Jurkas",
+        "position": "GK"
+      },
+      {
+        "surname": "Bašić",
+        "full_name": "Ivan Bašić",
+        "position": "MF"
+      },
+      {
+        "surname": "Šunjić",
+        "full_name": "Ivan Šunjić",
+        "position": "MF"
+      },
+      {
+        "surname": "Memić",
+        "full_name": "Amar Memić",
+        "position": "MF"
+      },
+      {
+        "surname": "Hadžiahmetović",
+        "full_name": "Amir Hadžiahmetović",
+        "position": "MF"
+      },
+      {
+        "surname": "Burnić",
+        "full_name": "Dženis Burnić",
+        "position": "MF"
+      },
+      {
+        "surname": "Katić",
+        "full_name": "Nikola Katić",
+        "position": "DF"
+      },
+      {
+        "surname": "Alajbegović",
+        "full_name": "Kerim Alajbegović",
+        "position": "FW"
+      },
+      {
+        "surname": "Bajraktarević",
+        "full_name": "Esmir Bajraktarević",
+        "position": "FW"
+      },
+      {
+        "surname": "Radeljić",
+        "full_name": "Stjepan Radeljić",
+        "position": "DF"
+      },
+      {
+        "surname": "Zlomislić",
+        "full_name": "Martin Zlomislić",
+        "position": "GK"
+      },
+      {
+        "surname": "Tabaković",
+        "full_name": "Haris Tabaković",
+        "position": "FW"
+      },
+      {
+        "surname": "Čelik",
+        "full_name": "Nidal Čelik",
+        "position": "DF"
+      },
+      {
+        "surname": "Lukić",
+        "full_name": "Jovo Lukić",
+        "position": "FW"
+      },
+      {
+        "surname": "Mahmić",
+        "full_name": "Ermin Mahmić",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "QAT",
+    "team": "Qatar",
+    "players": [
+      {
+        "surname": "Abunada",
+        "full_name": "Mahmud Abunada",
+        "position": "GK"
+      },
+      {
+        "surname": "Miguel",
+        "full_name": "Pedro Miguel",
+        "position": "DF"
+      },
+      {
+        "surname": "Mendes",
+        "full_name": "Lucas Mendes",
+        "position": "DF"
+      },
+      {
+        "surname": "Laye",
+        "full_name": "Issa Laye",
+        "position": "DF"
+      },
+      {
+        "surname": "Gaber",
+        "full_name": "Jassem Gaber",
+        "position": "DF"
+      },
+      {
+        "surname": "Hatem",
+        "full_name": "Abdulaziz Hatem",
+        "position": "MF"
+      },
+      {
+        "surname": "Alaaeldin",
+        "full_name": "Ahmed Alaaeldin",
+        "position": "FW"
+      },
+      {
+        "surname": "Junior",
+        "full_name": "Edmilson Junior",
+        "position": "FW"
+      },
+      {
+        "surname": "Muntari",
+        "full_name": "Mohammed Muntari",
+        "position": "FW"
+      },
+      {
+        "surname": "Al-Haydos",
+        "full_name": "Hassan Al-Haydos",
+        "position": "FW"
+      },
+      {
+        "surname": "Afif",
+        "full_name": "Akram Afif",
+        "position": "FW"
+      },
+      {
+        "surname": "Boudiaf",
+        "full_name": "Karim Boudiaf",
+        "position": "MF"
+      },
+      {
+        "surname": "Al-Oui",
+        "full_name": "Ayoub Al-Oui",
+        "position": "DF"
+      },
+      {
+        "surname": "Ahmed",
+        "full_name": "Homam Ahmed",
+        "position": "DF"
+      },
+      {
+        "surname": "Abdurisag",
+        "full_name": "Yusuf Abdurisag",
+        "position": "FW"
+      },
+      {
+        "surname": "Khoukhi",
+        "full_name": "Boualem Khoukhi",
+        "position": "DF"
+      },
+      {
+        "surname": "Al-Ganehi",
+        "full_name": "Ahmed Al-Ganehi",
+        "position": "MF"
+      },
+      {
+        "surname": "Al-Brake",
+        "full_name": "Sultan Al-Brake",
+        "position": "DF"
+      },
+      {
+        "surname": "Ali",
+        "full_name": "Almoez Ali",
+        "position": "FW"
+      },
+      {
+        "surname": "Fathy",
+        "full_name": "Ahmed Fathy",
+        "position": "MF"
+      },
+      {
+        "surname": "Zakaria",
+        "full_name": "Salah Zakaria",
+        "position": "GK"
+      },
+      {
+        "surname": "Barsham",
+        "full_name": "Meshaal Barsham",
+        "position": "GK"
+      },
+      {
+        "surname": "Madibo",
+        "full_name": "Assim Madibo",
+        "position": "MF"
+      },
+      {
+        "surname": "Jamshid",
+        "full_name": "Tahsin Jamshid",
+        "position": "FW"
+      },
+      {
+        "surname": "Al-Hussain",
+        "full_name": "Al-Hashmi Al-Hussain",
+        "position": "DF"
+      },
+      {
+        "surname": "Manai",
+        "full_name": "Mohamed Manai",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "SUI",
+    "team": "Switzerland",
+    "players": [
+      {
+        "surname": "Kobel",
+        "full_name": "Gregor Kobel",
+        "position": "GK"
+      },
+      {
+        "surname": "Muheim",
+        "full_name": "Miro Muheim",
+        "position": "DF"
+      },
+      {
+        "surname": "Widmer",
+        "full_name": "Silvan Widmer",
+        "position": "DF"
+      },
+      {
+        "surname": "Elvedi",
+        "full_name": "Nico Elvedi",
+        "position": "DF"
+      },
+      {
+        "surname": "Akanji",
+        "full_name": "Manuel Akanji",
+        "position": "DF"
+      },
+      {
+        "surname": "Zakaria",
+        "full_name": "Denis Zakaria",
+        "position": "MF"
+      },
+      {
+        "surname": "Embolo",
+        "full_name": "Breel Embolo",
+        "position": "FW"
+      },
+      {
+        "surname": "Freuler",
+        "full_name": "Remo Freuler",
+        "position": "MF"
+      },
+      {
+        "surname": "Manzambi",
+        "full_name": "Johan Manzambi",
+        "position": "MF"
+      },
+      {
+        "surname": "Xhaka",
+        "full_name": "Granit Xhaka",
+        "position": "MF"
+      },
+      {
+        "surname": "Ndoye",
+        "full_name": "Dan Ndoye",
+        "position": "FW"
+      },
+      {
+        "surname": "Mvogo",
+        "full_name": "Yvon Mvogo",
+        "position": "GK"
+      },
+      {
+        "surname": "Rodriguez",
+        "full_name": "Ricardo Rodriguez",
+        "position": "DF"
+      },
+      {
+        "surname": "Jashari",
+        "full_name": "Ardon Jashari",
+        "position": "MF"
+      },
+      {
+        "surname": "Sow",
+        "full_name": "Djibril Sow",
+        "position": "MF"
+      },
+      {
+        "surname": "Fassnacht",
+        "full_name": "Christian Fassnacht",
+        "position": "FW"
+      },
+      {
+        "surname": "Vargas",
+        "full_name": "Rubén Vargas",
+        "position": "FW"
+      },
+      {
+        "surname": "Cömert",
+        "full_name": "Eray Cömert",
+        "position": "DF"
+      },
+      {
+        "surname": "Okafor",
+        "full_name": "Noah Okafor",
+        "position": "FW"
+      },
+      {
+        "surname": "Aebischer",
+        "full_name": "Michel Aebischer",
+        "position": "MF"
+      },
+      {
+        "surname": "Keller",
+        "full_name": "Marvin Keller",
+        "position": "GK"
+      },
+      {
+        "surname": "Rieder",
+        "full_name": "Fabian Rieder",
+        "position": "MF"
+      },
+      {
+        "surname": "Amdouni",
+        "full_name": "Zeki Amdouni",
+        "position": "FW"
+      },
+      {
+        "surname": "Amenda",
+        "full_name": "Aurèle Amenda",
+        "position": "DF"
+      },
+      {
+        "surname": "Jaquez",
+        "full_name": "Luca Jaquez",
+        "position": "DF"
+      },
+      {
+        "surname": "Itten",
+        "full_name": "Cedric Itten",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "BRA",
+    "team": "Brazil",
+    "players": [
+      {
+        "surname": "Alisson",
+        "full_name": "Alisson",
+        "position": "GK"
+      },
+      {
+        "surname": "Éderson",
+        "full_name": "Éderson Silva",
+        "position": "MF"
+      },
+      {
+        "surname": "Magalhães",
+        "full_name": "Gabriel Magalhães",
+        "position": "DF"
+      },
+      {
+        "surname": "Marquinhos",
+        "full_name": "Marquinhos",
+        "position": "DF"
+      },
+      {
+        "surname": "Casemiro",
+        "full_name": "Casemiro",
+        "position": "MF"
+      },
+      {
+        "surname": "Sandro",
+        "full_name": "Alex Sandro",
+        "position": "DF"
+      },
+      {
+        "surname": "Vini Jr.",
+        "full_name": "Vinícius Júnior",
+        "position": "FW"
+      },
+      {
+        "surname": "Guimarães",
+        "full_name": "Bruno Guimarães",
+        "position": "MF"
+      },
+      {
+        "surname": "Cunha",
+        "full_name": "Matheus Cunha",
+        "position": "FW"
+      },
+      {
+        "surname": "Neymar",
+        "full_name": "Neymar",
+        "position": "FW"
+      },
+      {
+        "surname": "Raphinha",
+        "full_name": "Raphinha",
+        "position": "FW"
+      },
+      {
+        "surname": "Weverton",
+        "full_name": "Weverton",
+        "position": "GK"
+      },
+      {
+        "surname": "Danilo",
+        "full_name": "Danilo Luiz",
+        "position": "DF"
+      },
+      {
+        "surname": "Bremer",
+        "full_name": "Bremer",
+        "position": "DF"
+      },
+      {
+        "surname": "Léo Pereira",
+        "full_name": "Léo Pereira",
+        "position": "DF"
+      },
+      {
+        "surname": "Santos",
+        "full_name": "Douglas Santos",
+        "position": "DF"
+      },
+      {
+        "surname": "Fabinho",
+        "full_name": "Fabinho",
+        "position": "MF"
+      },
+      {
+        "surname": "Danilo",
+        "full_name": "Danilo Santos",
+        "position": "MF"
+      },
+      {
+        "surname": "Endrick",
+        "full_name": "Endrick",
+        "position": "FW"
+      },
+      {
+        "surname": "Paquetá",
+        "full_name": "Lucas Paquetá",
+        "position": "MF"
+      },
+      {
+        "surname": "Luiz Henrique",
+        "full_name": "Luiz Henrique",
+        "position": "FW"
+      },
+      {
+        "surname": "Martinelli",
+        "full_name": "Gabriel Martinelli",
+        "position": "FW"
+      },
+      {
+        "surname": "Ederson",
+        "full_name": "Ederson Moraes",
+        "position": "GK"
+      },
+      {
+        "surname": "Ibañez",
+        "full_name": "Roger Ibañez",
+        "position": "DF"
+      },
+      {
+        "surname": "Igor Thiago",
+        "full_name": "Igor Thiago",
+        "position": "FW"
+      },
+      {
+        "surname": "Rayan",
+        "full_name": "Rayan",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "MAR",
+    "team": "Morocco",
+    "players": [
+      {
+        "surname": "Bounou",
+        "full_name": "Yassine Bounou",
+        "position": "GK"
+      },
+      {
+        "surname": "Hakimi",
+        "full_name": "Achraf Hakimi",
+        "position": "DF"
+      },
+      {
+        "surname": "Mazraoui",
+        "full_name": "Noussair Mazraoui",
+        "position": "DF"
+      },
+      {
+        "surname": "Amrabat",
+        "full_name": "Sofyan Amrabat",
+        "position": "MF"
+      },
+      {
+        "surname": "Aguerd",
+        "full_name": "Nayef Aguerd",
+        "position": "DF"
+      },
+      {
+        "surname": "Bouaddi",
+        "full_name": "Ayyoub Bouaddi",
+        "position": "MF"
+      },
+      {
+        "surname": "Talbi",
+        "full_name": "Chemsdine Talbi",
+        "position": "MF"
+      },
+      {
+        "surname": "Ounahi",
+        "full_name": "Azzedine Ounahi",
+        "position": "MF"
+      },
+      {
+        "surname": "Rahimi",
+        "full_name": "Soufiane Rahimi",
+        "position": "FW"
+      },
+      {
+        "surname": "Díaz",
+        "full_name": "Brahim Díaz",
+        "position": "FW"
+      },
+      {
+        "surname": "Saibari",
+        "full_name": "Ismael Saibari",
+        "position": "MF"
+      },
+      {
+        "surname": "Mohamedi",
+        "full_name": "Munir Mohamedi",
+        "position": "GK"
+      },
+      {
+        "surname": "Ouahdi",
+        "full_name": "Zakaria El Ouahdi",
+        "position": "DF"
+      },
+      {
+        "surname": "Diop",
+        "full_name": "Issa Diop",
+        "position": "DF"
+      },
+      {
+        "surname": "Mourabet",
+        "full_name": "Samir El Mourabet",
+        "position": "MF"
+      },
+      {
+        "surname": "Yassine",
+        "full_name": "Gessime Yassine",
+        "position": "MF"
+      },
+      {
+        "surname": "Ezzalzouli",
+        "full_name": "Abde Ezzalzouli",
+        "position": "FW"
+      },
+      {
+        "surname": "Riad",
+        "full_name": "Chadi Riad",
+        "position": "DF"
+      },
+      {
+        "surname": "Belammari",
+        "full_name": "Youssef Belammari",
+        "position": "DF"
+      },
+      {
+        "surname": "Kaabi",
+        "full_name": "Ayoub El Kaabi",
+        "position": "FW"
+      },
+      {
+        "surname": "Amaimouni",
+        "full_name": "Ayoube Amaimouni",
+        "position": "FW"
+      },
+      {
+        "surname": "Tagnaouti",
+        "full_name": "Ahmed Reda Tagnaouti",
+        "position": "GK"
+      },
+      {
+        "surname": "Khannouss",
+        "full_name": "Bilal El Khannouss",
+        "position": "MF"
+      },
+      {
+        "surname": "Aynaoui",
+        "full_name": "Neil El Aynaoui",
+        "position": "MF"
+      },
+      {
+        "surname": "Halhal",
+        "full_name": "Redouane Halhal",
+        "position": "DF"
+      },
+      {
+        "surname": "Salah-Eddine",
+        "full_name": "Anass Salah-Eddine",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "HAI",
+    "team": "Haiti",
+    "players": [
+      {
+        "surname": "Placide",
+        "full_name": "Johny Placide",
+        "position": "GK"
+      },
+      {
+        "surname": "Arcus",
+        "full_name": "Carlens Arcus",
+        "position": "DF"
+      },
+      {
+        "surname": "Thermoncy",
+        "full_name": "Keeto Thermoncy",
+        "position": "DF"
+      },
+      {
+        "surname": "Adé",
+        "full_name": "Ricardo Adé",
+        "position": "DF"
+      },
+      {
+        "surname": "Delcroix",
+        "full_name": "Hannes Delcroix",
+        "position": "DF"
+      },
+      {
+        "surname": "Sainté",
+        "full_name": "Carl Sainté",
+        "position": "MF"
+      },
+      {
+        "surname": "Jr.",
+        "full_name": "Derrick Etienne Jr.",
+        "position": "FW"
+      },
+      {
+        "surname": "Expérience",
+        "full_name": "Martin Expérience",
+        "position": "DF"
+      },
+      {
+        "surname": "Nazon",
+        "full_name": "Duckens Nazon",
+        "position": "FW"
+      },
+      {
+        "surname": "Bellegarde",
+        "full_name": "Jean-Ricner Bellegarde",
+        "position": "MF"
+      },
+      {
+        "surname": "Deedson",
+        "full_name": "Louicius Deedson",
+        "position": "FW"
+      },
+      {
+        "surname": "Pierre",
+        "full_name": "Alexandre Pierre",
+        "position": "GK"
+      },
+      {
+        "surname": "Lacroix",
+        "full_name": "Duke Lacroix",
+        "position": "DF"
+      },
+      {
+        "surname": "Pierre",
+        "full_name": "Leverton Pierre",
+        "position": "MF"
+      },
+      {
+        "surname": "Providence",
+        "full_name": "Ruben Providence",
+        "position": "FW"
+      },
+      {
+        "surname": "Joseph",
+        "full_name": "Lenny Joseph",
+        "position": "FW"
+      },
+      {
+        "surname": "Jean Jacques",
+        "full_name": "Danley Jean Jacques",
+        "position": "MF"
+      },
+      {
+        "surname": "Isidor",
+        "full_name": "Wilson Isidor",
+        "position": "FW"
+      },
+      {
+        "surname": "Fortuné",
+        "full_name": "Yassin Fortuné",
+        "position": "FW"
+      },
+      {
+        "surname": "Pierrot",
+        "full_name": "Frantzdy Pierrot",
+        "position": "FW"
+      },
+      {
+        "surname": "Casimir",
+        "full_name": "Josué Casimir",
+        "position": "FW"
+      },
+      {
+        "surname": "Duverne",
+        "full_name": "Jean-Kévin Duverne",
+        "position": "DF"
+      },
+      {
+        "surname": "Duverger",
+        "full_name": "Josué Duverger",
+        "position": "GK"
+      },
+      {
+        "surname": "Paugain",
+        "full_name": "Wilguens Paugain",
+        "position": "DF"
+      },
+      {
+        "surname": "Simon",
+        "full_name": "Dominique Simon",
+        "position": "MF"
+      },
+      {
+        "surname": "Pierre",
+        "full_name": "Woodensky Pierre",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "SCO",
+    "team": "Scotland",
+    "players": [
+      {
+        "surname": "Gunn",
+        "full_name": "Angus Gunn",
+        "position": "GK"
+      },
+      {
+        "surname": "Hickey",
+        "full_name": "Aaron Hickey",
+        "position": "DF"
+      },
+      {
+        "surname": "Robertson",
+        "full_name": "Andy Robertson",
+        "position": "DF"
+      },
+      {
+        "surname": "McTominay",
+        "full_name": "Scott McTominay",
+        "position": "MF"
+      },
+      {
+        "surname": "Hanley",
+        "full_name": "Grant Hanley",
+        "position": "DF"
+      },
+      {
+        "surname": "Tierney",
+        "full_name": "Kieran Tierney",
+        "position": "DF"
+      },
+      {
+        "surname": "McGinn",
+        "full_name": "John McGinn",
+        "position": "MF"
+      },
+      {
+        "surname": "Fletcher",
+        "full_name": "Tyler Fletcher",
+        "position": "MF"
+      },
+      {
+        "surname": "Dykes",
+        "full_name": "Lyndon Dykes",
+        "position": "FW"
+      },
+      {
+        "surname": "Adams",
+        "full_name": "Ché Adams",
+        "position": "FW"
+      },
+      {
+        "surname": "Christie",
+        "full_name": "Ryan Christie",
+        "position": "MF"
+      },
+      {
+        "surname": "Kelly",
+        "full_name": "Liam Kelly",
+        "position": "GK"
+      },
+      {
+        "surname": "Hendry",
+        "full_name": "Jack Hendry",
+        "position": "DF"
+      },
+      {
+        "surname": "Stewart",
+        "full_name": "Ross Stewart",
+        "position": "FW"
+      },
+      {
+        "surname": "Souttar",
+        "full_name": "John Souttar",
+        "position": "DF"
+      },
+      {
+        "surname": "Hyam",
+        "full_name": "Dominic Hyam",
+        "position": "DF"
+      },
+      {
+        "surname": "Gannon-Doak",
+        "full_name": "Ben Gannon-Doak",
+        "position": "FW"
+      },
+      {
+        "surname": "Hirst",
+        "full_name": "George Hirst",
+        "position": "FW"
+      },
+      {
+        "surname": "Ferguson",
+        "full_name": "Lewis Ferguson",
+        "position": "MF"
+      },
+      {
+        "surname": "Shankland",
+        "full_name": "Lawrence Shankland",
+        "position": "FW"
+      },
+      {
+        "surname": "Gordon",
+        "full_name": "Craig Gordon",
+        "position": "GK"
+      },
+      {
+        "surname": "Patterson",
+        "full_name": "Nathan Patterson",
+        "position": "DF"
+      },
+      {
+        "surname": "McLean",
+        "full_name": "Kenny McLean",
+        "position": "MF"
+      },
+      {
+        "surname": "Ralston",
+        "full_name": "Anthony Ralston",
+        "position": "DF"
+      },
+      {
+        "surname": "Curtis",
+        "full_name": "Findlay Curtis",
+        "position": "FW"
+      },
+      {
+        "surname": "McKenna",
+        "full_name": "Scott McKenna",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "USA",
+    "team": "United States",
+    "players": [
+      {
+        "surname": "Turner",
+        "full_name": "Matt Turner",
+        "position": "GK"
+      },
+      {
+        "surname": "Dest",
+        "full_name": "Sergiño Dest",
+        "position": "DF"
+      },
+      {
+        "surname": "Richards",
+        "full_name": "Chris Richards",
+        "position": "DF"
+      },
+      {
+        "surname": "Adams",
+        "full_name": "Tyler Adams",
+        "position": "MF"
+      },
+      {
+        "surname": "Robinson",
+        "full_name": "Antonee Robinson",
+        "position": "DF"
+      },
+      {
+        "surname": "Trusty",
+        "full_name": "Auston Trusty",
+        "position": "DF"
+      },
+      {
+        "surname": "Reyna",
+        "full_name": "Giovanni Reyna",
+        "position": "MF"
+      },
+      {
+        "surname": "McKennie",
+        "full_name": "Weston McKennie",
+        "position": "MF"
+      },
+      {
+        "surname": "Pepi",
+        "full_name": "Ricardo Pepi",
+        "position": "FW"
+      },
+      {
+        "surname": "Pulisic",
+        "full_name": "Christian Pulisic",
+        "position": "FW"
+      },
+      {
+        "surname": "Aaronson",
+        "full_name": "Brenden Aaronson",
+        "position": "FW"
+      },
+      {
+        "surname": "Robinson",
+        "full_name": "Miles Robinson",
+        "position": "DF"
+      },
+      {
+        "surname": "Ream",
+        "full_name": "Tim Ream",
+        "position": "DF"
+      },
+      {
+        "surname": "Berhalter",
+        "full_name": "Sebastian Berhalter",
+        "position": "MF"
+      },
+      {
+        "surname": "Roldan",
+        "full_name": "Cristian Roldan",
+        "position": "MF"
+      },
+      {
+        "surname": "Freeman",
+        "full_name": "Alex Freeman",
+        "position": "DF"
+      },
+      {
+        "surname": "Tillman",
+        "full_name": "Malik Tillman",
+        "position": "MF"
+      },
+      {
+        "surname": "Arfsten",
+        "full_name": "Max Arfsten",
+        "position": "DF"
+      },
+      {
+        "surname": "Wright",
+        "full_name": "Haji Wright",
+        "position": "FW"
+      },
+      {
+        "surname": "Balogun",
+        "full_name": "Folarin Balogun",
+        "position": "FW"
+      },
+      {
+        "surname": "Weah",
+        "full_name": "Timothy Weah",
+        "position": "FW"
+      },
+      {
+        "surname": "McKenzie",
+        "full_name": "Mark McKenzie",
+        "position": "DF"
+      },
+      {
+        "surname": "Scally",
+        "full_name": "Joe Scally",
+        "position": "DF"
+      },
+      {
+        "surname": "Freese",
+        "full_name": "Matt Freese",
+        "position": "GK"
+      },
+      {
+        "surname": "Brady",
+        "full_name": "Chris Brady",
+        "position": "GK"
+      },
+      {
+        "surname": "Zendejas",
+        "full_name": "Alejandro Zendejas",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "PAR",
+    "team": "Paraguay",
+    "players": [
+      {
+        "surname": "Fernández",
+        "full_name": "Gatito Fernández",
+        "position": "GK"
+      },
+      {
+        "surname": "Velázquez",
+        "full_name": "Gustavo Velázquez",
+        "position": "DF"
+      },
+      {
+        "surname": "Alderete",
+        "full_name": "Omar Alderete",
+        "position": "DF"
+      },
+      {
+        "surname": "Cáceres",
+        "full_name": "Juan José Cáceres",
+        "position": "DF"
+      },
+      {
+        "surname": "Balbuena",
+        "full_name": "Fabián Balbuena",
+        "position": "DF"
+      },
+      {
+        "surname": "Alonso",
+        "full_name": "Júnior Alonso",
+        "position": "DF"
+      },
+      {
+        "surname": "Sosa",
+        "full_name": "Ramón Sosa",
+        "position": "MF"
+      },
+      {
+        "surname": "Gómez",
+        "full_name": "Diego Gómez",
+        "position": "MF"
+      },
+      {
+        "surname": "Sanabria",
+        "full_name": "Antonio Sanabria",
+        "position": "FW"
+      },
+      {
+        "surname": "Almirón",
+        "full_name": "Miguel Almirón",
+        "position": "MF"
+      },
+      {
+        "surname": "Maurício",
+        "full_name": "Maurício",
+        "position": "MF"
+      },
+      {
+        "surname": "Gill",
+        "full_name": "Orlando Gill",
+        "position": "GK"
+      },
+      {
+        "surname": "Canale",
+        "full_name": "José Canale",
+        "position": "DF"
+      },
+      {
+        "surname": "Cubas",
+        "full_name": "Andrés Cubas",
+        "position": "MF"
+      },
+      {
+        "surname": "Gómez",
+        "full_name": "Gustavo Gómez",
+        "position": "DF"
+      },
+      {
+        "surname": "Bobadilla",
+        "full_name": "Damián Bobadilla",
+        "position": "MF"
+      },
+      {
+        "surname": "Kaku",
+        "full_name": "Kaku",
+        "position": "FW"
+      },
+      {
+        "surname": "Arce",
+        "full_name": "Álex Arce",
+        "position": "FW"
+      },
+      {
+        "surname": "Enciso",
+        "full_name": "Julio Enciso",
+        "position": "FW"
+      },
+      {
+        "surname": "Ojeda",
+        "full_name": "Braian Ojeda",
+        "position": "MF"
+      },
+      {
+        "surname": "Ávalos",
+        "full_name": "Gabriel Ávalos",
+        "position": "FW"
+      },
+      {
+        "surname": "Olveira",
+        "full_name": "Gastón Olveira",
+        "position": "GK"
+      },
+      {
+        "surname": "Galarza",
+        "full_name": "Matías Galarza",
+        "position": "MF"
+      },
+      {
+        "surname": "Caballero",
+        "full_name": "Gustavo Caballero",
+        "position": "MF"
+      },
+      {
+        "surname": "Pitta",
+        "full_name": "Isidro Pitta",
+        "position": "FW"
+      },
+      {
+        "surname": "Maidana",
+        "full_name": "Alexandro Maidana",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "AUS",
+    "team": "Australia",
+    "players": [
+      {
+        "surname": "Ryan",
+        "full_name": "Mathew Ryan",
+        "position": "GK"
+      },
+      {
+        "surname": "Degenek",
+        "full_name": "Miloš Degenek",
+        "position": "DF"
+      },
+      {
+        "surname": "Circati",
+        "full_name": "Alessandro Circati",
+        "position": "DF"
+      },
+      {
+        "surname": "Italiano",
+        "full_name": "Jacob Italiano",
+        "position": "DF"
+      },
+      {
+        "surname": "Bos",
+        "full_name": "Jordan Bos",
+        "position": "DF"
+      },
+      {
+        "surname": "Geria",
+        "full_name": "Jason Geria",
+        "position": "DF"
+      },
+      {
+        "surname": "Leckie",
+        "full_name": "Mathew Leckie",
+        "position": "FW"
+      },
+      {
+        "surname": "Metcalfe",
+        "full_name": "Connor Metcalfe",
+        "position": "MF"
+      },
+      {
+        "surname": "Touré",
+        "full_name": "Mohamed Touré",
+        "position": "FW"
+      },
+      {
+        "surname": "Hrustic",
+        "full_name": "Ajdin Hrustic",
+        "position": "FW"
+      },
+      {
+        "surname": "Mabil",
+        "full_name": "Awer Mabil",
+        "position": "FW"
+      },
+      {
+        "surname": "Izzo",
+        "full_name": "Paul Izzo",
+        "position": "GK"
+      },
+      {
+        "surname": "O'Neill",
+        "full_name": "Aiden O'Neill",
+        "position": "MF"
+      },
+      {
+        "surname": "Devlin",
+        "full_name": "Cammy Devlin",
+        "position": "MF"
+      },
+      {
+        "surname": "Trewin",
+        "full_name": "Kai Trewin",
+        "position": "DF"
+      },
+      {
+        "surname": "Behich",
+        "full_name": "Aziz Behich",
+        "position": "DF"
+      },
+      {
+        "surname": "Irankunda",
+        "full_name": "Nestory Irankunda",
+        "position": "FW"
+      },
+      {
+        "surname": "Beach",
+        "full_name": "Patrick Beach",
+        "position": "GK"
+      },
+      {
+        "surname": "Souttar",
+        "full_name": "Harry Souttar",
+        "position": "DF"
+      },
+      {
+        "surname": "Volpato",
+        "full_name": "Cristian Volpato",
+        "position": "FW"
+      },
+      {
+        "surname": "Burgess",
+        "full_name": "Cameron Burgess",
+        "position": "DF"
+      },
+      {
+        "surname": "Irvine",
+        "full_name": "Jackson Irvine",
+        "position": "MF"
+      },
+      {
+        "surname": "Velupillay",
+        "full_name": "Nishan Velupillay",
+        "position": "FW"
+      },
+      {
+        "surname": "Okon-Engstler",
+        "full_name": "Paul Okon-Engstler",
+        "position": "MF"
+      },
+      {
+        "surname": "Herrington",
+        "full_name": "Lucas Herrington",
+        "position": "DF"
+      },
+      {
+        "surname": "Yengi",
+        "full_name": "Tete Yengi",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "TUR",
+    "team": "Türkiye",
+    "players": [
+      {
+        "surname": "Günok",
+        "full_name": "Mert Günok",
+        "position": "GK"
+      },
+      {
+        "surname": "Çelik",
+        "full_name": "Zeki Çelik",
+        "position": "DF"
+      },
+      {
+        "surname": "Demiral",
+        "full_name": "Merih Demiral",
+        "position": "DF"
+      },
+      {
+        "surname": "Söyüncü",
+        "full_name": "Çağlar Söyüncü",
+        "position": "DF"
+      },
+      {
+        "surname": "Özcan",
+        "full_name": "Salih Özcan",
+        "position": "MF"
+      },
+      {
+        "surname": "Kökçü",
+        "full_name": "Orkun Kökçü",
+        "position": "MF"
+      },
+      {
+        "surname": "Aktürkoğlu",
+        "full_name": "Kerem Aktürkoğlu",
+        "position": "FW"
+      },
+      {
+        "surname": "Güler",
+        "full_name": "Arda Güler",
+        "position": "FW"
+      },
+      {
+        "surname": "Gül",
+        "full_name": "Deniz Gül",
+        "position": "FW"
+      },
+      {
+        "surname": "Çalhanoğlu",
+        "full_name": "Hakan Çalhanoğlu",
+        "position": "MF"
+      },
+      {
+        "surname": "Yıldız",
+        "full_name": "Kenan Yıldız",
+        "position": "FW"
+      },
+      {
+        "surname": "Bayındır",
+        "full_name": "Altay Bayındır",
+        "position": "GK"
+      },
+      {
+        "surname": "Elmalı",
+        "full_name": "Eren Elmalı",
+        "position": "DF"
+      },
+      {
+        "surname": "Bardakcı",
+        "full_name": "Abdülkerim Bardakcı",
+        "position": "DF"
+      },
+      {
+        "surname": "Kabak",
+        "full_name": "Ozan Kabak",
+        "position": "DF"
+      },
+      {
+        "surname": "Yüksek",
+        "full_name": "İsmail Yüksek",
+        "position": "MF"
+      },
+      {
+        "surname": "Kahveci",
+        "full_name": "İrfan Can Kahveci",
+        "position": "FW"
+      },
+      {
+        "surname": "Müldür",
+        "full_name": "Mert Müldür",
+        "position": "DF"
+      },
+      {
+        "surname": "Akgün",
+        "full_name": "Yunus Akgün",
+        "position": "FW"
+      },
+      {
+        "surname": "Kadıoğlu",
+        "full_name": "Ferdi Kadıoğlu",
+        "position": "DF"
+      },
+      {
+        "surname": "Yılmaz",
+        "full_name": "Barış Alper Yılmaz",
+        "position": "FW"
+      },
+      {
+        "surname": "Ayhan",
+        "full_name": "Kaan Ayhan",
+        "position": "MF"
+      },
+      {
+        "surname": "Çakır",
+        "full_name": "Uğurcan Çakır",
+        "position": "GK"
+      },
+      {
+        "surname": "Aydın",
+        "full_name": "Oğuz Aydın",
+        "position": "FW"
+      },
+      {
+        "surname": "Akaydin",
+        "full_name": "Samet Akaydin",
+        "position": "DF"
+      },
+      {
+        "surname": "Uzun",
+        "full_name": "Can Uzun",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "GER",
+    "team": "Germany",
+    "players": [
+      {
+        "surname": "Neuer",
+        "full_name": "Manuel Neuer",
+        "position": "GK"
+      },
+      {
+        "surname": "Rüdiger",
+        "full_name": "Antonio Rüdiger",
+        "position": "DF"
+      },
+      {
+        "surname": "Anton",
+        "full_name": "Waldemar Anton",
+        "position": "DF"
+      },
+      {
+        "surname": "Tah",
+        "full_name": "Jonathan Tah",
+        "position": "DF"
+      },
+      {
+        "surname": "Pavlović",
+        "full_name": "Aleksandar Pavlović",
+        "position": "MF"
+      },
+      {
+        "surname": "Kimmich",
+        "full_name": "Joshua Kimmich",
+        "position": "DF"
+      },
+      {
+        "surname": "Havertz",
+        "full_name": "Kai Havertz",
+        "position": "FW"
+      },
+      {
+        "surname": "Goretzka",
+        "full_name": "Leon Goretzka",
+        "position": "MF"
+      },
+      {
+        "surname": "Leweling",
+        "full_name": "Jamie Leweling",
+        "position": "MF"
+      },
+      {
+        "surname": "Musiala",
+        "full_name": "Jamal Musiala",
+        "position": "MF"
+      },
+      {
+        "surname": "Woltemade",
+        "full_name": "Nick Woltemade",
+        "position": "FW"
+      },
+      {
+        "surname": "Baumann",
+        "full_name": "Oliver Baumann",
+        "position": "GK"
+      },
+      {
+        "surname": "Groß",
+        "full_name": "Pascal Groß",
+        "position": "MF"
+      },
+      {
+        "surname": "Beier",
+        "full_name": "Maximilian Beier",
+        "position": "FW"
+      },
+      {
+        "surname": "Schlotterbeck",
+        "full_name": "Nico Schlotterbeck",
+        "position": "DF"
+      },
+      {
+        "surname": "Stiller",
+        "full_name": "Angelo Stiller",
+        "position": "MF"
+      },
+      {
+        "surname": "Wirtz",
+        "full_name": "Florian Wirtz",
+        "position": "MF"
+      },
+      {
+        "surname": "Brown",
+        "full_name": "Nathaniel Brown",
+        "position": "DF"
+      },
+      {
+        "surname": "Sané",
+        "full_name": "Leroy Sané",
+        "position": "MF"
+      },
+      {
+        "surname": "Amiri",
+        "full_name": "Nadiem Amiri",
+        "position": "MF"
+      },
+      {
+        "surname": "Nübel",
+        "full_name": "Alexander Nübel",
+        "position": "GK"
+      },
+      {
+        "surname": "Raum",
+        "full_name": "David Raum",
+        "position": "DF"
+      },
+      {
+        "surname": "Nmecha",
+        "full_name": "Felix Nmecha",
+        "position": "MF"
+      },
+      {
+        "surname": "Thiaw",
+        "full_name": "Malick Thiaw",
+        "position": "DF"
+      },
+      {
+        "surname": "Ouédraogo",
+        "full_name": "Assan Ouédraogo",
+        "position": "MF"
+      },
+      {
+        "surname": "Undav",
+        "full_name": "Deniz Undav",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "CUW",
+    "team": "Curaçao",
+    "players": [
+      {
+        "surname": "Room",
+        "full_name": "Eloy Room",
+        "position": "GK"
+      },
+      {
+        "surname": "Sambo",
+        "full_name": "Shurandy Sambo",
+        "position": "DF"
+      },
+      {
+        "surname": "Gaari",
+        "full_name": "Juriën Gaari",
+        "position": "DF"
+      },
+      {
+        "surname": "Eijma",
+        "full_name": "Roshon van Eijma",
+        "position": "DF"
+      },
+      {
+        "surname": "Floranus",
+        "full_name": "Sherel Floranus",
+        "position": "DF"
+      },
+      {
+        "surname": "Roemeratoe",
+        "full_name": "Godfried Roemeratoe",
+        "position": "MF"
+      },
+      {
+        "surname": "Bacuna",
+        "full_name": "Juninho Bacuna",
+        "position": "MF"
+      },
+      {
+        "surname": "Comenencia",
+        "full_name": "Livano Comenencia",
+        "position": "MF"
+      },
+      {
+        "surname": "Locadia",
+        "full_name": "Jürgen Locadia",
+        "position": "FW"
+      },
+      {
+        "surname": "Bacuna",
+        "full_name": "Leandro Bacuna",
+        "position": "MF"
+      },
+      {
+        "surname": "Antonisse",
+        "full_name": "Jeremy Antonisse",
+        "position": "FW"
+      },
+      {
+        "surname": "Hansen",
+        "full_name": "Sontje Hansen",
+        "position": "FW"
+      },
+      {
+        "surname": "Noslin",
+        "full_name": "Tyrese Noslin",
+        "position": "FW"
+      },
+      {
+        "surname": "Gorré",
+        "full_name": "Kenji Gorré",
+        "position": "FW"
+      },
+      {
+        "surname": "Martha",
+        "full_name": "Ar'jany Martha",
+        "position": "MF"
+      },
+      {
+        "surname": "Margaritha",
+        "full_name": "Jearl Margaritha",
+        "position": "FW"
+      },
+      {
+        "surname": "Kuwas",
+        "full_name": "Brandley Kuwas",
+        "position": "FW"
+      },
+      {
+        "surname": "Obispo",
+        "full_name": "Armando Obispo",
+        "position": "DF"
+      },
+      {
+        "surname": "Kastaneer",
+        "full_name": "Gervane Kastaneer",
+        "position": "FW"
+      },
+      {
+        "surname": "Brenet",
+        "full_name": "Joshua Brenet",
+        "position": "DF"
+      },
+      {
+        "surname": "Chong",
+        "full_name": "Tahith Chong",
+        "position": "MF"
+      },
+      {
+        "surname": "Felida",
+        "full_name": "Kevin Felida",
+        "position": "MF"
+      },
+      {
+        "surname": "Bazoer",
+        "full_name": "Riechedly Bazoer",
+        "position": "DF"
+      },
+      {
+        "surname": "Fonville",
+        "full_name": "Deveron Fonville",
+        "position": "DF"
+      },
+      {
+        "surname": "Bodak",
+        "full_name": "Tyrick Bodak",
+        "position": "GK"
+      },
+      {
+        "surname": "Doornbusch",
+        "full_name": "Trevor Doornbusch",
+        "position": "GK"
+      }
+    ]
+  },
+  {
+    "code": "CIV",
+    "team": "Ivory Coast",
+    "players": [
+      {
+        "surname": "Fofana",
+        "full_name": "Yahia Fofana",
+        "position": "GK"
+      },
+      {
+        "surname": "Diomande",
+        "full_name": "Ousmane Diomande",
+        "position": "DF"
+      },
+      {
+        "surname": "Konan",
+        "full_name": "Ghislain Konan",
+        "position": "DF"
+      },
+      {
+        "surname": "Seri",
+        "full_name": "Jean Michaël Seri",
+        "position": "MF"
+      },
+      {
+        "surname": "Singo",
+        "full_name": "Wilfried Singo",
+        "position": "DF"
+      },
+      {
+        "surname": "Fofana",
+        "full_name": "Seko Fofana",
+        "position": "MF"
+      },
+      {
+        "surname": "Kossounou",
+        "full_name": "Odilon Kossounou",
+        "position": "DF"
+      },
+      {
+        "surname": "Kessié",
+        "full_name": "Franck Kessié",
+        "position": "MF"
+      },
+      {
+        "surname": "Bonny",
+        "full_name": "Ange-Yoan Bonny",
+        "position": "FW"
+      },
+      {
+        "surname": "Adingra",
+        "full_name": "Simon Adingra",
+        "position": "FW"
+      },
+      {
+        "surname": "Diomande",
+        "full_name": "Yan Diomande",
+        "position": "FW"
+      },
+      {
+        "surname": "Wahi",
+        "full_name": "Elye Wahi",
+        "position": "FW"
+      },
+      {
+        "surname": "Opéri",
+        "full_name": "Christopher Opéri",
+        "position": "DF"
+      },
+      {
+        "surname": "Diakité",
+        "full_name": "Oumar Diakité",
+        "position": "FW"
+      },
+      {
+        "surname": "Diallo",
+        "full_name": "Amad Diallo",
+        "position": "FW"
+      },
+      {
+        "surname": "Koné",
+        "full_name": "Mohamed Koné",
+        "position": "GK"
+      },
+      {
+        "surname": "Doué",
+        "full_name": "Guéla Doué",
+        "position": "DF"
+      },
+      {
+        "surname": "Sangaré",
+        "full_name": "Ibrahim Sangaré",
+        "position": "MF"
+      },
+      {
+        "surname": "Pépé",
+        "full_name": "Nicolas Pépé",
+        "position": "FW"
+      },
+      {
+        "surname": "Agbadou",
+        "full_name": "Emmanuel Agbadou",
+        "position": "DF"
+      },
+      {
+        "surname": "Ndicka",
+        "full_name": "Evan Ndicka",
+        "position": "DF"
+      },
+      {
+        "surname": "Guessand",
+        "full_name": "Evann Guessand",
+        "position": "FW"
+      },
+      {
+        "surname": "Lafont",
+        "full_name": "Alban Lafont",
+        "position": "GK"
+      },
+      {
+        "surname": "Touré",
+        "full_name": "Bazoumana Touré",
+        "position": "FW"
+      },
+      {
+        "surname": "Guiagon",
+        "full_name": "Parfait Guiagon",
+        "position": "MF"
+      },
+      {
+        "surname": "Inao Oulaï",
+        "full_name": "Christ Inao Oulaï",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "ECU",
+    "team": "Ecuador",
+    "players": [
+      {
+        "surname": "Galíndez",
+        "full_name": "Hernán Galíndez",
+        "position": "GK"
+      },
+      {
+        "surname": "Torres",
+        "full_name": "Félix Torres",
+        "position": "DF"
+      },
+      {
+        "surname": "Hincapié",
+        "full_name": "Piero Hincapié",
+        "position": "DF"
+      },
+      {
+        "surname": "Ordóñez",
+        "full_name": "Joel Ordóñez",
+        "position": "DF"
+      },
+      {
+        "surname": "Alcívar",
+        "full_name": "Jordy Alcívar",
+        "position": "MF"
+      },
+      {
+        "surname": "Pacho",
+        "full_name": "Willian Pacho",
+        "position": "DF"
+      },
+      {
+        "surname": "Estupiñán",
+        "full_name": "Pervis Estupiñán",
+        "position": "DF"
+      },
+      {
+        "surname": "Valencia",
+        "full_name": "Anthony Valencia",
+        "position": "MF"
+      },
+      {
+        "surname": "Yeboah",
+        "full_name": "John Yeboah",
+        "position": "FW"
+      },
+      {
+        "surname": "Páez",
+        "full_name": "Kendry Páez",
+        "position": "MF"
+      },
+      {
+        "surname": "Rodríguez",
+        "full_name": "Kevin Rodríguez",
+        "position": "FW"
+      },
+      {
+        "surname": "Ramírez",
+        "full_name": "Moisés Ramírez",
+        "position": "GK"
+      },
+      {
+        "surname": "Valencia",
+        "full_name": "Enner Valencia",
+        "position": "FW"
+      },
+      {
+        "surname": "Minda",
+        "full_name": "Alan Minda",
+        "position": "MF"
+      },
+      {
+        "surname": "Vite",
+        "full_name": "Pedro Vite",
+        "position": "MF"
+      },
+      {
+        "surname": "Caicedo",
+        "full_name": "Jordy Caicedo",
+        "position": "FW"
+      },
+      {
+        "surname": "Preciado",
+        "full_name": "Ángelo Preciado",
+        "position": "DF"
+      },
+      {
+        "surname": "Castillo",
+        "full_name": "Denil Castillo",
+        "position": "MF"
+      },
+      {
+        "surname": "Plata",
+        "full_name": "Gonzalo Plata",
+        "position": "FW"
+      },
+      {
+        "surname": "Angulo",
+        "full_name": "Nilson Angulo",
+        "position": "FW"
+      },
+      {
+        "surname": "Franco",
+        "full_name": "Alan Franco",
+        "position": "MF"
+      },
+      {
+        "surname": "Valle",
+        "full_name": "Gonzalo Valle",
+        "position": "GK"
+      },
+      {
+        "surname": "Caicedo",
+        "full_name": "Moisés Caicedo",
+        "position": "MF"
+      },
+      {
+        "surname": "Arévalo",
+        "full_name": "Jeremy Arévalo",
+        "position": "FW"
+      },
+      {
+        "surname": "Porozo",
+        "full_name": "Jackson Porozo",
+        "position": "DF"
+      },
+      {
+        "surname": "Medina",
+        "full_name": "Yaimar Medina",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "NED",
+    "team": "Netherlands",
+    "players": [
+      {
+        "surname": "Verbruggen",
+        "full_name": "Bart Verbruggen",
+        "position": "GK"
+      },
+      {
+        "surname": "Geertruida",
+        "full_name": "Lutsharel Geertruida",
+        "position": "DF"
+      },
+      {
+        "surname": "Roon",
+        "full_name": "Marten de Roon",
+        "position": "MF"
+      },
+      {
+        "surname": "Dijk",
+        "full_name": "Virgil van Dijk",
+        "position": "DF"
+      },
+      {
+        "surname": "Aké",
+        "full_name": "Nathan Aké",
+        "position": "DF"
+      },
+      {
+        "surname": "Hecke",
+        "full_name": "Jan Paul van Hecke",
+        "position": "DF"
+      },
+      {
+        "surname": "Kluivert",
+        "full_name": "Justin Kluivert",
+        "position": "MF"
+      },
+      {
+        "surname": "Gravenberch",
+        "full_name": "Ryan Gravenberch",
+        "position": "MF"
+      },
+      {
+        "surname": "Weghorst",
+        "full_name": "Wout Weghorst",
+        "position": "FW"
+      },
+      {
+        "surname": "Depay",
+        "full_name": "Memphis Depay",
+        "position": "FW"
+      },
+      {
+        "surname": "Gakpo",
+        "full_name": "Cody Gakpo",
+        "position": "FW"
+      },
+      {
+        "surname": "Wieffer",
+        "full_name": "Mats Wieffer",
+        "position": "DF"
+      },
+      {
+        "surname": "Roefs",
+        "full_name": "Robin Roefs",
+        "position": "GK"
+      },
+      {
+        "surname": "Reijnders",
+        "full_name": "Tijjani Reijnders",
+        "position": "MF"
+      },
+      {
+        "surname": "Ven",
+        "full_name": "Micky van de Ven",
+        "position": "DF"
+      },
+      {
+        "surname": "Til",
+        "full_name": "Guus Til",
+        "position": "MF"
+      },
+      {
+        "surname": "Lang",
+        "full_name": "Noa Lang",
+        "position": "FW"
+      },
+      {
+        "surname": "Malen",
+        "full_name": "Donyell Malen",
+        "position": "FW"
+      },
+      {
+        "surname": "Brobbey",
+        "full_name": "Brian Brobbey",
+        "position": "FW"
+      },
+      {
+        "surname": "Koopmeiners",
+        "full_name": "Teun Koopmeiners",
+        "position": "MF"
+      },
+      {
+        "surname": "Jong",
+        "full_name": "Frenkie de Jong",
+        "position": "MF"
+      },
+      {
+        "surname": "Dumfries",
+        "full_name": "Denzel Dumfries",
+        "position": "DF"
+      },
+      {
+        "surname": "Flekken",
+        "full_name": "Mark Flekken",
+        "position": "GK"
+      },
+      {
+        "surname": "Summerville",
+        "full_name": "Crysencio Summerville",
+        "position": "FW"
+      },
+      {
+        "surname": "Hato",
+        "full_name": "Jorrel Hato",
+        "position": "DF"
+      },
+      {
+        "surname": "Timber",
+        "full_name": "Quinten Timber",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "JPN",
+    "team": "Japan",
+    "players": [
+      {
+        "surname": "Suzuki",
+        "full_name": "Zion Suzuki",
+        "position": "GK"
+      },
+      {
+        "surname": "Sugawara",
+        "full_name": "Yukinari Sugawara",
+        "position": "DF"
+      },
+      {
+        "surname": "Taniguchi",
+        "full_name": "Shōgo Taniguchi",
+        "position": "DF"
+      },
+      {
+        "surname": "Itakura",
+        "full_name": "Kō Itakura",
+        "position": "DF"
+      },
+      {
+        "surname": "Nagatomo",
+        "full_name": "Yūto Nagatomo",
+        "position": "DF"
+      },
+      {
+        "surname": "Endo",
+        "full_name": "Wataru Endo",
+        "position": "MF"
+      },
+      {
+        "surname": "Tanaka",
+        "full_name": "Ao Tanaka",
+        "position": "MF"
+      },
+      {
+        "surname": "Kubo",
+        "full_name": "Takefusa Kubo",
+        "position": "MF"
+      },
+      {
+        "surname": "Gotō",
+        "full_name": "Keisuke Gotō",
+        "position": "FW"
+      },
+      {
+        "surname": "Dōan",
+        "full_name": "Ritsu Dōan",
+        "position": "MF"
+      },
+      {
+        "surname": "Maeda",
+        "full_name": "Daizen Maeda",
+        "position": "MF"
+      },
+      {
+        "surname": "Ōsako",
+        "full_name": "Keisuke Ōsako",
+        "position": "GK"
+      },
+      {
+        "surname": "Nakamura",
+        "full_name": "Keito Nakamura",
+        "position": "MF"
+      },
+      {
+        "surname": "Itō",
+        "full_name": "Junya Itō",
+        "position": "MF"
+      },
+      {
+        "surname": "Kamada",
+        "full_name": "Daichi Kamada",
+        "position": "MF"
+      },
+      {
+        "surname": "Watanabe",
+        "full_name": "Tsuyoshi Watanabe",
+        "position": "DF"
+      },
+      {
+        "surname": "Suzuki",
+        "full_name": "Yuito Suzuki",
+        "position": "MF"
+      },
+      {
+        "surname": "Ueda",
+        "full_name": "Ayase Ueda",
+        "position": "FW"
+      },
+      {
+        "surname": "Ogawa",
+        "full_name": "Kōki Ogawa",
+        "position": "FW"
+      },
+      {
+        "surname": "Seko",
+        "full_name": "Ayumu Seko",
+        "position": "DF"
+      },
+      {
+        "surname": "Itō",
+        "full_name": "Hiroki Itō",
+        "position": "DF"
+      },
+      {
+        "surname": "Tomiyasu",
+        "full_name": "Takehiro Tomiyasu",
+        "position": "DF"
+      },
+      {
+        "surname": "Hayakawa",
+        "full_name": "Tomoki Hayakawa",
+        "position": "GK"
+      },
+      {
+        "surname": "Sano",
+        "full_name": "Kaishū Sano",
+        "position": "MF"
+      },
+      {
+        "surname": "Suzuki",
+        "full_name": "Junnosuke Suzuki",
+        "position": "DF"
+      },
+      {
+        "surname": "Shiogai",
+        "full_name": "Kento Shiogai",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "SWE",
+    "team": "Sweden",
+    "players": [
+      {
+        "surname": "Widell Zetterström",
+        "full_name": "Jacob Widell Zetterström",
+        "position": "GK"
+      },
+      {
+        "surname": "Lagerbielke",
+        "full_name": "Gustaf Lagerbielke",
+        "position": "DF"
+      },
+      {
+        "surname": "Lindelöf",
+        "full_name": "Victor Lindelöf",
+        "position": "DF"
+      },
+      {
+        "surname": "Hien",
+        "full_name": "Isak Hien",
+        "position": "DF"
+      },
+      {
+        "surname": "Gudmundsson",
+        "full_name": "Gabriel Gudmundsson",
+        "position": "DF"
+      },
+      {
+        "surname": "Johansson",
+        "full_name": "Herman Johansson",
+        "position": "DF"
+      },
+      {
+        "surname": "Bergvall",
+        "full_name": "Lucas Bergvall",
+        "position": "MF"
+      },
+      {
+        "surname": "Svensson",
+        "full_name": "Daniel Svensson",
+        "position": "DF"
+      },
+      {
+        "surname": "Isak",
+        "full_name": "Alexander Isak",
+        "position": "FW"
+      },
+      {
+        "surname": "Nygren",
+        "full_name": "Benjamin Nygren",
+        "position": "MF"
+      },
+      {
+        "surname": "Elanga",
+        "full_name": "Anthony Elanga",
+        "position": "FW"
+      },
+      {
+        "surname": "Johansson",
+        "full_name": "Viktor Johansson",
+        "position": "GK"
+      },
+      {
+        "surname": "Sema",
+        "full_name": "Ken Sema",
+        "position": "MF"
+      },
+      {
+        "surname": "Ekdal",
+        "full_name": "Hjalmar Ekdal",
+        "position": "DF"
+      },
+      {
+        "surname": "Starfelt",
+        "full_name": "Carl Starfelt",
+        "position": "DF"
+      },
+      {
+        "surname": "Karlström",
+        "full_name": "Jesper Karlström",
+        "position": "MF"
+      },
+      {
+        "surname": "Gyökeres",
+        "full_name": "Viktor Gyökeres",
+        "position": "FW"
+      },
+      {
+        "surname": "Ayari",
+        "full_name": "Yasin Ayari",
+        "position": "MF"
+      },
+      {
+        "surname": "Svanberg",
+        "full_name": "Mattias Svanberg",
+        "position": "MF"
+      },
+      {
+        "surname": "Smith",
+        "full_name": "Eric Smith",
+        "position": "DF"
+      },
+      {
+        "surname": "Bernhardsson",
+        "full_name": "Alexander Bernhardsson",
+        "position": "DF"
+      },
+      {
+        "surname": "Zeneli",
+        "full_name": "Besfort Zeneli",
+        "position": "MF"
+      },
+      {
+        "surname": "Nordfeldt",
+        "full_name": "Kristoffer Nordfeldt",
+        "position": "GK"
+      },
+      {
+        "surname": "Stroud",
+        "full_name": "Elliot Stroud",
+        "position": "DF"
+      },
+      {
+        "surname": "Nilsson",
+        "full_name": "Gustaf Nilsson",
+        "position": "FW"
+      },
+      {
+        "surname": "Ali",
+        "full_name": "Taha Ali",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "TUN",
+    "team": "Tunisia",
+    "players": [
+      {
+        "surname": "Chamakh",
+        "full_name": "Mouhib Chamakh",
+        "position": "GK"
+      },
+      {
+        "surname": "Abdi",
+        "full_name": "Ali Abdi",
+        "position": "DF"
+      },
+      {
+        "surname": "Talbi",
+        "full_name": "Montassar Talbi",
+        "position": "DF"
+      },
+      {
+        "surname": "Rekik",
+        "full_name": "Omar Rekik",
+        "position": "DF"
+      },
+      {
+        "surname": "Arous",
+        "full_name": "Adem Arous",
+        "position": "DF"
+      },
+      {
+        "surname": "Bronn",
+        "full_name": "Dylan Bronn",
+        "position": "DF"
+      },
+      {
+        "surname": "Achouri",
+        "full_name": "Elias Achouri",
+        "position": "FW"
+      },
+      {
+        "surname": "Saad",
+        "full_name": "Elias Saad",
+        "position": "FW"
+      },
+      {
+        "surname": "Mastouri",
+        "full_name": "Hazem Mastouri",
+        "position": "FW"
+      },
+      {
+        "surname": "Mejbri",
+        "full_name": "Hannibal Mejbri",
+        "position": "MF"
+      },
+      {
+        "surname": "Gharbi",
+        "full_name": "Ismaël Gharbi",
+        "position": "MF"
+      },
+      {
+        "surname": "Ben Ouanes",
+        "full_name": "Mortadha Ben Ouanes",
+        "position": "DF"
+      },
+      {
+        "surname": "Khedira",
+        "full_name": "Rani Khedira",
+        "position": "MF"
+      },
+      {
+        "surname": "Ayari",
+        "full_name": "Khalil Ayari",
+        "position": "MF"
+      },
+      {
+        "surname": "Mahmoud",
+        "full_name": "Hadj Mahmoud",
+        "position": "MF"
+      },
+      {
+        "surname": "Dahmen",
+        "full_name": "Aymen Dahmen",
+        "position": "GK"
+      },
+      {
+        "surname": "Skhiri",
+        "full_name": "Ellyes Skhiri",
+        "position": "MF"
+      },
+      {
+        "surname": "Elloumi",
+        "full_name": "Rayan Elloumi",
+        "position": "FW"
+      },
+      {
+        "surname": "Chaouat",
+        "full_name": "Firas Chaouat",
+        "position": "FW"
+      },
+      {
+        "surname": "Valery",
+        "full_name": "Yan Valery",
+        "position": "DF"
+      },
+      {
+        "surname": "Ben Hamida",
+        "full_name": "Mohamed Amine Ben Hamida",
+        "position": "DF"
+      },
+      {
+        "surname": "Ben Hessen",
+        "full_name": "Sabri Ben Hessen",
+        "position": "GK"
+      },
+      {
+        "surname": "Neffati",
+        "full_name": "Moutaz Neffati",
+        "position": "DF"
+      },
+      {
+        "surname": "Chikhaoui",
+        "full_name": "Raed Chikhaoui",
+        "position": "DF"
+      },
+      {
+        "surname": "Ben Slimane",
+        "full_name": "Anis Ben Slimane",
+        "position": "MF"
+      },
+      {
+        "surname": "Tounekti",
+        "full_name": "Sebastian Tounekti",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "BEL",
+    "team": "Belgium",
+    "players": [
+      {
+        "surname": "Courtois",
+        "full_name": "Thibaut Courtois",
+        "position": "GK"
+      },
+      {
+        "surname": "Debast",
+        "full_name": "Zeno Debast",
+        "position": "DF"
+      },
+      {
+        "surname": "Theate",
+        "full_name": "Arthur Theate",
+        "position": "DF"
+      },
+      {
+        "surname": "Mechele",
+        "full_name": "Brandon Mechele",
+        "position": "DF"
+      },
+      {
+        "surname": "De Cuyper",
+        "full_name": "Maxim De Cuyper",
+        "position": "DF"
+      },
+      {
+        "surname": "Witsel",
+        "full_name": "Axel Witsel",
+        "position": "MF"
+      },
+      {
+        "surname": "De Bruyne",
+        "full_name": "Kevin De Bruyne",
+        "position": "MF"
+      },
+      {
+        "surname": "Tielemans",
+        "full_name": "Youri Tielemans",
+        "position": "MF"
+      },
+      {
+        "surname": "Lukaku",
+        "full_name": "Romelu Lukaku",
+        "position": "FW"
+      },
+      {
+        "surname": "Trossard",
+        "full_name": "Leandro Trossard",
+        "position": "FW"
+      },
+      {
+        "surname": "Doku",
+        "full_name": "Jérémy Doku",
+        "position": "FW"
+      },
+      {
+        "surname": "Lammens",
+        "full_name": "Senne Lammens",
+        "position": "GK"
+      },
+      {
+        "surname": "Penders",
+        "full_name": "Mike Penders",
+        "position": "GK"
+      },
+      {
+        "surname": "Lukébakio",
+        "full_name": "Dodi Lukébakio",
+        "position": "FW"
+      },
+      {
+        "surname": "Meunier",
+        "full_name": "Thomas Meunier",
+        "position": "DF"
+      },
+      {
+        "surname": "De Winter",
+        "full_name": "Koni De Winter",
+        "position": "DF"
+      },
+      {
+        "surname": "De Ketelaere",
+        "full_name": "Charles De Ketelaere",
+        "position": "FW"
+      },
+      {
+        "surname": "Seys",
+        "full_name": "Joaquin Seys",
+        "position": "DF"
+      },
+      {
+        "surname": "Moreira",
+        "full_name": "Diego Moreira",
+        "position": "MF"
+      },
+      {
+        "surname": "Vanaken",
+        "full_name": "Hans Vanaken",
+        "position": "MF"
+      },
+      {
+        "surname": "Castagne",
+        "full_name": "Timothy Castagne",
+        "position": "DF"
+      },
+      {
+        "surname": "Saelemaekers",
+        "full_name": "Alexis Saelemaekers",
+        "position": "MF"
+      },
+      {
+        "surname": "Raskin",
+        "full_name": "Nicolas Raskin",
+        "position": "MF"
+      },
+      {
+        "surname": "Onana",
+        "full_name": "Amadou Onana",
+        "position": "MF"
+      },
+      {
+        "surname": "Ngoy",
+        "full_name": "Nathan Ngoy",
+        "position": "DF"
+      },
+      {
+        "surname": "Fernandez-Pardo",
+        "full_name": "Matias Fernandez-Pardo",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "EGY",
+    "team": "Egypt",
+    "players": [
+      {
+        "surname": "Shenawy",
+        "full_name": "Mohamed El Shenawy",
+        "position": "GK"
+      },
+      {
+        "surname": "Ibrahim",
+        "full_name": "Yasser Ibrahim",
+        "position": "DF"
+      },
+      {
+        "surname": "Hany",
+        "full_name": "Mohamed Hany",
+        "position": "DF"
+      },
+      {
+        "surname": "Abdelmaguid",
+        "full_name": "Hossam Abdelmaguid",
+        "position": "DF"
+      },
+      {
+        "surname": "Rabia",
+        "full_name": "Ramy Rabia",
+        "position": "DF"
+      },
+      {
+        "surname": "Abdelmonem",
+        "full_name": "Mohamed Abdelmonem",
+        "position": "DF"
+      },
+      {
+        "surname": "Trézéguet",
+        "full_name": "Trézéguet",
+        "position": "FW"
+      },
+      {
+        "surname": "Ashour",
+        "full_name": "Emam Ashour",
+        "position": "MF"
+      },
+      {
+        "surname": "Abdelkarim",
+        "full_name": "Hamza Abdelkarim",
+        "position": "FW"
+      },
+      {
+        "surname": "Salah",
+        "full_name": "Mohamed Salah",
+        "position": "FW"
+      },
+      {
+        "surname": "Ziko",
+        "full_name": "Mostafa Ziko",
+        "position": "MF"
+      },
+      {
+        "surname": "Hassan",
+        "full_name": "Haissem Hassan",
+        "position": "FW"
+      },
+      {
+        "surname": "Fatouh",
+        "full_name": "Ahmed Fatouh",
+        "position": "DF"
+      },
+      {
+        "surname": "Fathy",
+        "full_name": "Hamdy Fathy",
+        "position": "MF"
+      },
+      {
+        "surname": "Hafez",
+        "full_name": "Karim Hafez",
+        "position": "DF"
+      },
+      {
+        "surname": "Soliman",
+        "full_name": "El Mahdy Soliman",
+        "position": "GK"
+      },
+      {
+        "surname": "Lasheen",
+        "full_name": "Mohanad Lasheen",
+        "position": "MF"
+      },
+      {
+        "surname": "Emad",
+        "full_name": "Nabil Emad",
+        "position": "MF"
+      },
+      {
+        "surname": "Attia",
+        "full_name": "Marwan Attia",
+        "position": "MF"
+      },
+      {
+        "surname": "Adel",
+        "full_name": "Ibrahim Adel",
+        "position": "FW"
+      },
+      {
+        "surname": "Saber",
+        "full_name": "Mahmoud Saber",
+        "position": "MF"
+      },
+      {
+        "surname": "Marmoush",
+        "full_name": "Omar Marmoush",
+        "position": "FW"
+      },
+      {
+        "surname": "Shobeir",
+        "full_name": "Mostafa Shobeir",
+        "position": "GK"
+      },
+      {
+        "surname": "Alaa",
+        "full_name": "Tarek Alaa",
+        "position": "DF"
+      },
+      {
+        "surname": "Zizo",
+        "full_name": "Zizo",
+        "position": "FW"
+      },
+      {
+        "surname": "Alaa",
+        "full_name": "Mohamed Alaa",
+        "position": "GK"
+      }
+    ]
+  },
+  {
+    "code": "IRN",
+    "team": "Iran",
+    "players": [
+      {
+        "surname": "Beiranvand",
+        "full_name": "Alireza Beiranvand",
+        "position": "GK"
+      },
+      {
+        "surname": "Hardani",
+        "full_name": "Saleh Hardani",
+        "position": "DF"
+      },
+      {
+        "surname": "Hajsafi",
+        "full_name": "Ehsan Hajsafi",
+        "position": "DF"
+      },
+      {
+        "surname": "Khalilzadeh",
+        "full_name": "Shojae Khalilzadeh",
+        "position": "DF"
+      },
+      {
+        "surname": "Mohammadi",
+        "full_name": "Milad Mohammadi",
+        "position": "DF"
+      },
+      {
+        "surname": "Ezatolahi",
+        "full_name": "Saeid Ezatolahi",
+        "position": "MF"
+      },
+      {
+        "surname": "Jahanbakhsh",
+        "full_name": "Alireza Jahanbakhsh",
+        "position": "MF"
+      },
+      {
+        "surname": "Mohebi",
+        "full_name": "Mohammad Mohebi",
+        "position": "MF"
+      },
+      {
+        "surname": "Taremi",
+        "full_name": "Mehdi Taremi",
+        "position": "FW"
+      },
+      {
+        "surname": "Ghayedi",
+        "full_name": "Mehdi Ghayedi",
+        "position": "FW"
+      },
+      {
+        "surname": "Alipour",
+        "full_name": "Ali Alipour",
+        "position": "FW"
+      },
+      {
+        "surname": "Niazmand",
+        "full_name": "Payam Niazmand",
+        "position": "GK"
+      },
+      {
+        "surname": "Kanaanizadegan",
+        "full_name": "Hossein Kanaanizadegan",
+        "position": "DF"
+      },
+      {
+        "surname": "Ghoddos",
+        "full_name": "Saman Ghoddos",
+        "position": "MF"
+      },
+      {
+        "surname": "Cheshmi",
+        "full_name": "Rouzbeh Cheshmi",
+        "position": "MF"
+      },
+      {
+        "surname": "Torabi",
+        "full_name": "Mehdi Torabi",
+        "position": "MF"
+      },
+      {
+        "surname": "Yousefi",
+        "full_name": "Aria Yousefi",
+        "position": "DF"
+      },
+      {
+        "surname": "Hosseinzadeh",
+        "full_name": "Amirhossein Hosseinzadeh",
+        "position": "FW"
+      },
+      {
+        "surname": "Nemati",
+        "full_name": "Ali Nemati",
+        "position": "DF"
+      },
+      {
+        "surname": "Moghanlou",
+        "full_name": "Shahriyar Moghanlou",
+        "position": "FW"
+      },
+      {
+        "surname": "Ghorbani",
+        "full_name": "Mohammad Ghorbani",
+        "position": "MF"
+      },
+      {
+        "surname": "Hosseini",
+        "full_name": "Hossein Hosseini",
+        "position": "GK"
+      },
+      {
+        "surname": "Rezaeian",
+        "full_name": "Ramin Rezaeian",
+        "position": "DF"
+      },
+      {
+        "surname": "Eckert",
+        "full_name": "Dennis Eckert",
+        "position": "FW"
+      },
+      {
+        "surname": "Eiri",
+        "full_name": "Danial Eiri",
+        "position": "DF"
+      },
+      {
+        "surname": "Razzaghinia",
+        "full_name": "Amirmohammad Razzaghinia",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "NZL",
+    "team": "New Zealand",
+    "players": [
+      {
+        "surname": "Crocombe",
+        "full_name": "Max Crocombe",
+        "position": "GK"
+      },
+      {
+        "surname": "Payne",
+        "full_name": "Tim Payne",
+        "position": "DF"
+      },
+      {
+        "surname": "de Vries",
+        "full_name": "Francis de Vries",
+        "position": "DF"
+      },
+      {
+        "surname": "Bindon",
+        "full_name": "Tyler Bindon",
+        "position": "DF"
+      },
+      {
+        "surname": "Boxall",
+        "full_name": "Michael Boxall",
+        "position": "DF"
+      },
+      {
+        "surname": "Bell",
+        "full_name": "Joe Bell",
+        "position": "MF"
+      },
+      {
+        "surname": "Garbett",
+        "full_name": "Matthew Garbett",
+        "position": "MF"
+      },
+      {
+        "surname": "Stamenić",
+        "full_name": "Marko Stamenić",
+        "position": "MF"
+      },
+      {
+        "surname": "Wood",
+        "full_name": "Chris Wood",
+        "position": "FW"
+      },
+      {
+        "surname": "Singh",
+        "full_name": "Sarpreet Singh",
+        "position": "MF"
+      },
+      {
+        "surname": "Just",
+        "full_name": "Elijah Just",
+        "position": "MF"
+      },
+      {
+        "surname": "Paulsen",
+        "full_name": "Alex Paulsen",
+        "position": "GK"
+      },
+      {
+        "surname": "Cacace",
+        "full_name": "Liberato Cacace",
+        "position": "DF"
+      },
+      {
+        "surname": "Rufer",
+        "full_name": "Alex Rufer",
+        "position": "MF"
+      },
+      {
+        "surname": "Pijnaker",
+        "full_name": "Nando Pijnaker",
+        "position": "DF"
+      },
+      {
+        "surname": "Surman",
+        "full_name": "Finn Surman",
+        "position": "DF"
+      },
+      {
+        "surname": "Barbarouses",
+        "full_name": "Kosta Barbarouses",
+        "position": "FW"
+      },
+      {
+        "surname": "Waine",
+        "full_name": "Ben Waine",
+        "position": "FW"
+      },
+      {
+        "surname": "Old",
+        "full_name": "Ben Old",
+        "position": "MF"
+      },
+      {
+        "surname": "McCowatt",
+        "full_name": "Callum McCowatt",
+        "position": "MF"
+      },
+      {
+        "surname": "Randall",
+        "full_name": "Jesse Randall",
+        "position": "FW"
+      },
+      {
+        "surname": "Woud",
+        "full_name": "Michael Woud",
+        "position": "GK"
+      },
+      {
+        "surname": "Thomas",
+        "full_name": "Ryan Thomas",
+        "position": "MF"
+      },
+      {
+        "surname": "Elliot",
+        "full_name": "Callan Elliot",
+        "position": "DF"
+      },
+      {
+        "surname": "Bayliss",
+        "full_name": "Lachlan Bayliss",
+        "position": "MF"
+      },
+      {
+        "surname": "Smith",
+        "full_name": "Tommy Smith",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "ESP",
+    "team": "Spain",
+    "players": [
+      {
+        "surname": "Raya",
+        "full_name": "David Raya",
+        "position": "GK"
+      },
+      {
+        "surname": "Pubill",
+        "full_name": "Marc Pubill",
+        "position": "DF"
+      },
+      {
+        "surname": "Grimaldo",
+        "full_name": "Álex Grimaldo",
+        "position": "DF"
+      },
+      {
+        "surname": "García",
+        "full_name": "Eric García",
+        "position": "DF"
+      },
+      {
+        "surname": "Llorente",
+        "full_name": "Marcos Llorente",
+        "position": "DF"
+      },
+      {
+        "surname": "Merino",
+        "full_name": "Mikel Merino",
+        "position": "MF"
+      },
+      {
+        "surname": "Torres",
+        "full_name": "Ferran Torres",
+        "position": "FW"
+      },
+      {
+        "surname": "Ruiz",
+        "full_name": "Fabián Ruiz",
+        "position": "MF"
+      },
+      {
+        "surname": "Gavi",
+        "full_name": "Gavi",
+        "position": "MF"
+      },
+      {
+        "surname": "Olmo",
+        "full_name": "Dani Olmo",
+        "position": "FW"
+      },
+      {
+        "surname": "Pino",
+        "full_name": "Yéremy Pino",
+        "position": "FW"
+      },
+      {
+        "surname": "Porro",
+        "full_name": "Pedro Porro",
+        "position": "DF"
+      },
+      {
+        "surname": "Garcia",
+        "full_name": "Joan Garcia",
+        "position": "GK"
+      },
+      {
+        "surname": "Laporte",
+        "full_name": "Aymeric Laporte",
+        "position": "DF"
+      },
+      {
+        "surname": "Baena",
+        "full_name": "Álex Baena",
+        "position": "MF"
+      },
+      {
+        "surname": "Rodri",
+        "full_name": "Rodri",
+        "position": "MF"
+      },
+      {
+        "surname": "Williams",
+        "full_name": "Nico Williams",
+        "position": "FW"
+      },
+      {
+        "surname": "Zubimendi",
+        "full_name": "Martín Zubimendi",
+        "position": "MF"
+      },
+      {
+        "surname": "Yamal",
+        "full_name": "Lamine Yamal",
+        "position": "FW"
+      },
+      {
+        "surname": "Pedri",
+        "full_name": "Pedri",
+        "position": "MF"
+      },
+      {
+        "surname": "Oyarzabal",
+        "full_name": "Mikel Oyarzabal",
+        "position": "FW"
+      },
+      {
+        "surname": "Cubarsí",
+        "full_name": "Pau Cubarsí",
+        "position": "DF"
+      },
+      {
+        "surname": "Simón",
+        "full_name": "Unai Simón",
+        "position": "GK"
+      },
+      {
+        "surname": "Cucurella",
+        "full_name": "Marc Cucurella",
+        "position": "DF"
+      },
+      {
+        "surname": "Muñoz",
+        "full_name": "Víctor Muñoz",
+        "position": "FW"
+      },
+      {
+        "surname": "Iglesias",
+        "full_name": "Borja Iglesias",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "CPV",
+    "team": "Cape Verde",
+    "players": [
+      {
+        "surname": "Vozinha",
+        "full_name": "Vozinha",
+        "position": "GK"
+      },
+      {
+        "surname": "Stopira",
+        "full_name": "Stopira",
+        "position": "DF"
+      },
+      {
+        "surname": "Diney",
+        "full_name": "Diney",
+        "position": "DF"
+      },
+      {
+        "surname": "Lopes",
+        "full_name": "Roberto Lopes",
+        "position": "DF"
+      },
+      {
+        "surname": "Costa",
+        "full_name": "Logan Costa",
+        "position": "DF"
+      },
+      {
+        "surname": "Pina",
+        "full_name": "Kevin Pina",
+        "position": "MF"
+      },
+      {
+        "surname": "Cabral",
+        "full_name": "Jovane Cabral",
+        "position": "MF"
+      },
+      {
+        "surname": "Paulo",
+        "full_name": "João Paulo",
+        "position": "MF"
+      },
+      {
+        "surname": "Benchimol",
+        "full_name": "Gilson Benchimol",
+        "position": "FW"
+      },
+      {
+        "surname": "Monteiro",
+        "full_name": "Jamiro Monteiro",
+        "position": "MF"
+      },
+      {
+        "surname": "Rodrigues",
+        "full_name": "Garry Rodrigues",
+        "position": "MF"
+      },
+      {
+        "surname": "Rosa",
+        "full_name": "Márcio Rosa",
+        "position": "GK"
+      },
+      {
+        "surname": "Lopes Cabral",
+        "full_name": "Sidny Lopes Cabral",
+        "position": "DF"
+      },
+      {
+        "surname": "Duarte",
+        "full_name": "Deroy Duarte",
+        "position": "MF"
+      },
+      {
+        "surname": "Duarte",
+        "full_name": "Laros Duarte",
+        "position": "MF"
+      },
+      {
+        "surname": "Semedo",
+        "full_name": "Yannick Semedo",
+        "position": "MF"
+      },
+      {
+        "surname": "Semedo",
+        "full_name": "Willy Semedo",
+        "position": "MF"
+      },
+      {
+        "surname": "Arcanjo",
+        "full_name": "Telmo Arcanjo",
+        "position": "MF"
+      },
+      {
+        "surname": "Livramento",
+        "full_name": "Dailon Livramento",
+        "position": "FW"
+      },
+      {
+        "surname": "Mendes",
+        "full_name": "Ryan Mendes",
+        "position": "FW"
+      },
+      {
+        "surname": "da Costa",
+        "full_name": "Nuno da Costa",
+        "position": "MF"
+      },
+      {
+        "surname": "Moreira",
+        "full_name": "Steven Moreira",
+        "position": "DF"
+      },
+      {
+        "surname": "dos Santos",
+        "full_name": "CJ dos Santos",
+        "position": "GK"
+      },
+      {
+        "surname": "Pina",
+        "full_name": "Wagner Pina",
+        "position": "DF"
+      },
+      {
+        "surname": "Pires",
+        "full_name": "Kelvin Pires",
+        "position": "DF"
+      },
+      {
+        "surname": "Varela",
+        "full_name": "Hélio Varela",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "KSA",
+    "team": "Saudi Arabia",
+    "players": [
+      {
+        "surname": "Al-Aqidi",
+        "full_name": "Nawaf Al-Aqidi",
+        "position": "GK"
+      },
+      {
+        "surname": "Majrashi",
+        "full_name": "Ali Majrashi",
+        "position": "DF"
+      },
+      {
+        "surname": "Lajami",
+        "full_name": "Ali Lajami",
+        "position": "DF"
+      },
+      {
+        "surname": "Al-Amri",
+        "full_name": "Abdulelah Al-Amri",
+        "position": "DF"
+      },
+      {
+        "surname": "Al-Tambakti",
+        "full_name": "Hassan Al-Tambakti",
+        "position": "DF"
+      },
+      {
+        "surname": "Al-Dawsari",
+        "full_name": "Nasser Al-Dawsari",
+        "position": "MF"
+      },
+      {
+        "surname": "Al-Juwayr",
+        "full_name": "Musab Al-Juwayr",
+        "position": "MF"
+      },
+      {
+        "surname": "Yahya",
+        "full_name": "Ayman Yahya",
+        "position": "FW"
+      },
+      {
+        "surname": "Al-Buraikan",
+        "full_name": "Firas Al-Buraikan",
+        "position": "FW"
+      },
+      {
+        "surname": "Al-Dawsari",
+        "full_name": "Salem Al-Dawsari",
+        "position": "FW"
+      },
+      {
+        "surname": "Al-Shehri",
+        "full_name": "Saleh Al-Shehri",
+        "position": "FW"
+      },
+      {
+        "surname": "Abdulhamid",
+        "full_name": "Saud Abdulhamid",
+        "position": "DF"
+      },
+      {
+        "surname": "Boushal",
+        "full_name": "Nawaf Boushal",
+        "position": "DF"
+      },
+      {
+        "surname": "Kadesh",
+        "full_name": "Hassan Kadesh",
+        "position": "DF"
+      },
+      {
+        "surname": "Al-Khaibari",
+        "full_name": "Abdullah Al-Khaibari",
+        "position": "MF"
+      },
+      {
+        "surname": "Al-Johani",
+        "full_name": "Ziyad Al-Johani",
+        "position": "MF"
+      },
+      {
+        "surname": "Al-Ghannam",
+        "full_name": "Khalid Al-Ghannam",
+        "position": "FW"
+      },
+      {
+        "surname": "Al-Hejji",
+        "full_name": "Alaa Al-Hejji",
+        "position": "MF"
+      },
+      {
+        "surname": "Al-Hamdan",
+        "full_name": "Abdullah Al-Hamdan",
+        "position": "FW"
+      },
+      {
+        "surname": "Mandash",
+        "full_name": "Sultan Mandash",
+        "position": "FW"
+      },
+      {
+        "surname": "Al-Owais",
+        "full_name": "Mohammed Al-Owais",
+        "position": "GK"
+      },
+      {
+        "surname": "Al-Kassar",
+        "full_name": "Ahmed Al-Kassar",
+        "position": "GK"
+      },
+      {
+        "surname": "Kanno",
+        "full_name": "Mohamed Kanno",
+        "position": "MF"
+      },
+      {
+        "surname": "Al-Harbi",
+        "full_name": "Moteb Al-Harbi",
+        "position": "DF"
+      },
+      {
+        "surname": "Thakri",
+        "full_name": "Jehad Thakri",
+        "position": "DF"
+      },
+      {
+        "surname": "Abu Al-Shamat",
+        "full_name": "Mohammed Abu Al-Shamat",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "URU",
+    "team": "Uruguay",
+    "players": [
+      {
+        "surname": "Rochet",
+        "full_name": "Sergio Rochet",
+        "position": "GK"
+      },
+      {
+        "surname": "Giménez",
+        "full_name": "José Giménez",
+        "position": "DF"
+      },
+      {
+        "surname": "Cáceres",
+        "full_name": "Sebastián Cáceres",
+        "position": "DF"
+      },
+      {
+        "surname": "Araújo",
+        "full_name": "Ronald Araújo",
+        "position": "DF"
+      },
+      {
+        "surname": "Ugarte",
+        "full_name": "Manuel Ugarte",
+        "position": "MF"
+      },
+      {
+        "surname": "Bentancur",
+        "full_name": "Rodrigo Bentancur",
+        "position": "MF"
+      },
+      {
+        "surname": "Cruz",
+        "full_name": "Nicolás de la Cruz",
+        "position": "MF"
+      },
+      {
+        "surname": "Valverde",
+        "full_name": "Federico Valverde",
+        "position": "MF"
+      },
+      {
+        "surname": "Núñez",
+        "full_name": "Darwin Núñez",
+        "position": "FW"
+      },
+      {
+        "surname": "Arrascaeta",
+        "full_name": "Giorgian de Arrascaeta",
+        "position": "MF"
+      },
+      {
+        "surname": "Pellistri",
+        "full_name": "Facundo Pellistri",
+        "position": "FW"
+      },
+      {
+        "surname": "Mele",
+        "full_name": "Santiago Mele",
+        "position": "GK"
+      },
+      {
+        "surname": "Varela",
+        "full_name": "Guillermo Varela",
+        "position": "DF"
+      },
+      {
+        "surname": "Canobbio",
+        "full_name": "Agustín Canobbio",
+        "position": "MF"
+      },
+      {
+        "surname": "Martínez",
+        "full_name": "Emiliano Martínez",
+        "position": "MF"
+      },
+      {
+        "surname": "Olivera",
+        "full_name": "Mathías Olivera",
+        "position": "DF"
+      },
+      {
+        "surname": "Viña",
+        "full_name": "Matías Viña",
+        "position": "DF"
+      },
+      {
+        "surname": "Rodríguez",
+        "full_name": "Brian Rodríguez",
+        "position": "FW"
+      },
+      {
+        "surname": "Aguirre",
+        "full_name": "Rodrigo Aguirre",
+        "position": "FW"
+      },
+      {
+        "surname": "Araújo",
+        "full_name": "Maximiliano Araújo",
+        "position": "MF"
+      },
+      {
+        "surname": "Viñas",
+        "full_name": "Federico Viñas",
+        "position": "FW"
+      },
+      {
+        "surname": "Piquerez",
+        "full_name": "Joaquín Piquerez",
+        "position": "MF"
+      },
+      {
+        "surname": "Muslera",
+        "full_name": "Fernando Muslera",
+        "position": "GK"
+      },
+      {
+        "surname": "Bueno",
+        "full_name": "Santiago Bueno",
+        "position": "DF"
+      },
+      {
+        "surname": "Sanabria",
+        "full_name": "Juan Manuel Sanabria",
+        "position": "MF"
+      },
+      {
+        "surname": "Zalazar",
+        "full_name": "Rodrigo Zalazar",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "FRA",
+    "team": "France",
+    "players": [
+      {
+        "surname": "Samba",
+        "full_name": "Brice Samba",
+        "position": "GK"
+      },
+      {
+        "surname": "Gusto",
+        "full_name": "Malo Gusto",
+        "position": "DF"
+      },
+      {
+        "surname": "Digne",
+        "full_name": "Lucas Digne",
+        "position": "DF"
+      },
+      {
+        "surname": "Upamecano",
+        "full_name": "Dayot Upamecano",
+        "position": "DF"
+      },
+      {
+        "surname": "Koundé",
+        "full_name": "Jules Koundé",
+        "position": "DF"
+      },
+      {
+        "surname": "Koné",
+        "full_name": "Manu Koné",
+        "position": "MF"
+      },
+      {
+        "surname": "Dembélé",
+        "full_name": "Ousmane Dembélé",
+        "position": "FW"
+      },
+      {
+        "surname": "Tchouaméni",
+        "full_name": "Aurélien Tchouaméni",
+        "position": "MF"
+      },
+      {
+        "surname": "Thuram",
+        "full_name": "Marcus Thuram",
+        "position": "FW"
+      },
+      {
+        "surname": "Mbappé",
+        "full_name": "Kylian Mbappé",
+        "position": "FW"
+      },
+      {
+        "surname": "Olise",
+        "full_name": "Michael Olise",
+        "position": "FW"
+      },
+      {
+        "surname": "Barcola",
+        "full_name": "Bradley Barcola",
+        "position": "FW"
+      },
+      {
+        "surname": "Kanté",
+        "full_name": "N'Golo Kanté",
+        "position": "MF"
+      },
+      {
+        "surname": "Rabiot",
+        "full_name": "Adrien Rabiot",
+        "position": "MF"
+      },
+      {
+        "surname": "Konaté",
+        "full_name": "Ibrahima Konaté",
+        "position": "DF"
+      },
+      {
+        "surname": "Maignan",
+        "full_name": "Mike Maignan",
+        "position": "GK"
+      },
+      {
+        "surname": "Saliba",
+        "full_name": "William Saliba",
+        "position": "DF"
+      },
+      {
+        "surname": "Zaïre-Emery",
+        "full_name": "Warren Zaïre-Emery",
+        "position": "MF"
+      },
+      {
+        "surname": "Hernandez",
+        "full_name": "Théo Hernandez",
+        "position": "DF"
+      },
+      {
+        "surname": "Doué",
+        "full_name": "Désiré Doué",
+        "position": "FW"
+      },
+      {
+        "surname": "Hernandez",
+        "full_name": "Lucas Hernandez",
+        "position": "DF"
+      },
+      {
+        "surname": "Mateta",
+        "full_name": "Jean-Philippe Mateta",
+        "position": "FW"
+      },
+      {
+        "surname": "Risser",
+        "full_name": "Robin Risser",
+        "position": "GK"
+      },
+      {
+        "surname": "Cherki",
+        "full_name": "Rayan Cherki",
+        "position": "MF"
+      },
+      {
+        "surname": "Akliouche",
+        "full_name": "Maghnes Akliouche",
+        "position": "MF"
+      },
+      {
+        "surname": "Lacroix",
+        "full_name": "Maxence Lacroix",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "SEN",
+    "team": "Senegal",
+    "players": [
+      {
+        "surname": "Diouf",
+        "full_name": "Yehvann Diouf",
+        "position": "GK"
+      },
+      {
+        "surname": "Sarr",
+        "full_name": "Mamadou Sarr",
+        "position": "DF"
+      },
+      {
+        "surname": "Koulibaly",
+        "full_name": "Kalidou Koulibaly",
+        "position": "DF"
+      },
+      {
+        "surname": "Seck",
+        "full_name": "Abdoulaye Seck",
+        "position": "DF"
+      },
+      {
+        "surname": "Gueye",
+        "full_name": "Idrissa Gueye",
+        "position": "MF"
+      },
+      {
+        "surname": "Ciss",
+        "full_name": "Pathé Ciss",
+        "position": "MF"
+      },
+      {
+        "surname": "Diao",
+        "full_name": "Assane Diao",
+        "position": "FW"
+      },
+      {
+        "surname": "Camara",
+        "full_name": "Lamine Camara",
+        "position": "MF"
+      },
+      {
+        "surname": "Dieng",
+        "full_name": "Bamba Dieng",
+        "position": "FW"
+      },
+      {
+        "surname": "Mané",
+        "full_name": "Sadio Mané",
+        "position": "FW"
+      },
+      {
+        "surname": "Jackson",
+        "full_name": "Nicolas Jackson",
+        "position": "FW"
+      },
+      {
+        "surname": "Ndiaye",
+        "full_name": "Cherif Ndiaye",
+        "position": "FW"
+      },
+      {
+        "surname": "Ndiaye",
+        "full_name": "Iliman Ndiaye",
+        "position": "FW"
+      },
+      {
+        "surname": "Jakobs",
+        "full_name": "Ismail Jakobs",
+        "position": "DF"
+      },
+      {
+        "surname": "Diatta",
+        "full_name": "Krépin Diatta",
+        "position": "DF"
+      },
+      {
+        "surname": "Mendy",
+        "full_name": "Édouard Mendy",
+        "position": "GK"
+      },
+      {
+        "surname": "Sarr",
+        "full_name": "Pape Matar Sarr",
+        "position": "MF"
+      },
+      {
+        "surname": "Sarr",
+        "full_name": "Ismaïla Sarr",
+        "position": "FW"
+      },
+      {
+        "surname": "Niakhaté",
+        "full_name": "Moussa Niakhaté",
+        "position": "DF"
+      },
+      {
+        "surname": "Mbaye",
+        "full_name": "Ibrahim Mbaye",
+        "position": "FW"
+      },
+      {
+        "surname": "Diarra",
+        "full_name": "Habib Diarra",
+        "position": "MF"
+      },
+      {
+        "surname": "Sapoko Ndiaye",
+        "full_name": "Bara Sapoko Ndiaye",
+        "position": "MF"
+      },
+      {
+        "surname": "Diaw",
+        "full_name": "Mory Diaw",
+        "position": "GK"
+      },
+      {
+        "surname": "Mendy",
+        "full_name": "Antoine Mendy",
+        "position": "DF"
+      },
+      {
+        "surname": "Diouf",
+        "full_name": "El Hadji Malick Diouf",
+        "position": "DF"
+      },
+      {
+        "surname": "Gueye",
+        "full_name": "Pape Gueye",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "IRQ",
+    "team": "Iraq",
+    "players": [
+      {
+        "surname": "Talib",
+        "full_name": "Fahad Talib",
+        "position": "GK"
+      },
+      {
+        "surname": "Sulaka",
+        "full_name": "Rebin Sulaka",
+        "position": "DF"
+      },
+      {
+        "surname": "Ali",
+        "full_name": "Hussein Ali",
+        "position": "DF"
+      },
+      {
+        "surname": "Tahseen",
+        "full_name": "Zaid Tahseen",
+        "position": "DF"
+      },
+      {
+        "surname": "Hashim",
+        "full_name": "Akam Hashim",
+        "position": "DF"
+      },
+      {
+        "surname": "Younis",
+        "full_name": "Manaf Younis",
+        "position": "DF"
+      },
+      {
+        "surname": "Amyn",
+        "full_name": "Youssef Amyn",
+        "position": "MF"
+      },
+      {
+        "surname": "Bayesh",
+        "full_name": "Ibrahim Bayesh",
+        "position": "MF"
+      },
+      {
+        "surname": "Al-Hamadi",
+        "full_name": "Ali Al-Hamadi",
+        "position": "FW"
+      },
+      {
+        "surname": "Ali",
+        "full_name": "Mohanad Ali",
+        "position": "FW"
+      },
+      {
+        "surname": "Qasem",
+        "full_name": "Ahmed Qasem",
+        "position": "FW"
+      },
+      {
+        "surname": "Hassan",
+        "full_name": "Jalal Hassan",
+        "position": "GK"
+      },
+      {
+        "surname": "Yousif",
+        "full_name": "Ali Yousif",
+        "position": "FW"
+      },
+      {
+        "surname": "Iqbal",
+        "full_name": "Zidane Iqbal",
+        "position": "MF"
+      },
+      {
+        "surname": "Maknzi",
+        "full_name": "Ahmed Maknzi",
+        "position": "DF"
+      },
+      {
+        "surname": "Al-Ammari",
+        "full_name": "Amir Al-Ammari",
+        "position": "MF"
+      },
+      {
+        "surname": "Jasim",
+        "full_name": "Ali Jasim",
+        "position": "FW"
+      },
+      {
+        "surname": "Hussein",
+        "full_name": "Aymen Hussein",
+        "position": "FW"
+      },
+      {
+        "surname": "Yakob",
+        "full_name": "Kevin Yakob",
+        "position": "MF"
+      },
+      {
+        "surname": "Sher",
+        "full_name": "Aimar Sher",
+        "position": "MF"
+      },
+      {
+        "surname": "Farji",
+        "full_name": "Marko Farji",
+        "position": "FW"
+      },
+      {
+        "surname": "Basil",
+        "full_name": "Ahmed Basil",
+        "position": "GK"
+      },
+      {
+        "surname": "Doski",
+        "full_name": "Merchas Doski",
+        "position": "DF"
+      },
+      {
+        "surname": "Ismail",
+        "full_name": "Zaid Ismail",
+        "position": "MF"
+      },
+      {
+        "surname": "Saadoon",
+        "full_name": "Mustafa Saadoon",
+        "position": "DF"
+      },
+      {
+        "surname": "Putros",
+        "full_name": "Frans Putros",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "NOR",
+    "team": "Norway",
+    "players": [
+      {
+        "surname": "Nyland",
+        "full_name": "Ørjan Nyland",
+        "position": "GK"
+      },
+      {
+        "surname": "Thorsby",
+        "full_name": "Morten Thorsby",
+        "position": "MF"
+      },
+      {
+        "surname": "Ajer",
+        "full_name": "Kristoffer Ajer",
+        "position": "DF"
+      },
+      {
+        "surname": "Østigård",
+        "full_name": "Leo Østigård",
+        "position": "DF"
+      },
+      {
+        "surname": "Møller Wolfe",
+        "full_name": "David Møller Wolfe",
+        "position": "DF"
+      },
+      {
+        "surname": "Berg",
+        "full_name": "Patrick Berg",
+        "position": "MF"
+      },
+      {
+        "surname": "Sørloth",
+        "full_name": "Alexander Sørloth",
+        "position": "FW"
+      },
+      {
+        "surname": "Berge",
+        "full_name": "Sander Berge",
+        "position": "MF"
+      },
+      {
+        "surname": "Haaland",
+        "full_name": "Erling Haaland",
+        "position": "FW"
+      },
+      {
+        "surname": "Ødegaard",
+        "full_name": "Martin Ødegaard",
+        "position": "MF"
+      },
+      {
+        "surname": "Strand Larsen",
+        "full_name": "Jørgen Strand Larsen",
+        "position": "FW"
+      },
+      {
+        "surname": "Tangvik",
+        "full_name": "Sander Tangvik",
+        "position": "GK"
+      },
+      {
+        "surname": "Selvik",
+        "full_name": "Egil Selvik",
+        "position": "GK"
+      },
+      {
+        "surname": "Aursnes",
+        "full_name": "Fredrik Aursnes",
+        "position": "MF"
+      },
+      {
+        "surname": "Bjørkan",
+        "full_name": "Fredrik André Bjørkan",
+        "position": "DF"
+      },
+      {
+        "surname": "Pedersen",
+        "full_name": "Marcus Holmgren Pedersen",
+        "position": "DF"
+      },
+      {
+        "surname": "Heggem",
+        "full_name": "Torbjørn Heggem",
+        "position": "DF"
+      },
+      {
+        "surname": "Thorstvedt",
+        "full_name": "Kristian Thorstvedt",
+        "position": "MF"
+      },
+      {
+        "surname": "Aasgaard",
+        "full_name": "Thelo Aasgaard",
+        "position": "MF"
+      },
+      {
+        "surname": "Nusa",
+        "full_name": "Antonio Nusa",
+        "position": "FW"
+      },
+      {
+        "surname": "Schjelderup",
+        "full_name": "Andreas Schjelderup",
+        "position": "MF"
+      },
+      {
+        "surname": "Bobb",
+        "full_name": "Oscar Bobb",
+        "position": "MF"
+      },
+      {
+        "surname": "Hauge",
+        "full_name": "Jens Petter Hauge",
+        "position": "MF"
+      },
+      {
+        "surname": "Langås",
+        "full_name": "Sondre Langås",
+        "position": "DF"
+      },
+      {
+        "surname": "Falchener",
+        "full_name": "Henrik Falchener",
+        "position": "DF"
+      },
+      {
+        "surname": "Ryerson",
+        "full_name": "Julian Ryerson",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "ARG",
+    "team": "Argentina",
+    "players": [
+      {
+        "surname": "Musso",
+        "full_name": "Juan Musso",
+        "position": "GK"
+      },
+      {
+        "surname": "Balerdi",
+        "full_name": "Leonardo Balerdi",
+        "position": "DF"
+      },
+      {
+        "surname": "Tagliafico",
+        "full_name": "Nicolás Tagliafico",
+        "position": "DF"
+      },
+      {
+        "surname": "Montiel",
+        "full_name": "Gonzalo Montiel",
+        "position": "DF"
+      },
+      {
+        "surname": "Paredes",
+        "full_name": "Leandro Paredes",
+        "position": "MF"
+      },
+      {
+        "surname": "Martínez",
+        "full_name": "Lisandro Martínez",
+        "position": "DF"
+      },
+      {
+        "surname": "De Paul",
+        "full_name": "Rodrigo De Paul",
+        "position": "MF"
+      },
+      {
+        "surname": "Barco",
+        "full_name": "Valentín Barco",
+        "position": "MF"
+      },
+      {
+        "surname": "Alvarez",
+        "full_name": "Julián Alvarez",
+        "position": "FW"
+      },
+      {
+        "surname": "Messi",
+        "full_name": "Lionel Messi",
+        "position": "FW"
+      },
+      {
+        "surname": "Lo Celso",
+        "full_name": "Giovani Lo Celso",
+        "position": "MF"
+      },
+      {
+        "surname": "Rulli",
+        "full_name": "Gerónimo Rulli",
+        "position": "GK"
+      },
+      {
+        "surname": "Romero",
+        "full_name": "Cristian Romero",
+        "position": "DF"
+      },
+      {
+        "surname": "Palacios",
+        "full_name": "Exequiel Palacios",
+        "position": "MF"
+      },
+      {
+        "surname": "González",
+        "full_name": "Nicolás González",
+        "position": "MF"
+      },
+      {
+        "surname": "Almada",
+        "full_name": "Thiago Almada",
+        "position": "FW"
+      },
+      {
+        "surname": "Simeone",
+        "full_name": "Giuliano Simeone",
+        "position": "FW"
+      },
+      {
+        "surname": "Paz",
+        "full_name": "Nico Paz",
+        "position": "FW"
+      },
+      {
+        "surname": "Otamendi",
+        "full_name": "Nicolás Otamendi",
+        "position": "DF"
+      },
+      {
+        "surname": "Mac Allister",
+        "full_name": "Alexis Mac Allister",
+        "position": "MF"
+      },
+      {
+        "surname": "López",
+        "full_name": "José Manuel López",
+        "position": "FW"
+      },
+      {
+        "surname": "Martínez",
+        "full_name": "Lautaro Martínez",
+        "position": "FW"
+      },
+      {
+        "surname": "Martínez",
+        "full_name": "Emiliano Martínez",
+        "position": "GK"
+      },
+      {
+        "surname": "Fernández",
+        "full_name": "Enzo Fernández",
+        "position": "MF"
+      },
+      {
+        "surname": "Medina",
+        "full_name": "Facundo Medina",
+        "position": "DF"
+      },
+      {
+        "surname": "Molina",
+        "full_name": "Nahuel Molina",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "ALG",
+    "team": "Algeria",
+    "players": [
+      {
+        "surname": "Mastil",
+        "full_name": "Melvin Mastil",
+        "position": "GK"
+      },
+      {
+        "surname": "Mandi",
+        "full_name": "Aïssa Mandi",
+        "position": "DF"
+      },
+      {
+        "surname": "Abada",
+        "full_name": "Achref Abada",
+        "position": "DF"
+      },
+      {
+        "surname": "Tougai",
+        "full_name": "Mohamed Amine Tougai",
+        "position": "DF"
+      },
+      {
+        "surname": "Belaïd",
+        "full_name": "Zineddine Belaïd",
+        "position": "DF"
+      },
+      {
+        "surname": "Zerrouki",
+        "full_name": "Ramiz Zerrouki",
+        "position": "MF"
+      },
+      {
+        "surname": "Mahrez",
+        "full_name": "Riyad Mahrez",
+        "position": "FW"
+      },
+      {
+        "surname": "Aouar",
+        "full_name": "Houssem Aouar",
+        "position": "MF"
+      },
+      {
+        "surname": "Gouiri",
+        "full_name": "Amine Gouiri",
+        "position": "FW"
+      },
+      {
+        "surname": "Chaïbi",
+        "full_name": "Farès Chaïbi",
+        "position": "MF"
+      },
+      {
+        "surname": "Hadj Moussa",
+        "full_name": "Anis Hadj Moussa",
+        "position": "FW"
+      },
+      {
+        "surname": "Benbouali",
+        "full_name": "Nadhir Benbouali",
+        "position": "FW"
+      },
+      {
+        "surname": "Hadjam",
+        "full_name": "Jaouen Hadjam",
+        "position": "DF"
+      },
+      {
+        "surname": "Boudaoui",
+        "full_name": "Hicham Boudaoui",
+        "position": "MF"
+      },
+      {
+        "surname": "Aït-Nouri",
+        "full_name": "Rayan Aït-Nouri",
+        "position": "DF"
+      },
+      {
+        "surname": "Benbot",
+        "full_name": "Oussama Benbot",
+        "position": "GK"
+      },
+      {
+        "surname": "Belghali",
+        "full_name": "Rafik Belghali",
+        "position": "DF"
+      },
+      {
+        "surname": "Amoura",
+        "full_name": "Mohamed Amoura",
+        "position": "FW"
+      },
+      {
+        "surname": "Bentaleb",
+        "full_name": "Nabil Bentaleb",
+        "position": "MF"
+      },
+      {
+        "surname": "Boulbina",
+        "full_name": "Adil Boulbina",
+        "position": "FW"
+      },
+      {
+        "surname": "Bensebaini",
+        "full_name": "Ramy Bensebaini",
+        "position": "DF"
+      },
+      {
+        "surname": "Maza",
+        "full_name": "Ibrahim Maza",
+        "position": "MF"
+      },
+      {
+        "surname": "Zidane",
+        "full_name": "Luca Zidane",
+        "position": "GK"
+      },
+      {
+        "surname": "Titraoui",
+        "full_name": "Yacine Titraoui",
+        "position": "MF"
+      },
+      {
+        "surname": "Ghedjemis",
+        "full_name": "Farès Ghedjemis",
+        "position": "FW"
+      },
+      {
+        "surname": "Chergui",
+        "full_name": "Samir Chergui",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "AUT",
+    "team": "Austria",
+    "players": [
+      {
+        "surname": "Schlager",
+        "full_name": "Alexander Schlager",
+        "position": "GK"
+      },
+      {
+        "surname": "Affengruber",
+        "full_name": "David Affengruber",
+        "position": "DF"
+      },
+      {
+        "surname": "Danso",
+        "full_name": "Kevin Danso",
+        "position": "DF"
+      },
+      {
+        "surname": "Schlager",
+        "full_name": "Xaver Schlager",
+        "position": "MF"
+      },
+      {
+        "surname": "Posch",
+        "full_name": "Stefan Posch",
+        "position": "DF"
+      },
+      {
+        "surname": "Seiwald",
+        "full_name": "Nicolas Seiwald",
+        "position": "MF"
+      },
+      {
+        "surname": "Arnautović",
+        "full_name": "Marko Arnautović",
+        "position": "FW"
+      },
+      {
+        "surname": "Alaba",
+        "full_name": "David Alaba",
+        "position": "DF"
+      },
+      {
+        "surname": "Sabitzer",
+        "full_name": "Marcel Sabitzer",
+        "position": "MF"
+      },
+      {
+        "surname": "Grillitsch",
+        "full_name": "Florian Grillitsch",
+        "position": "MF"
+      },
+      {
+        "surname": "Gregoritsch",
+        "full_name": "Michael Gregoritsch",
+        "position": "FW"
+      },
+      {
+        "surname": "Wiegele",
+        "full_name": "Florian Wiegele",
+        "position": "GK"
+      },
+      {
+        "surname": "Pentz",
+        "full_name": "Patrick Pentz",
+        "position": "GK"
+      },
+      {
+        "surname": "Kalajdžić",
+        "full_name": "Saša Kalajdžić",
+        "position": "FW"
+      },
+      {
+        "surname": "Lienhart",
+        "full_name": "Philipp Lienhart",
+        "position": "DF"
+      },
+      {
+        "surname": "Mwene",
+        "full_name": "Phillipp Mwene",
+        "position": "DF"
+      },
+      {
+        "surname": "Chukwuemeka",
+        "full_name": "Carney Chukwuemeka",
+        "position": "MF"
+      },
+      {
+        "surname": "Schmid",
+        "full_name": "Romano Schmid",
+        "position": "MF"
+      },
+      {
+        "surname": "Baumgartner",
+        "full_name": "Christoph Baumgartner",
+        "position": "MF"
+      },
+      {
+        "surname": "Laimer",
+        "full_name": "Konrad Laimer",
+        "position": "MF"
+      },
+      {
+        "surname": "Wimmer",
+        "full_name": "Patrick Wimmer",
+        "position": "FW"
+      },
+      {
+        "surname": "Prass",
+        "full_name": "Alexander Prass",
+        "position": "MF"
+      },
+      {
+        "surname": "Friedl",
+        "full_name": "Marco Friedl",
+        "position": "DF"
+      },
+      {
+        "surname": "Wanner",
+        "full_name": "Paul Wanner",
+        "position": "MF"
+      },
+      {
+        "surname": "Svoboda",
+        "full_name": "Michael Svoboda",
+        "position": "DF"
+      },
+      {
+        "surname": "Schöpf",
+        "full_name": "Alessandro Schöpf",
+        "position": "MF"
+      }
+    ]
+  },
+  {
+    "code": "JOR",
+    "team": "Jordan",
+    "players": [
+      {
+        "surname": "Abulaila",
+        "full_name": "Yazeed Abulaila",
+        "position": "GK"
+      },
+      {
+        "surname": "Abu Hashish",
+        "full_name": "Mohammad Abu Hashish",
+        "position": "DF"
+      },
+      {
+        "surname": "Nasib",
+        "full_name": "Abdallah Nasib",
+        "position": "DF"
+      },
+      {
+        "surname": "Abu Dahab",
+        "full_name": "Husam Abu Dahab",
+        "position": "DF"
+      },
+      {
+        "surname": "Al-Arab",
+        "full_name": "Yazan Al-Arab",
+        "position": "DF"
+      },
+      {
+        "surname": "Jamous",
+        "full_name": "Amer Jamous",
+        "position": "MF"
+      },
+      {
+        "surname": "Abu Zrayq",
+        "full_name": "Mohammad Abu Zrayq",
+        "position": "FW"
+      },
+      {
+        "surname": "Al-Rawabdeh",
+        "full_name": "Noor Al-Rawabdeh",
+        "position": "MF"
+      },
+      {
+        "surname": "Olwan",
+        "full_name": "Ali Olwan",
+        "position": "FW"
+      },
+      {
+        "surname": "Al-Taamari",
+        "full_name": "Musa Al-Taamari",
+        "position": "FW"
+      },
+      {
+        "surname": "Al-Fakhouri",
+        "full_name": "Odeh Al-Fakhouri",
+        "position": "FW"
+      },
+      {
+        "surname": "Bani Attiah",
+        "full_name": "Nour Bani Attiah",
+        "position": "GK"
+      },
+      {
+        "surname": "Al-Mardi",
+        "full_name": "Mahmoud Al-Mardi",
+        "position": "FW"
+      },
+      {
+        "surname": "Ayed",
+        "full_name": "Rajaei Ayed",
+        "position": "MF"
+      },
+      {
+        "surname": "Sadeh",
+        "full_name": "Ibrahim Sadeh",
+        "position": "MF"
+      },
+      {
+        "surname": "Abualnadi",
+        "full_name": "Mo Abualnadi",
+        "position": "DF"
+      },
+      {
+        "surname": "Obaid",
+        "full_name": "Salim Obaid",
+        "position": "DF"
+      },
+      {
+        "surname": "Taha",
+        "full_name": "Mohammad Taha",
+        "position": "DF"
+      },
+      {
+        "surname": "Al-Rosan",
+        "full_name": "Saed Al-Rosan",
+        "position": "DF"
+      },
+      {
+        "surname": "Abu Taha",
+        "full_name": "Mohannad Abu Taha",
+        "position": "MF"
+      },
+      {
+        "surname": "Al-Rashdan",
+        "full_name": "Nizar Al-Rashdan",
+        "position": "MF"
+      },
+      {
+        "surname": "Al-Fakhouri",
+        "full_name": "Abdallah Al-Fakhouri",
+        "position": "GK"
+      },
+      {
+        "surname": "Haddad",
+        "full_name": "Ihsan Haddad",
+        "position": "DF"
+      },
+      {
+        "surname": "Azaizeh",
+        "full_name": "Ali Azaizeh",
+        "position": "FW"
+      },
+      {
+        "surname": "Al-Dawoud",
+        "full_name": "Mohammad Al-Dawoud",
+        "position": "MF"
+      },
+      {
+        "surname": "Badawi",
+        "full_name": "Anas Badawi",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "POR",
+    "team": "Portugal",
+    "players": [
+      {
+        "surname": "Costa",
+        "full_name": "Diogo Costa",
+        "position": "GK"
+      },
+      {
+        "surname": "Semedo",
+        "full_name": "Nélson Semedo",
+        "position": "DF"
+      },
+      {
+        "surname": "Dias",
+        "full_name": "Rúben Dias",
+        "position": "DF"
+      },
+      {
+        "surname": "Araújo",
+        "full_name": "Tomás Araújo",
+        "position": "DF"
+      },
+      {
+        "surname": "Dalot",
+        "full_name": "Diogo Dalot",
+        "position": "DF"
+      },
+      {
+        "surname": "Nunes",
+        "full_name": "Matheus Nunes",
+        "position": "MF"
+      },
+      {
+        "surname": "Ronaldo",
+        "full_name": "Cristiano Ronaldo",
+        "position": "FW"
+      },
+      {
+        "surname": "Fernandes",
+        "full_name": "Bruno Fernandes",
+        "position": "MF"
+      },
+      {
+        "surname": "Ramos",
+        "full_name": "Gonçalo Ramos",
+        "position": "FW"
+      },
+      {
+        "surname": "Silva",
+        "full_name": "Bernardo Silva",
+        "position": "MF"
+      },
+      {
+        "surname": "Félix",
+        "full_name": "João Félix",
+        "position": "FW"
+      },
+      {
+        "surname": "Sá",
+        "full_name": "José Sá",
+        "position": "GK"
+      },
+      {
+        "surname": "Veiga",
+        "full_name": "Renato Veiga",
+        "position": "DF"
+      },
+      {
+        "surname": "Inácio",
+        "full_name": "Gonçalo Inácio",
+        "position": "DF"
+      },
+      {
+        "surname": "Neves",
+        "full_name": "João Neves",
+        "position": "MF"
+      },
+      {
+        "surname": "Trincão",
+        "full_name": "Francisco Trincão",
+        "position": "FW"
+      },
+      {
+        "surname": "Leão",
+        "full_name": "Rafael Leão",
+        "position": "FW"
+      },
+      {
+        "surname": "Neto",
+        "full_name": "Pedro Neto",
+        "position": "FW"
+      },
+      {
+        "surname": "Guedes",
+        "full_name": "Gonçalo Guedes",
+        "position": "FW"
+      },
+      {
+        "surname": "Cancelo",
+        "full_name": "João Cancelo",
+        "position": "DF"
+      },
+      {
+        "surname": "Neves",
+        "full_name": "Rúben Neves",
+        "position": "MF"
+      },
+      {
+        "surname": "Silva",
+        "full_name": "Rui Silva",
+        "position": "GK"
+      },
+      {
+        "surname": "Vitinha",
+        "full_name": "Vitinha",
+        "position": "MF"
+      },
+      {
+        "surname": "Costa",
+        "full_name": "Samú Costa",
+        "position": "DF"
+      },
+      {
+        "surname": "Mendes",
+        "full_name": "Nuno Mendes",
+        "position": "DF"
+      },
+      {
+        "surname": "Conceição",
+        "full_name": "Francisco Conceição",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "COD",
+    "team": "DR Congo",
+    "players": [
+      {
+        "surname": "Mpasi",
+        "full_name": "Lionel Mpasi",
+        "position": "GK"
+      },
+      {
+        "surname": "Wan-Bissaka",
+        "full_name": "Aaron Wan-Bissaka",
+        "position": "DF"
+      },
+      {
+        "surname": "Kapuadi",
+        "full_name": "Steve Kapuadi",
+        "position": "DF"
+      },
+      {
+        "surname": "Tuanzebe",
+        "full_name": "Axel Tuanzebe",
+        "position": "DF"
+      },
+      {
+        "surname": "Batubinsika",
+        "full_name": "Dylan Batubinsika",
+        "position": "DF"
+      },
+      {
+        "surname": "Mukau",
+        "full_name": "Ngal'ayel Mukau",
+        "position": "MF"
+      },
+      {
+        "surname": "Mbuku",
+        "full_name": "Nathanaël Mbuku",
+        "position": "MF"
+      },
+      {
+        "surname": "Moutoussamy",
+        "full_name": "Samuel Moutoussamy",
+        "position": "MF"
+      },
+      {
+        "surname": "Cipenga",
+        "full_name": "Brian Cipenga",
+        "position": "FW"
+      },
+      {
+        "surname": "Bongonda",
+        "full_name": "Théo Bongonda",
+        "position": "MF"
+      },
+      {
+        "surname": "Kakuta",
+        "full_name": "Gaël Kakuta",
+        "position": "FW"
+      },
+      {
+        "surname": "Kayembe",
+        "full_name": "Joris Kayembe",
+        "position": "DF"
+      },
+      {
+        "surname": "Elia",
+        "full_name": "Meschak Elia",
+        "position": "FW"
+      },
+      {
+        "surname": "Sadiki",
+        "full_name": "Noah Sadiki",
+        "position": "MF"
+      },
+      {
+        "surname": "Tshibola",
+        "full_name": "Aaron Tshibola",
+        "position": "MF"
+      },
+      {
+        "surname": "Fayulu",
+        "full_name": "Timothy Fayulu",
+        "position": "GK"
+      },
+      {
+        "surname": "Bakambu",
+        "full_name": "Cédric Bakambu",
+        "position": "FW"
+      },
+      {
+        "surname": "Pickel",
+        "full_name": "Charles Pickel",
+        "position": "MF"
+      },
+      {
+        "surname": "Mayele",
+        "full_name": "Fiston Mayele",
+        "position": "FW"
+      },
+      {
+        "surname": "Wissa",
+        "full_name": "Yoane Wissa",
+        "position": "FW"
+      },
+      {
+        "surname": "Epolo",
+        "full_name": "Matthieu Epolo",
+        "position": "GK"
+      },
+      {
+        "surname": "Mbemba",
+        "full_name": "Chancel Mbemba",
+        "position": "DF"
+      },
+      {
+        "surname": "Banza",
+        "full_name": "Simon Banza",
+        "position": "FW"
+      },
+      {
+        "surname": "Kalulu",
+        "full_name": "Gédéon Kalulu",
+        "position": "DF"
+      },
+      {
+        "surname": "Kayembe",
+        "full_name": "Edo Kayembe",
+        "position": "MF"
+      },
+      {
+        "surname": "Masuaku",
+        "full_name": "Arthur Masuaku",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "UZB",
+    "team": "Uzbekistan",
+    "players": [
+      {
+        "surname": "Yusupov",
+        "full_name": "Utkir Yusupov",
+        "position": "GK"
+      },
+      {
+        "surname": "Khusanov",
+        "full_name": "Abdukodir Khusanov",
+        "position": "DF"
+      },
+      {
+        "surname": "Alijonov",
+        "full_name": "Khojiakbar Alijonov",
+        "position": "DF"
+      },
+      {
+        "surname": "Sayfiev",
+        "full_name": "Farrukh Sayfiev",
+        "position": "DF"
+      },
+      {
+        "surname": "Ashurmatov",
+        "full_name": "Rustam Ashurmatov",
+        "position": "DF"
+      },
+      {
+        "surname": "Mozgovoy",
+        "full_name": "Akmal Mozgovoy",
+        "position": "MF"
+      },
+      {
+        "surname": "Shukurov",
+        "full_name": "Otabek Shukurov",
+        "position": "MF"
+      },
+      {
+        "surname": "Iskanderov",
+        "full_name": "Jamshid Iskanderov",
+        "position": "MF"
+      },
+      {
+        "surname": "Hamrobekov",
+        "full_name": "Odiljon Hamrobekov",
+        "position": "MF"
+      },
+      {
+        "surname": "Masharipov",
+        "full_name": "Jaloliddin Masharipov",
+        "position": "MF"
+      },
+      {
+        "surname": "Urunov",
+        "full_name": "Oston Urunov",
+        "position": "MF"
+      },
+      {
+        "surname": "Nematov",
+        "full_name": "Abduvohid Nematov",
+        "position": "GK"
+      },
+      {
+        "surname": "Nasrullaev",
+        "full_name": "Sherzod Nasrullaev",
+        "position": "DF"
+      },
+      {
+        "surname": "Shomurodov",
+        "full_name": "Eldor Shomurodov",
+        "position": "FW"
+      },
+      {
+        "surname": "Eshmurodov",
+        "full_name": "Umar Eshmurodov",
+        "position": "DF"
+      },
+      {
+        "surname": "Ergashev",
+        "full_name": "Botirali Ergashev",
+        "position": "GK"
+      },
+      {
+        "surname": "Khamdamov",
+        "full_name": "Dostonbek Khamdamov",
+        "position": "MF"
+      },
+      {
+        "surname": "Abdullaev",
+        "full_name": "Abdulla Abdullaev",
+        "position": "DF"
+      },
+      {
+        "surname": "Ganiev",
+        "full_name": "Azizjon Ganiev",
+        "position": "MF"
+      },
+      {
+        "surname": "Amonov",
+        "full_name": "Azizbek Amonov",
+        "position": "FW"
+      },
+      {
+        "surname": "Sergeev",
+        "full_name": "Igor Sergeev",
+        "position": "FW"
+      },
+      {
+        "surname": "Fayzullaev",
+        "full_name": "Abbosbek Fayzullaev",
+        "position": "MF"
+      },
+      {
+        "surname": "Esanov",
+        "full_name": "Sherzod Esanov",
+        "position": "MF"
+      },
+      {
+        "surname": "Karimov",
+        "full_name": "Bekhruz Karimov",
+        "position": "DF"
+      },
+      {
+        "surname": "Ulmasaliev",
+        "full_name": "Avazbek Ulmasaliev",
+        "position": "DF"
+      },
+      {
+        "surname": "Urozov",
+        "full_name": "Jakhongir Urozov",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "COL",
+    "team": "Colombia",
+    "players": [
+      {
+        "surname": "Ospina",
+        "full_name": "David Ospina",
+        "position": "GK"
+      },
+      {
+        "surname": "Muñoz",
+        "full_name": "Daniel Muñoz",
+        "position": "DF"
+      },
+      {
+        "surname": "Lucumí",
+        "full_name": "Jhon Lucumí",
+        "position": "DF"
+      },
+      {
+        "surname": "Arias",
+        "full_name": "Santiago Arias",
+        "position": "DF"
+      },
+      {
+        "surname": "Castaño",
+        "full_name": "Kevin Castaño",
+        "position": "MF"
+      },
+      {
+        "surname": "Ríos",
+        "full_name": "Richard Ríos",
+        "position": "MF"
+      },
+      {
+        "surname": "Díaz",
+        "full_name": "Luis Díaz",
+        "position": "FW"
+      },
+      {
+        "surname": "Carrascal",
+        "full_name": "Jorge Carrascal",
+        "position": "MF"
+      },
+      {
+        "surname": "Córdoba",
+        "full_name": "Jhon Córdoba",
+        "position": "FW"
+      },
+      {
+        "surname": "Rodríguez",
+        "full_name": "James Rodríguez",
+        "position": "MF"
+      },
+      {
+        "surname": "Arias",
+        "full_name": "Jhon Arias",
+        "position": "MF"
+      },
+      {
+        "surname": "Vargas",
+        "full_name": "Camilo Vargas",
+        "position": "GK"
+      },
+      {
+        "surname": "Mina",
+        "full_name": "Yerry Mina",
+        "position": "DF"
+      },
+      {
+        "surname": "Puerta",
+        "full_name": "Gustavo Puerta",
+        "position": "DF"
+      },
+      {
+        "surname": "Portilla",
+        "full_name": "Juan Portilla",
+        "position": "MF"
+      },
+      {
+        "surname": "Lerma",
+        "full_name": "Jefferson Lerma",
+        "position": "MF"
+      },
+      {
+        "surname": "Mojica",
+        "full_name": "Johan Mojica",
+        "position": "DF"
+      },
+      {
+        "surname": "Ditta",
+        "full_name": "Willer Ditta",
+        "position": "DF"
+      },
+      {
+        "surname": "Hernández",
+        "full_name": "Cucho Hernández",
+        "position": "FW"
+      },
+      {
+        "surname": "Quintero",
+        "full_name": "Juan Fernando Quintero",
+        "position": "MF"
+      },
+      {
+        "surname": "Campaz",
+        "full_name": "Jaminton Campaz",
+        "position": "FW"
+      },
+      {
+        "surname": "Machado",
+        "full_name": "Deiver Machado",
+        "position": "DF"
+      },
+      {
+        "surname": "Sánchez",
+        "full_name": "Davinson Sánchez",
+        "position": "DF"
+      },
+      {
+        "surname": "Montero",
+        "full_name": "Álvaro Montero",
+        "position": "GK"
+      },
+      {
+        "surname": "Suárez",
+        "full_name": "Luis Suárez",
+        "position": "FW"
+      },
+      {
+        "surname": "Gómez",
+        "full_name": "Andrés Gómez",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "ENG",
+    "team": "England",
+    "players": [
+      {
+        "surname": "Pickford",
+        "full_name": "Jordan Pickford",
+        "position": "GK"
+      },
+      {
+        "surname": "Konsa",
+        "full_name": "Ezri Konsa",
+        "position": "DF"
+      },
+      {
+        "surname": "O'Reilly",
+        "full_name": "Nico O'Reilly",
+        "position": "DF"
+      },
+      {
+        "surname": "Rice",
+        "full_name": "Declan Rice",
+        "position": "MF"
+      },
+      {
+        "surname": "Stones",
+        "full_name": "John Stones",
+        "position": "DF"
+      },
+      {
+        "surname": "Guéhi",
+        "full_name": "Marc Guéhi",
+        "position": "DF"
+      },
+      {
+        "surname": "Saka",
+        "full_name": "Bukayo Saka",
+        "position": "FW"
+      },
+      {
+        "surname": "Anderson",
+        "full_name": "Elliot Anderson",
+        "position": "MF"
+      },
+      {
+        "surname": "Kane",
+        "full_name": "Harry Kane",
+        "position": "FW"
+      },
+      {
+        "surname": "Bellingham",
+        "full_name": "Jude Bellingham",
+        "position": "MF"
+      },
+      {
+        "surname": "Rashford",
+        "full_name": "Marcus Rashford",
+        "position": "FW"
+      },
+      {
+        "surname": "Livramento",
+        "full_name": "Tino Livramento",
+        "position": "DF"
+      },
+      {
+        "surname": "Henderson",
+        "full_name": "Dean Henderson",
+        "position": "GK"
+      },
+      {
+        "surname": "Henderson",
+        "full_name": "Jordan Henderson",
+        "position": "MF"
+      },
+      {
+        "surname": "Burn",
+        "full_name": "Dan Burn",
+        "position": "DF"
+      },
+      {
+        "surname": "Mainoo",
+        "full_name": "Kobbie Mainoo",
+        "position": "MF"
+      },
+      {
+        "surname": "Rogers",
+        "full_name": "Morgan Rogers",
+        "position": "MF"
+      },
+      {
+        "surname": "Gordon",
+        "full_name": "Anthony Gordon",
+        "position": "FW"
+      },
+      {
+        "surname": "Watkins",
+        "full_name": "Ollie Watkins",
+        "position": "FW"
+      },
+      {
+        "surname": "Madueke",
+        "full_name": "Noni Madueke",
+        "position": "FW"
+      },
+      {
+        "surname": "Eze",
+        "full_name": "Eberechi Eze",
+        "position": "MF"
+      },
+      {
+        "surname": "Toney",
+        "full_name": "Ivan Toney",
+        "position": "FW"
+      },
+      {
+        "surname": "Trafford",
+        "full_name": "James Trafford",
+        "position": "GK"
+      },
+      {
+        "surname": "James",
+        "full_name": "Reece James",
+        "position": "DF"
+      },
+      {
+        "surname": "Spence",
+        "full_name": "Djed Spence",
+        "position": "DF"
+      },
+      {
+        "surname": "Quansah",
+        "full_name": "Jarell Quansah",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "CRO",
+    "team": "Croatia",
+    "players": [
+      {
+        "surname": "Livaković",
+        "full_name": "Dominik Livaković",
+        "position": "GK"
+      },
+      {
+        "surname": "Stanišić",
+        "full_name": "Josip Stanišić",
+        "position": "DF"
+      },
+      {
+        "surname": "Pongračić",
+        "full_name": "Marin Pongračić",
+        "position": "DF"
+      },
+      {
+        "surname": "Gvardiol",
+        "full_name": "Joško Gvardiol",
+        "position": "DF"
+      },
+      {
+        "surname": "Ćaleta-Car",
+        "full_name": "Duje Ćaleta-Car",
+        "position": "DF"
+      },
+      {
+        "surname": "Šutalo",
+        "full_name": "Josip Šutalo",
+        "position": "DF"
+      },
+      {
+        "surname": "Moro",
+        "full_name": "Nikola Moro",
+        "position": "MF"
+      },
+      {
+        "surname": "Kovačić",
+        "full_name": "Mateo Kovačić",
+        "position": "MF"
+      },
+      {
+        "surname": "Kramarić",
+        "full_name": "Andrej Kramarić",
+        "position": "FW"
+      },
+      {
+        "surname": "Modrić",
+        "full_name": "Luka Modrić",
+        "position": "MF"
+      },
+      {
+        "surname": "Budimir",
+        "full_name": "Ante Budimir",
+        "position": "FW"
+      },
+      {
+        "surname": "Pandur",
+        "full_name": "Ivor Pandur",
+        "position": "GK"
+      },
+      {
+        "surname": "Vlašić",
+        "full_name": "Nikola Vlašić",
+        "position": "MF"
+      },
+      {
+        "surname": "Perišić",
+        "full_name": "Ivan Perišić",
+        "position": "FW"
+      },
+      {
+        "surname": "Pašalić",
+        "full_name": "Mario Pašalić",
+        "position": "MF"
+      },
+      {
+        "surname": "Baturina",
+        "full_name": "Martin Baturina",
+        "position": "MF"
+      },
+      {
+        "surname": "Sučić",
+        "full_name": "Petar Sučić",
+        "position": "MF"
+      },
+      {
+        "surname": "Jakić",
+        "full_name": "Kristijan Jakić",
+        "position": "DF"
+      },
+      {
+        "surname": "Fruk",
+        "full_name": "Toni Fruk",
+        "position": "MF"
+      },
+      {
+        "surname": "Matanović",
+        "full_name": "Igor Matanović",
+        "position": "FW"
+      },
+      {
+        "surname": "Sučić",
+        "full_name": "Luka Sučić",
+        "position": "MF"
+      },
+      {
+        "surname": "Vušković",
+        "full_name": "Luka Vušković",
+        "position": "DF"
+      },
+      {
+        "surname": "Kotarski",
+        "full_name": "Dominik Kotarski",
+        "position": "GK"
+      },
+      {
+        "surname": "Pašalić",
+        "full_name": "Marco Pašalić",
+        "position": "FW"
+      },
+      {
+        "surname": "Erlić",
+        "full_name": "Martin Erlić",
+        "position": "DF"
+      },
+      {
+        "surname": "Musa",
+        "full_name": "Petar Musa",
+        "position": "FW"
+      }
+    ]
+  },
+  {
+    "code": "GHA",
+    "team": "Ghana",
+    "players": [
+      {
+        "surname": "Ati-Zigi",
+        "full_name": "Lawrence Ati-Zigi",
+        "position": "GK"
+      },
+      {
+        "surname": "Seidu",
+        "full_name": "Alidu Seidu",
+        "position": "DF"
+      },
+      {
+        "surname": "Yirenkyi",
+        "full_name": "Caleb Yirenkyi",
+        "position": "MF"
+      },
+      {
+        "surname": "Adjetey",
+        "full_name": "Jonas Adjetey",
+        "position": "DF"
+      },
+      {
+        "surname": "Partey",
+        "full_name": "Thomas Partey",
+        "position": "MF"
+      },
+      {
+        "surname": "Mumin",
+        "full_name": "Abdul Mumin",
+        "position": "DF"
+      },
+      {
+        "surname": "Fatawu",
+        "full_name": "Abdul Fatawu",
+        "position": "FW"
+      },
+      {
+        "surname": "Sibo",
+        "full_name": "Kwasi Sibo",
+        "position": "MF"
+      },
+      {
+        "surname": "Ayew",
+        "full_name": "Jordan Ayew",
+        "position": "FW"
+      },
+      {
+        "surname": "Thomas-Asante",
+        "full_name": "Brandon Thomas-Asante",
+        "position": "FW"
+      },
+      {
+        "surname": "Semenyo",
+        "full_name": "Antoine Semenyo",
+        "position": "MF"
+      },
+      {
+        "surname": "Anang",
+        "full_name": "Joseph Anang",
+        "position": "GK"
+      },
+      {
+        "surname": "Bonsu Baah",
+        "full_name": "Christopher Bonsu Baah",
+        "position": "FW"
+      },
+      {
+        "surname": "Mensah",
+        "full_name": "Gideon Mensah",
+        "position": "DF"
+      },
+      {
+        "surname": "Owusu",
+        "full_name": "Elisha Owusu",
+        "position": "MF"
+      },
+      {
+        "surname": "Asare",
+        "full_name": "Benjamin Asare",
+        "position": "GK"
+      },
+      {
+        "surname": "Baba",
+        "full_name": "Abdul Rahman Baba",
+        "position": "DF"
+      },
+      {
+        "surname": "Opoku",
+        "full_name": "Jerome Opoku",
+        "position": "DF"
+      },
+      {
+        "surname": "Williams",
+        "full_name": "Iñaki Williams",
+        "position": "FW"
+      },
+      {
+        "surname": "Boakye",
+        "full_name": "Augustine Boakye",
+        "position": "MF"
+      },
+      {
+        "surname": "Peprah Oppong",
+        "full_name": "Kojo Peprah Oppong",
+        "position": "DF"
+      },
+      {
+        "surname": "Sulemana",
+        "full_name": "Kamaldeen Sulemana",
+        "position": "FW"
+      },
+      {
+        "surname": "Luckassen",
+        "full_name": "Derrick Luckassen",
+        "position": "DF"
+      },
+      {
+        "surname": "Nuamah",
+        "full_name": "Ernest Nuamah",
+        "position": "FW"
+      },
+      {
+        "surname": "Adu",
+        "full_name": "Prince Kwabena Adu",
+        "position": "FW"
+      },
+      {
+        "surname": "Senaya",
+        "full_name": "Marvin Senaya",
+        "position": "DF"
+      }
+    ]
+  },
+  {
+    "code": "PAN",
+    "team": "Panama",
+    "players": [
+      {
+        "surname": "Mejía",
+        "full_name": "Luis Mejía",
+        "position": "GK"
+      },
+      {
+        "surname": "Blackman",
+        "full_name": "César Blackman",
+        "position": "DF"
+      },
+      {
+        "surname": "Córdoba",
+        "full_name": "José Córdoba",
+        "position": "DF"
+      },
+      {
+        "surname": "Escobar",
+        "full_name": "Fidel Escobar",
+        "position": "DF"
+      },
+      {
+        "surname": "Fariña",
+        "full_name": "Edgardo Fariña",
+        "position": "DF"
+      },
+      {
+        "surname": "Martínez",
+        "full_name": "Cristian Martínez",
+        "position": "MF"
+      },
+      {
+        "surname": "Rodríguez",
+        "full_name": "José Luis Rodríguez",
+        "position": "MF"
+      },
+      {
+        "surname": "Carrasquilla",
+        "full_name": "Adalberto Carrasquilla",
+        "position": "MF"
+      },
+      {
+        "surname": "Rodríguez",
+        "full_name": "Tomás Rodríguez",
+        "position": "FW"
+      },
+      {
+        "surname": "Díaz",
+        "full_name": "Ismael Díaz",
+        "position": "MF"
+      },
+      {
+        "surname": "Bárcenas",
+        "full_name": "Yoel Bárcenas",
+        "position": "MF"
+      },
+      {
+        "surname": "Samudio",
+        "full_name": "César Samudio",
+        "position": "GK"
+      },
+      {
+        "surname": "Ramos",
+        "full_name": "Jiovany Ramos",
+        "position": "DF"
+      },
+      {
+        "surname": "Harvey",
+        "full_name": "Carlos Harvey",
+        "position": "DF"
+      },
+      {
+        "surname": "Davis",
+        "full_name": "Eric Davis",
+        "position": "DF"
+      },
+      {
+        "surname": "Andrade",
+        "full_name": "Andrés Andrade",
+        "position": "DF"
+      },
+      {
+        "surname": "Fajardo",
+        "full_name": "José Fajardo",
+        "position": "FW"
+      },
+      {
+        "surname": "Waterman",
+        "full_name": "Cecilio Waterman",
+        "position": "FW"
+      },
+      {
+        "surname": "Quintero",
+        "full_name": "Alberto Quintero",
+        "position": "MF"
+      },
+      {
+        "surname": "Godoy",
+        "full_name": "Aníbal Godoy",
+        "position": "MF"
+      },
+      {
+        "surname": "Yanis",
+        "full_name": "César Yanis",
+        "position": "MF"
+      },
+      {
+        "surname": "Mosquera",
+        "full_name": "Orlando Mosquera",
+        "position": "GK"
+      },
+      {
+        "surname": "Murillo",
+        "full_name": "Michael Amir Murillo",
+        "position": "DF"
+      },
+      {
+        "surname": "Londoño",
+        "full_name": "Azarias Londoño",
+        "position": "FW"
+      },
+      {
+        "surname": "Miller",
+        "full_name": "Roderick Miller",
+        "position": "DF"
+      },
+      {
+        "surname": "Gutiérrez",
+        "full_name": "Jorge Gutiérrez",
+        "position": "DF"
+      }
+    ]
+  }
+]

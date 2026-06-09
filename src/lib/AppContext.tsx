@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './supabase'
+import { syncPushSubscription } from './push'
 import type { Match, Prediction, Profile, TournamentPrediction } from './types'
 
 interface AppState {
@@ -86,6 +87,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return
     }
     void refresh()
+    void syncPushSubscription(session.user.id)
     const channel = supabase
       .channel('app-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'matches' }, () => void refresh())

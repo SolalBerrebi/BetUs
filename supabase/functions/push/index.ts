@@ -37,29 +37,45 @@ interface Payload {
   tag: string
 }
 
+async function sendToSub(
+  s: { endpoint: string; p256dh: string; auth: string },
+  payload: Payload,
+): Promise<boolean> {
+  try {
+    await webpush.sendNotification(
+      { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+      JSON.stringify(payload),
+    )
+    return true
+  } catch (err) {
+    const code = (err as { statusCode?: number }).statusCode
+    if (code === 404 || code === 410) {
+      await supabase.from('push_subscriptions').delete().eq('endpoint', s.endpoint)
+    } else {
+      console.error('push error', code, s.endpoint.slice(0, 60))
+    }
+    return false
+  }
+}
+
 async function broadcast(payload: Payload): Promise<number> {
   const { data: subs } = await supabase.from('push_subscriptions').select('*')
   if (!subs?.length) return 0
-  let sent = 0
-  await Promise.all(
-    subs.map(async (s) => {
-      try {
-        await webpush.sendNotification(
-          { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-          JSON.stringify(payload),
-        )
-        sent++
-      } catch (err) {
-        const code = (err as { statusCode?: number }).statusCode
-        if (code === 404 || code === 410) {
-          await supabase.from('push_subscriptions').delete().eq('endpoint', s.endpoint)
-        } else {
-          console.error('push error', code, s.endpoint.slice(0, 60))
-        }
-      }
+  const results = await Promise.all(subs.map((s) => sendToSub(s, payload)))
+  return results.filter(Boolean).length
+}
+
+/** Envoi personnalisé : une fonction construit le payload par utilisateur (null = on saute). */
+async function broadcastPerUser(build: (userId: string) => Payload | null): Promise<number> {
+  const { data: subs } = await supabase.from('push_subscriptions').select('*')
+  if (!subs?.length) return 0
+  const results = await Promise.all(
+    subs.map((s) => {
+      const payload = build(s.user_id)
+      return payload ? sendToSub(s, payload) : Promise.resolve(false)
     }),
   )
-  return sent
+  return results.filter(Boolean).length
 }
 
 /** Réserve l'envoi (kind, match_id) ; false si déjà envoyé. */
@@ -96,12 +112,39 @@ Deno.serve(async (req) => {
     const matchId = Number(body.match_id)
     const { data: m } = await supabase.from('matches').select('*').eq('id', matchId).single()
     if (m && (await claim('result', m.id))) {
-      results[`match_${m.id}`] = await broadcast({
-        title: `🔔 ${team(m.home_team, m.home_code)} ${m.home_score} – ${m.away_score} ${team(m.away_team, m.away_code)}`,
-        body: 'Résultat saisi, classement mis à jour — viens voir tes points.',
-        url: `/BetUs/#/match/${m.id}`,
-        tag: `result-${m.id}`,
+      const title = `🔔 ${team(m.home_team, m.home_code)} ${m.home_score} – ${m.away_score} ${team(m.away_team, m.away_code)}`
+      const url = `/BetUs/#/match/${m.id}`
+
+      // Rangs avant (snapshot) vs après (classement courant)
+      const [{ data: before }, { data: after }] = await Promise.all([
+        supabase.from('rank_snapshot').select('user_id, rank'),
+        supabase.from('ranked_leaderboard').select('user_id, rank, total_points, display_name'),
+      ])
+      const prevRank = new Map((before ?? []).map((r) => [r.user_id, r.rank]))
+      const cur = new Map((after ?? []).map((r) => [r.user_id, r]))
+
+      results[`match_${m.id}`] = await broadcastPerUser((userId) => {
+        const c = cur.get(userId)
+        if (!c) return null
+        const prev = prevRank.get(userId)
+        let body = 'Résultat saisi, classement mis à jour — viens voir tes points.'
+        if (prev && prev !== c.rank) {
+          body =
+            c.rank < prev
+              ? `🔼 Tu remontes ${prev}e → ${c.rank}e au classement !`
+              : `🔽 Tu descends ${prev}e → ${c.rank}e. Reprends-toi !`
+        } else if (prev && prev === c.rank && c.rank === 1) {
+          body = '👑 Toujours en tête du classement !'
+        }
+        return { title, body, url, tag: `result-${m.id}` }
       })
+
+      // Met à jour le snapshot pour le prochain résultat
+      if (after?.length) {
+        await supabase.from('rank_snapshot').upsert(
+          after.map((r) => ({ user_id: r.user_id, rank: r.rank, total_points: r.total_points })),
+        )
+      }
     }
   } else if (task === 'test') {
     results.test = await broadcast({

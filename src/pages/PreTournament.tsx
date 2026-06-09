@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp, useNow } from '../lib/AppContext'
-import { Button, Card, Field, PageTitle } from '../components/ui'
+import { Button, Card, PageTitle } from '../components/ui'
+import PlayerInput from '../components/PlayerInput'
 import { countdown } from '../lib/format'
 import { ALL_TEAMS } from '../lib/teams'
 
@@ -96,26 +97,26 @@ export default function PreTournament() {
 
       <Card className="p-5">
         <div className="space-y-5">
-          <Field
+          <PlayerInput
             label="Meilleur buteur · 3 pts"
             value={topScorer}
-            onChange={(e) => setTopScorer(e.target.value)}
-            placeholder="Ex. Mbappé"
-            hint="⚠️ Nom de famille seul pour tous les joueurs (ex. « Mbappé », pas « Kylian Mbappé »)."
+            onChange={setTopScorer}
+            placeholder="Tape un nom…"
+            hint="Choisis dans la liste, ou tape le nom de famille."
             disabled={locked}
           />
-          <Field
+          <PlayerInput
             label="Meilleur passeur · 3 pts"
             value={topAssister}
-            onChange={(e) => setTopAssister(e.target.value)}
-            placeholder="Ex. Messi"
+            onChange={setTopAssister}
+            placeholder="Tape un nom…"
             disabled={locked}
           />
-          <Field
+          <PlayerInput
             label="Meilleur gardien · 3 pts"
             value={bestKeeper}
-            onChange={(e) => setBestKeeper(e.target.value)}
-            placeholder="Ex. Donnarumma"
+            onChange={setBestKeeper}
+            placeholder="Tape un nom…"
             disabled={locked}
           />
           <div>
@@ -126,11 +127,11 @@ export default function PreTournament() {
             </div>
           </div>
           <TeamSelect label="Équipe gagnante · 3 pts" value={winner} onChange={setWinner} disabled={locked} />
-          <Field
+          <PlayerInput
             label="Meilleur joueur · 3 pts"
             value={bestPlayer}
-            onChange={(e) => setBestPlayer(e.target.value)}
-            placeholder="Ex. Bellingham"
+            onChange={setBestPlayer}
+            placeholder="Tape un nom…"
             disabled={locked}
           />
 

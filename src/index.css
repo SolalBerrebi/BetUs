@@ -53,6 +53,24 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Ambiance « live » : pastille qui respire */
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+.live-dot {
+  animation: live-pulse 1.4s ease-in-out infinite;
+}
+
+/* Ambiance « imminent » : léger halo qui bat sur la carte du match qui va commencer */
+@keyframes imminent-glow {
+  0%, 100% { box-shadow: 0 1px 1px rgb(0 0 0 / 0.03), 0 8px 24px rgb(0 0 0 / 0.06), 0 0 0 0 rgb(255 149 0 / 0); }
+  50% { box-shadow: 0 1px 1px rgb(0 0 0 / 0.03), 0 8px 24px rgb(0 0 0 / 0.06), 0 0 0 3px rgb(255 149 0 / 0.18); }
+}
+.imminent-glow {
+  animation: imminent-glow 2.2s ease-in-out infinite;
+}
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;

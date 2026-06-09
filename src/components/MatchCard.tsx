@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Match, Prediction } from '../lib/types'
 import { teamFlag, teamName } from '../lib/teams'
-import { countdown, hasStarted, timeLabel } from '../lib/format'
+import { ambiance, countdown, timeLabel } from '../lib/format'
 import { Badge } from './ui'
 
 function TeamRow({ name, code, score, winner }: { name: string; code: string | null; score: number | null; winner: boolean }) {
@@ -29,19 +29,20 @@ export default function MatchCard({
   points?: number
   now: number
 }) {
-  const started = hasStarted(match.kickoff_at, now)
   const finished = match.status === 'finished'
   const homeWins = finished && match.home_score !== null && match.away_score !== null &&
     (match.home_score > match.away_score || (match.home_score === match.away_score && match.winner_override === 'home'))
   const awayWins = finished && match.home_score !== null && match.away_score !== null &&
     (match.away_score > match.home_score || (match.home_score === match.away_score && match.winner_override === 'away'))
   const cd = countdown(match.kickoff_at, now)
-  const soon = !started && cd !== null && new Date(match.kickoff_at).getTime() - now < 2 * 3600_000
+  const amb = ambiance(match.kickoff_at, match.status, now)
 
   return (
     <Link
       to={`/match/${match.id}`}
-      className="block rounded-(--radius-card) bg-surface p-4 shadow-(--shadow-card) transition-transform duration-150 active:scale-[0.98]"
+      className={`block rounded-(--radius-card) bg-surface p-4 shadow-(--shadow-card) transition-transform duration-150 active:scale-[0.98] ${
+        amb === 'imminent' ? 'imminent-glow' : ''
+      }`}
     >
       <div className="mb-2.5 flex items-center justify-between">
         <span className="text-[12px] font-medium uppercase tracking-wide text-ink-3">
@@ -55,11 +56,16 @@ export default function MatchCard({
           ) : (
             <Badge tone="neutral">Terminé</Badge>
           )
-        ) : started ? (
-          <Badge tone="warning">En cours</Badge>
+        ) : amb === 'live' ? (
+          <Badge tone="warning">
+            <span className="live-dot mr-0.5 inline-block size-1.5 rounded-full bg-warning" />
+            En cours
+          </Badge>
         ) : prediction ? (
           <Badge tone="positive">Prono ✓</Badge>
-        ) : soon ? (
+        ) : amb === 'imminent' ? (
+          <Badge tone="warning">⏳ Ferme dans {cd}</Badge>
+        ) : amb === 'soon' ? (
           <Badge tone="accent">Ferme dans {cd}</Badge>
         ) : (
           <Badge tone="neutral">À pronostiquer</Badge>

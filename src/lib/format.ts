@@ -36,3 +36,22 @@ export function countdown(iso: string, now: number): string | null {
 export function hasStarted(kickoffIso: string, now: number = Date.now()): boolean {
   return now >= new Date(kickoffIso).getTime()
 }
+
+/**
+ * Ambiance d'un match (sans API live) selon l'état et la proximité du coup d'envoi.
+ * - 'finished'  : terminé
+ * - 'live'      : coup d'envoi passé, pas encore marqué terminé
+ * - 'imminent'  : < 15 min → ça chauffe, fermeture imminente des pronos
+ * - 'soon'      : < 2 h → fenêtre de pronostic ouverte
+ * - 'upcoming'  : plus loin
+ */
+export type Ambiance = 'finished' | 'live' | 'imminent' | 'soon' | 'upcoming'
+
+export function ambiance(kickoffIso: string, status: string, now: number): Ambiance {
+  if (status === 'finished') return 'finished'
+  const ms = new Date(kickoffIso).getTime() - now
+  if (ms <= 0) return 'live'
+  if (ms < 15 * 60_000) return 'imminent'
+  if (ms < 2 * 3600_000) return 'soon'
+  return 'upcoming'
+}

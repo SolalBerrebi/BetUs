@@ -63,3 +63,31 @@ export async function disablePush(): Promise<void> {
   await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint)
   await sub.unsubscribe()
 }
+
+/**
+ * Réabonnement silencieux au démarrage : si l'utilisateur a déjà accordé la
+ * permission, on (re)crée l'abonnement et on le ré-enregistre en base. Évite
+ * que le push se perde quand le navigateur fait expirer/tourner l'abonnement
+ * (fréquent sur iOS) sur la durée du tournoi.
+ */
+export async function syncPushSubscription(userId: string): Promise<void> {
+  if (!pushSupported() || Notification.permission !== 'granted') return
+  try {
+    const reg = await navigator.serviceWorker.ready
+    const sub =
+      (await reg.pushManager.getSubscription()) ??
+      (await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as BufferSource,
+      }))
+    const json = sub.toJSON()
+    await supabase.from('push_subscriptions').upsert({
+      endpoint: sub.endpoint,
+      user_id: userId,
+      p256dh: json.keys!.p256dh,
+      auth: json.keys!.auth,
+    })
+  } catch {
+    /* silencieux : l'utilisateur pourra réactiver manuellement dans Profil */
+  }
+}

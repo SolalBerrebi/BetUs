@@ -5,8 +5,9 @@ import { supabase } from '../lib/supabase'
 import type { MatchPoints, Prediction } from '../lib/types'
 import { STAGE_LABELS } from '../lib/types'
 import { teamFlag, teamName } from '../lib/teams'
-import { countdown, dayLabel, hasStarted, timeLabel } from '../lib/format'
-import { Badge, Button, Card, Field, Segmented, Spinner } from '../components/ui'
+import { ambiance, countdown, dayLabel, hasStarted, timeLabel } from '../lib/format'
+import { Badge, Button, Card, Segmented, Spinner } from '../components/ui'
+import PlayerInput from '../components/PlayerInput'
 
 function ScoreStepper({ label, value, onChange, disabled }: {
   label: string
@@ -86,6 +87,7 @@ export default function MatchDetail() {
 
   const cd = countdown(match.kickoff_at, now)
   const finished = match.status === 'finished'
+  const amb = ambiance(match.kickoff_at, match.status, now)
 
   async function submit() {
     if (!match || !session) return
@@ -144,11 +146,19 @@ export default function MatchDetail() {
                 {match.home_score} – {match.away_score}
               </span>
             ) : started ? (
-              <Badge tone="warning">En cours</Badge>
+              <Badge tone="warning">
+                <span className="live-dot mr-0.5 inline-block size-1.5 rounded-full bg-warning" />
+                En cours
+              </Badge>
             ) : (
               <>
                 <span className="text-[15px] font-medium text-ink-2">dans</span>
-                <span className="tnum text-[22px] font-bold">{cd}</span>
+                <span className={`tnum whitespace-nowrap text-[20px] font-bold ${amb === 'imminent' ? 'text-warning' : ''}`}>{cd}</span>
+                {amb === 'imminent' && (
+                  <span className="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-warning">
+                    ça ferme bientôt
+                  </span>
+                )}
               </>
             )}
           </div>
@@ -208,18 +218,20 @@ export default function MatchDetail() {
               </div>
             </div>
 
-            <Field
+            <PlayerInput
               label="Buteur · 3 pts"
               value={scorer}
-              onChange={(e) => setScorer(e.target.value)}
-              placeholder="Ex. Mbappé"
-              hint="⚠️ Nom de famille seul (ex. « Mbappé », pas « Kylian Mbappé »). Accents et petites fautes tolérés."
+              onChange={setScorer}
+              placeholder="Tape un nom…"
+              teams={[match.home_code, match.away_code]}
+              hint="Choisis dans la liste, ou tape le nom de famille."
             />
-            <Field
+            <PlayerInput
               label="Passeur décisif · 3 pts"
               value={assister}
-              onChange={(e) => setAssister(e.target.value)}
-              placeholder="Ex. Griezmann"
+              onChange={setAssister}
+              placeholder="Tape un nom…"
+              teams={[match.home_code, match.away_code]}
             />
 
             {error && <p className="text-[14px] font-medium text-negative">{error}</p>}
