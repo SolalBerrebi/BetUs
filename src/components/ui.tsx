@@ -126,6 +126,14 @@ export function EmptyState({ icon, title, text }: { icon: string; title: string;
   )
 }
 
+export function Powered({ className = '' }: { className?: string }) {
+  return (
+    <p className={`pb-1 pt-12 text-center text-[9px] font-medium uppercase tracking-[0.22em] text-ink-3/70 select-none ${className}`}>
+      Powered by Solal Tech Sport Corp.
+    </p>
+  )
+}
+
 export function PageTitle({ children, sub }: { children: ReactNode; sub?: ReactNode }) {
   return (
     <header className="mb-5 pt-2">

@@ -36,6 +36,18 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Tab bar flottante façon Liquid Glass : translucidité saturée + reflet supérieur */
+.liquid-glass {
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.66), rgb(255 255 255 / 0.45));
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border: 1px solid rgb(255 255 255 / 0.6);
+  box-shadow:
+    0 12px 32px rgb(0 0 0 / 0.12),
+    0 2px 6px rgb(0 0 0 / 0.05),
+    inset 0 1px 0 rgb(255 255 255 / 0.7);
+}
+
 /* Scores, compteurs, classement : chiffres à chasse fixe */
 .tnum {
   font-variant-numeric: tabular-nums;

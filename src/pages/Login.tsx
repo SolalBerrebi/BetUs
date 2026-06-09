@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
-import { Button, Field, Segmented } from '../components/ui'
+import { Button, Field, Powered, Segmented } from '../components/ui'
 
 const ERRORS: Record<string, string> = {
   'Invalid login credentials': 'E-mail ou mot de passe incorrect.',
@@ -94,6 +94,7 @@ export default function Login() {
         <br />
         Cagnotte reversée : 70 % au 1er, 30 % au 2e.
       </p>
+      <Powered className="pt-6" />
     </div>
   )
 }
