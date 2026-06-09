@@ -1,0 +1,16 @@
+{
+  "name": "BetUs — Pronos Coupe du Monde 2026",
+  "short_name": "BetUs",
+  "description": "Concours de pronostics entre copains pour la Coupe du Monde 2026.",
+  "start_url": "/BetUs/",
+  "scope": "/BetUs/",
+  "display": "standalone",
+  "background_color": "#f2f2f7",
+  "theme_color": "#f2f2f7",
+  "lang": "fr",
+  "icons": [
+    { "src": "/BetUs/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/BetUs/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/BetUs/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

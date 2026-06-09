@@ -3,6 +3,67 @@ import { useApp } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
 import type { LeaderboardRow } from '../lib/types'
 import { Badge, Button, Card, Field, PageTitle } from '../components/ui'
+import { disablePush, enablePush, getSubscription, isIOS, isStandalone, pushSupported } from '../lib/push'
+
+function NotificationsCard({ userId }: { userId: string }) {
+  const [enabled, setEnabled] = useState<boolean | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    getSubscription().then((s) => setEnabled(!!s))
+  }, [])
+
+  const needsInstall = isIOS() && !isStandalone()
+
+  async function toggle() {
+    setBusy(true)
+    setError(null)
+    if (enabled) {
+      await disablePush()
+      setEnabled(false)
+    } else {
+      const err = await enablePush(userId)
+      if (err) setError(err)
+      else setEnabled(true)
+    }
+    setBusy(false)
+  }
+
+  return (
+    <Card className="mb-4 p-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-[17px] font-bold">Notifications</h2>
+          <p className="mt-0.5 text-[13px] text-ink-2">
+            Rappel 1 h avant chaque match, et résultats dès qu'ils tombent.
+          </p>
+        </div>
+      </div>
+      {needsInstall ? (
+        <p className="mt-3 rounded-xl bg-warning-soft px-4 py-3 text-[13px] leading-relaxed text-[#c77700]">
+          Sur iPhone : ajoute d'abord l'app à ton écran d'accueil (bouton Partager →
+          « Sur l'écran d'accueil »), puis reviens ici activer les notifications.
+        </p>
+      ) : !pushSupported() ? (
+        <p className="mt-3 text-[13px] text-ink-3">Ce navigateur ne supporte pas les notifications.</p>
+      ) : (
+        <>
+          <Button
+            variant={enabled ? 'secondary' : 'primary'}
+            onClick={toggle}
+            loading={busy || enabled === null}
+            className="mt-4 w-full"
+          >
+            {enabled ? 'Désactiver les notifications' : 'Activer les notifications'}
+          </Button>
+          {enabled && <p className="mt-2 text-center text-[12px] text-positive">Notifications activées sur cet appareil ✓</p>}
+          {error && <p className="mt-2 text-[13px] font-medium text-negative">{error}</p>}
+        </>
+      )}
+    </Card>
+  )
+}
 
 export default function Profile() {
   const { profile, signOut, refresh } = useApp()
@@ -54,6 +115,8 @@ export default function Profile() {
           </p>
         )}
       </Card>
+
+      {profile && <NotificationsCard userId={profile.id} />}
 
       {stats && (
         <Card className="mb-4 p-5">
