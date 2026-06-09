@@ -101,6 +101,7 @@ export default function PreTournament() {
             value={topScorer}
             onChange={(e) => setTopScorer(e.target.value)}
             placeholder="Ex. Mbappé"
+            hint="⚠️ Nom de famille seul pour tous les joueurs (ex. « Mbappé », pas « Kylian Mbappé »)."
             disabled={locked}
           />
           <Field

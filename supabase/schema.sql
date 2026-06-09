@@ -4,6 +4,7 @@
 set check_function_bodies = off;
 
 create extension if not exists unaccent with schema extensions;
+create extension if not exists fuzzystrmatch with schema extensions;
 
 -- ---------------------------------------------------------------------------
 -- Helpers
@@ -13,6 +14,25 @@ create extension if not exists unaccent with schema extensions;
 create or replace function public.norm_name(t text) returns text
 language sql stable as
 $$ select lower(trim(regexp_replace(extensions.unaccent(coalesce(t, '')), '\s+', ' ', 'g'))) $$;
+
+-- Comparaison tolérante aux fautes de frappe : égalité après normalisation, ou
+-- distance de Levenshtein ≤ 1 (noms ≥ 5 lettres) / ≤ 2 (noms ≥ 9 lettres), à
+-- condition que la première lettre corresponde (évite Hernandez ↔ Fernandez).
+create or replace function public.name_matches(a text, b text) returns boolean
+language sql stable as $$
+  select case
+    when a is null or b is null then false
+    else (
+      with n as (select public.norm_name(a) as x, public.norm_name(b) as y)
+      select x = y
+        or (left(x, 1) = left(y, 1)
+            and greatest(length(x), length(y)) >= 5
+            and extensions.levenshtein(x, y) <=
+                case when greatest(length(x), length(y)) >= 9 then 2 else 1 end)
+      from n
+    )
+  end
+$$;
 
 create or replace function public.is_admin() returns boolean
 language sql stable security definer set search_path = public as
@@ -255,11 +275,11 @@ select
   p.match_id,
   m.status,
   (p.winner is not null and p.winner = public.actual_outcome(m))::int                  as winner_pts,
-  case when p.scorer is not null and exists (
-    select 1 from unnest(m.scorers) s where public.norm_name(s) = public.norm_name(p.scorer)
+  case when exists (
+    select 1 from unnest(m.scorers) s where public.name_matches(s, p.scorer)
   ) then 3 else 0 end                                                                  as scorer_pts,
-  case when p.assister is not null and exists (
-    select 1 from unnest(m.assisters) a where public.norm_name(a) = public.norm_name(p.assister)
+  case when exists (
+    select 1 from unnest(m.assisters) a where public.name_matches(a, p.assister)
   ) then 3 else 0 end                                                                  as assister_pts,
   case when p.pred_home_score is not null and m.status = 'finished'
         and p.pred_home_score = m.home_score and p.pred_away_score = m.away_score
@@ -272,11 +292,11 @@ create or replace function public.tournament_points(uid uuid) returns int
 language sql stable as $$
   select coalesce((
     select
-      3 * ((public.norm_name(tp.top_scorer)   = public.norm_name(tr.top_scorer)   and tr.top_scorer   is not null)::int
-         + (public.norm_name(tp.top_assister) = public.norm_name(tr.top_assister) and tr.top_assister is not null)::int
-         + (public.norm_name(tp.best_keeper)  = public.norm_name(tr.best_keeper)  and tr.best_keeper  is not null)::int
-         + (public.norm_name(tp.winner)       = public.norm_name(tr.winner)       and tr.winner       is not null)::int
-         + (public.norm_name(tp.best_player)  = public.norm_name(tr.best_player)  and tr.best_player  is not null)::int
+      3 * (public.name_matches(tp.top_scorer, tr.top_scorer)::int
+         + public.name_matches(tp.top_assister, tr.top_assister)::int
+         + public.name_matches(tp.best_keeper, tr.best_keeper)::int
+         + (public.norm_name(tp.winner) = public.norm_name(tr.winner) and tr.winner is not null)::int
+         + public.name_matches(tp.best_player, tr.best_player)::int
          -- finale : la paire de finalistes, peu importe l'ordre
          + (tr.finalist_a is not null and tr.finalist_b is not null
             and public.norm_name(tp.finalist_a) in (public.norm_name(tr.finalist_a), public.norm_name(tr.finalist_b))

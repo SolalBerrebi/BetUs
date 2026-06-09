@@ -213,7 +213,7 @@ export default function MatchDetail() {
               value={scorer}
               onChange={(e) => setScorer(e.target.value)}
               placeholder="Ex. Mbappé"
-              hint="Un seul nom. Accents et majuscules sans importance."
+              hint="⚠️ Nom de famille seul (ex. « Mbappé », pas « Kylian Mbappé »). Accents et petites fautes tolérés."
             />
             <Field
               label="Passeur décisif · 3 pts"
