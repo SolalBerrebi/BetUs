@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import Matches from './pages/Matches'
 import MatchDetail from './pages/MatchDetail'
 import Leaderboard from './pages/Leaderboard'
+import PlayerDetail from './pages/PlayerDetail'
 import MyPredictions from './pages/MyPredictions'
 import PreTournament from './pages/PreTournament'
 import Profile from './pages/Profile'
@@ -32,6 +33,7 @@ function Shell() {
         <Route index element={<Matches />} />
         <Route path="match/:id" element={<MatchDetail />} />
         <Route path="classement" element={<Leaderboard />} />
+        <Route path="joueur/:id" element={<PlayerDetail />} />
         <Route path="pronos" element={<MyPredictions />} />
         <Route path="avant-competition" element={<PreTournament />} />
         <Route path="profil" element={<Profile />} />

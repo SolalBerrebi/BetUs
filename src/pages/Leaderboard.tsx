@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useApp } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
 import type { LeaderboardRow } from '../lib/types'
@@ -45,7 +46,11 @@ export default function Leaderboard() {
           {rows.map((r, i) => {
             const isMe = r.user_id === session?.user.id
             return (
-              <div key={r.user_id} className={`flex items-center gap-3 px-4 py-3.5 ${isMe ? 'bg-accent-soft/50' : ''}`}>
+              <Link
+                to={`/joueur/${r.user_id}`}
+                key={r.user_id}
+                className={`flex items-center gap-3 px-4 py-3.5 transition-colors active:bg-surface-2/70 ${isMe ? 'bg-accent-soft/50' : ''}`}
+              >
                 <span className="tnum w-8 text-center text-[17px] font-bold text-ink-2">
                   {i < 3 && r.total_points > 0 ? MEDALS[i] : i + 1}
                 </span>
@@ -60,8 +65,9 @@ export default function Leaderboard() {
                   </p>
                 </div>
                 <span className="tnum text-[20px] font-bold">{r.total_points}</span>
-                <span className="-ml-2 pt-1 text-[12px] font-medium text-ink-3">pts</span>
-              </div>
+                <span className="-ml-1 pt-1 text-[12px] font-medium text-ink-3">pts</span>
+                <span className="text-[18px] text-ink-3/60">›</span>
+              </Link>
             )
           })}
           {rows.length === 0 && (
@@ -71,6 +77,8 @@ export default function Leaderboard() {
       )}
 
       <p className="mt-4 px-2 text-center text-[12px] leading-relaxed text-ink-3">
+        Touche un participant pour voir le détail de ses points.
+        <br />
         Égalité départagée par : scores exacts, puis buteurs trouvés, puis passeurs trouvés.
       </p>
     </div>

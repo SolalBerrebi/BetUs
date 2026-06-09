@@ -82,6 +82,15 @@ export interface MatchPoints {
   exact_pts: number
 }
 
+export interface TournamentBreakdownRow {
+  user_id: string
+  slot: number
+  item: string
+  pick: string | null
+  answer: string | null
+  points: number
+}
+
 export const STAGE_LABELS: Record<Stage, string> = {
   group: 'Phase de groupes',
   round_of_32: '16es de finale',
