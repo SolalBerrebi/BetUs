@@ -140,14 +140,14 @@ export default function MatchDetail() {
               {teamName(match.home_team, match.home_code)}
             </span>
           </div>
-          <div className="flex flex-col items-center">
+          <div className="flex shrink-0 flex-col items-center">
             {finished ? (
-              <span className="tnum text-[34px] font-bold">
+              <span className="tnum whitespace-nowrap text-[34px] font-bold">
                 {match.home_score} – {match.away_score}
               </span>
             ) : started && match.home_score !== null ? (
               <>
-                <span className="tnum text-[34px] font-bold">
+                <span className="tnum whitespace-nowrap text-[34px] font-bold">
                   {match.home_score} – {match.away_score}
                 </span>
                 <span className="mt-1 inline-flex items-center gap-1 text-[12px] font-semibold uppercase tracking-wide text-warning">
