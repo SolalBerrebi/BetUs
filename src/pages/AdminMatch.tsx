@@ -1,10 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useApp } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
 import { ALL_TEAMS, isPlaceholder, teamName } from '../lib/teams'
 import { STAGE_LABELS } from '../lib/types'
-import { Button, Card, PageTitle, Segmented, Spinner } from '../components/ui'
+import { Badge, Button, Card, PageTitle, Segmented, Spinner } from '../components/ui'
+
+interface ResultDraft {
+  match_id: number
+  home_score: number | null
+  away_score: number | null
+  winner_override: 'home' | 'away' | null
+  scorers: string[]
+  assisters: string[]
+  own_goals: string[]
+  fixture_status: string | null
+}
 
 function ChipsInput({ label, values, onChange }: {
   label: string
@@ -100,6 +111,28 @@ export default function AdminMatch() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [draft, setDraft] = useState<ResultDraft | null>(null)
+  const [applied, setApplied] = useState(false)
+
+  useEffect(() => {
+    if (!id) return
+    supabase
+      .from('result_draft')
+      .select('*')
+      .eq('match_id', Number(id))
+      .maybeSingle()
+      .then(({ data }) => setDraft((data as ResultDraft) ?? null))
+  }, [id])
+
+  function applyDraft() {
+    if (!draft) return
+    setHs(draft.home_score?.toString() ?? '')
+    setAs(draft.away_score?.toString() ?? '')
+    setScorers(draft.scorers)
+    setAssisters(draft.assisters)
+    setOverride(draft.winner_override)
+    setApplied(true)
+  }
 
   if (!match) {
     return (
@@ -178,6 +211,51 @@ export default function AdminMatch() {
           </div>
           <Button variant="secondary" onClick={saveTeams} loading={saving} className="mt-4 w-full">
             Enregistrer les équipes
+          </Button>
+        </Card>
+      )}
+
+      {draft && match.status !== 'finished' && (
+        <Card className="mb-4 border border-accent/20 bg-accent-soft/40 p-5">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-[17px] font-bold">🤖 Proposition automatique</h2>
+            <Badge tone="accent">{draft.fixture_status === 'PEN' ? 'Tirs au but' : 'Fin de match'}</Badge>
+          </div>
+          <p className="mb-3 text-[13px] text-ink-2">
+            Récupérée via l'API. À <strong>vérifier</strong> (surtout les passeurs) avant de valider.
+          </p>
+          <div className="space-y-1.5 text-[14px]">
+            <div className="flex justify-between">
+              <span className="text-ink-2">Score</span>
+              <span className="tnum font-semibold">{draft.home_score} – {draft.away_score}</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-ink-2">Buteurs</span>
+              <span className="text-right font-medium">{draft.scorers.join(', ') || '—'}</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-ink-2">Passeurs</span>
+              <span className="text-right font-medium">{draft.assisters.join(', ') || '—'}</span>
+            </div>
+            {draft.own_goals.length > 0 && (
+              <div className="flex justify-between gap-4">
+                <span className="text-ink-2">CSC (non comptés)</span>
+                <span className="text-right font-medium">{draft.own_goals.join(', ')}</span>
+              </div>
+            )}
+            {draft.winner_override && (
+              <div className="flex justify-between">
+                <span className="text-ink-2">Qualifié aux TAB</span>
+                <span className="font-medium">
+                  {draft.winner_override === 'home'
+                    ? teamName(match.home_team, match.home_code)
+                    : teamName(match.away_team, match.away_code)}
+                </span>
+              </div>
+            )}
+          </div>
+          <Button variant="secondary" onClick={applyDraft} className="mt-4 w-full">
+            {applied ? 'Proposition chargée ✓' : 'Pré-remplir le formulaire'}
           </Button>
         </Card>
       )}
