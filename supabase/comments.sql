@@ -29,3 +29,27 @@ create policy pc_delete on public.player_comments for delete to authenticated
 
 -- Realtime pour voir les commentaires apparaître en direct
 alter publication supabase_realtime add table public.player_comments;
+
+-- 3) Notif push au joueur ciblé quand il reçoit un commentaire (sauf auto-commentaire)
+create or replace function public.notify_comment() returns trigger
+language plpgsql security definer set search_path = public as $fn$
+declare author_name text;
+begin
+  if new.author_id = new.target_user_id then return new; end if;
+  select display_name into author_name from public.profiles where id = new.author_id;
+  perform public.call_push_function(jsonb_build_object(
+    'task', 'direct',
+    'items', jsonb_build_array(jsonb_build_object(
+      'user_id', new.target_user_id::text,
+      'title', '💬 ' || coalesce(author_name, 'Quelqu''un') || ' a commenté tes pronos',
+      'body', left(new.body, 140),
+      'url', '/BetUs/#/joueur/' || new.target_user_id::text,
+      'tag', 'comment-' || new.id::text
+    ))
+  ));
+  return new;
+end $fn$;
+
+drop trigger if exists player_comments_notify on public.player_comments;
+create trigger player_comments_notify after insert on public.player_comments
+for each row execute function public.notify_comment();
