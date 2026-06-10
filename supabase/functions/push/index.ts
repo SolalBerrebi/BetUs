@@ -218,6 +218,27 @@ Deno.serve(async (req) => {
         )
       }
     }
+  } else if (task === 'direct') {
+    // Envoi personnalisé : liste {user_id, title, body, url, tag} (appelée par livescore)
+    const items = (body.items ?? []) as Array<Payload & { user_id: string }>
+    const { data: subs } = await supabase.from('push_subscriptions').select('*')
+    const byUser = new Map<string, typeof subs>()
+    for (const s of subs ?? []) {
+      const arr = byUser.get(s.user_id) ?? []
+      arr.push(s)
+      byUser.set(s.user_id, arr)
+    }
+    let sent = 0
+    await Promise.all(
+      items.flatMap((it) =>
+        (byUser.get(it.user_id) ?? []).map((s) =>
+          sendToSub(s, { title: it.title, body: it.body, url: it.url, tag: it.tag }).then((ok) => {
+            if (ok) sent++
+          }),
+        ),
+      ),
+    )
+    results.direct = sent
   } else if (task === 'test') {
     results.test = await broadcast({
       title: 'BetUs 🏆',

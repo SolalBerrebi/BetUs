@@ -4,10 +4,10 @@ import type { FormEvent } from 'react'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { useApp, useNow } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
-import type { Message } from '../lib/types'
+import type { Message, Prediction } from '../lib/types'
 import { teamFlag, teamName } from '../lib/teams'
 import { countdown, hasStarted } from '../lib/format'
-import { Spinner } from '../components/ui'
+import { Segmented, Spinner } from '../components/ui'
 
 interface Online {
   user_id: string
@@ -41,11 +41,23 @@ export default function ChatRoom() {
   const [online, setOnline] = useState<Online[]>([])
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
+  const [view, setView] = useState<'chat' | 'pronos'>('chat')
+  const [preds, setPreds] = useState<Prediction[] | null>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const channelRef = useRef<RealtimeChannel | null>(null)
 
   const names = useMemo(() => new Map(profiles.map((p) => [p.id, p.display_name])), [profiles])
   const started = match ? hasStarted(match.kickoff_at, now) : false
+
+  // Pronos de tout le monde (visibles une fois le match commencé, comme la fiche match)
+  useEffect(() => {
+    if (view !== 'pronos' || !matchId || !started) return
+    supabase
+      .from('predictions')
+      .select('*')
+      .eq('match_id', matchId)
+      .then(({ data }) => setPreds((data as Prediction[]) ?? []))
+  }, [view, matchId, started])
 
   // Messages initiaux + abonnement realtime + présence
   useEffect(() => {
@@ -174,9 +186,60 @@ export default function ChatRoom() {
             ))}
           </div>
         </div>
+        <div className="mt-3">
+          <Segmented
+            options={[
+              { value: 'chat', label: 'Chat' },
+              { value: 'pronos', label: 'Pronos du groupe' },
+            ]}
+            value={view}
+            onChange={setView}
+          />
+        </div>
       </header>
 
-      {/* Fil de messages */}
+      {view === 'pronos' ? (
+        <div className="flex-1 space-y-2.5 overflow-y-auto px-4 py-4">
+          {preds === null ? (
+            <div className="py-10 text-center">
+              <Spinner />
+            </div>
+          ) : preds.length === 0 ? (
+            <p className="px-6 py-10 text-center text-[15px] text-ink-2">Aucun prono sur ce match.</p>
+          ) : (
+            preds
+              .slice()
+              .sort((a, b) => (names.get(a.user_id) ?? '').localeCompare(names.get(b.user_id) ?? ''))
+              .map((p) => (
+                <div key={p.user_id} className="rounded-2xl bg-surface px-4 py-3 shadow-(--shadow-card)">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[15px] font-semibold">
+                      {names.get(p.user_id) ?? '?'}
+                      {p.user_id === me && <span className="font-normal text-ink-3"> (moi)</span>}
+                    </span>
+                    {p.pred_home_score !== null && (
+                      <span className="tnum text-[14px] font-semibold text-ink-2">
+                        {p.pred_home_score}–{p.pred_away_score}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-[13px] text-ink-2">
+                    {p.winner
+                      ? p.winner === 'draw'
+                        ? 'Nul'
+                        : p.winner === 'home'
+                          ? teamName(match.home_team, match.home_code)
+                          : teamName(match.away_team, match.away_code)
+                      : '—'}
+                    {p.scorer && ` · ⚽️ ${p.scorer}`}
+                    {p.assister && ` · 🅰️ ${p.assister}`}
+                  </p>
+                </div>
+              ))
+          )}
+        </div>
+      ) : (
+      /* Fil de messages */
       <div ref={listRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-4">
         {messages === null ? (
           <div className="py-10 text-center">
@@ -211,9 +274,14 @@ export default function ChatRoom() {
           })
         )}
       </div>
+      )}
 
       {/* Saisie */}
-      {started ? (
+      {!started ? (
+        <div className="border-t border-line/60 px-4 py-4 text-center text-[14px] text-ink-2">
+          Le salon ouvre au coup d'envoi — dans {countdown(match.kickoff_at, now)}.
+        </div>
+      ) : view === 'chat' ? (
         <form
           onSubmit={send}
           className="sticky bottom-0 flex items-center gap-2 border-t border-line/60 bg-white/80 px-3 py-2.5 backdrop-blur-xl"
@@ -237,11 +305,7 @@ export default function ChatRoom() {
             </svg>
           </button>
         </form>
-      ) : (
-        <div className="border-t border-line/60 px-4 py-4 text-center text-[14px] text-ink-2">
-          Le salon ouvre au coup d'envoi — dans {countdown(match.kickoff_at, now)}.
-        </div>
-      )}
+      ) : null}
     </div>
   )
 }
