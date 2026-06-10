@@ -78,10 +78,91 @@ async function broadcastPerUser(build: (userId: string) => Payload | null): Prom
   return results.filter(Boolean).length
 }
 
+/** Envoi ciblé à un ensemble d'utilisateurs (ex. ceux qui ont pronostiqué le match). */
+async function broadcastToUsers(userIds: Set<string>, payload: Payload): Promise<number> {
+  if (!userIds.size) return 0
+  const { data: subs } = await supabase.from('push_subscriptions').select('*')
+  if (!subs?.length) return 0
+  const targets = subs.filter((s) => userIds.has(s.user_id))
+  const results = await Promise.all(targets.map((s) => sendToSub(s, payload)))
+  return results.filter(Boolean).length
+}
+
 /** Réserve l'envoi (kind, match_id) ; false si déjà envoyé. */
 async function claim(kind: string, matchId: number): Promise<boolean> {
   const { error } = await supabase.from('push_log').insert({ kind, match_id: matchId })
   return !error
+}
+
+/** Les utilisateurs ayant pronostiqué ce match (audience naturelle du salon). */
+async function predictorIds(matchId: number): Promise<Set<string>> {
+  const { data } = await supabase.from('predictions').select('user_id').eq('match_id', matchId)
+  return new Set((data ?? []).map((r) => r.user_id as string))
+}
+
+// --- Tâches périodiques (appelées par pg_cron via `tick`) ---
+
+async function runReminders(out: Record<string, number>): Promise<void> {
+  const { data: due } = await supabase
+    .from('matches')
+    .select('*')
+    .eq('status', 'scheduled')
+    .gt('kickoff_at', new Date().toISOString())
+    .lte('kickoff_at', new Date(Date.now() + 62 * 60_000).toISOString())
+  for (const m of due ?? []) {
+    if (!(await claim('reminder', m.id))) continue
+    out[`reminder_${m.id}`] = await broadcast({
+      title: `⚽️ ${team(m.home_team, m.home_code)} – ${team(m.away_team, m.away_code)} dans 1 h`,
+      body: 'Envoie ton prono avant le coup d’envoi !',
+      url: `/BetUs/#/match/${m.id}`,
+      tag: `reminder-${m.id}`,
+    })
+  }
+}
+
+/** Au coup d'envoi : on invite les pronostiqueurs à rejoindre le salon. */
+async function runKickoff(out: Record<string, number>): Promise<void> {
+  const now = Date.now()
+  const { data: started } = await supabase
+    .from('matches')
+    .select('*')
+    .neq('status', 'finished')
+    .gte('kickoff_at', new Date(now - 6 * 60_000).toISOString())
+    .lte('kickoff_at', new Date(now).toISOString())
+  for (const m of started ?? []) {
+    if (!(await claim('kickoff', m.id))) continue
+    out[`kickoff_${m.id}`] = await broadcastToUsers(await predictorIds(m.id), {
+      title: `🟢 Coup d'envoi ! ${team(m.home_team, m.home_code)} – ${team(m.away_team, m.away_code)}`,
+      body: 'Le salon est ouvert — viens réagir en direct avec les copains 💬',
+      url: `/BetUs/#/match/${m.id}/chat`,
+      tag: `kickoff-${m.id}`,
+    })
+  }
+}
+
+/** En cours de match : si le salon s'anime, on prévient ceux qui ne sont pas (encore) venus. */
+async function runSalon(out: Record<string, number>): Promise<void> {
+  const now = Date.now()
+  const { data: live } = await supabase
+    .from('matches')
+    .select('*')
+    .neq('status', 'finished')
+    .gte('kickoff_at', new Date(now - 110 * 60_000).toISOString())
+    .lte('kickoff_at', new Date(now - 15 * 60_000).toISOString())
+  for (const m of live ?? []) {
+    const { count } = await supabase
+      .from('messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('match_id', m.id)
+    if ((count ?? 0) < 3) continue // on n'anime que les salons déjà vivants
+    if (!(await claim('salon', m.id))) continue
+    out[`salon_${m.id}`] = await broadcastToUsers(await predictorIds(m.id), {
+      title: `🔥 Ça chauffe ! ${team(m.home_team, m.home_code)} – ${team(m.away_team, m.away_code)}`,
+      body: 'Le salon s’enflamme, rejoins la discussion 💬',
+      url: `/BetUs/#/match/${m.id}/chat`,
+      tag: `salon-${m.id}`,
+    })
+  }
 }
 
 Deno.serve(async (req) => {
@@ -92,22 +173,13 @@ Deno.serve(async (req) => {
   const task = body.task as string
   const results: Record<string, number> = {}
 
-  if (task === 'reminders') {
-    const { data: due } = await supabase
-      .from('matches')
-      .select('*')
-      .eq('status', 'scheduled')
-      .gt('kickoff_at', new Date().toISOString())
-      .lte('kickoff_at', new Date(Date.now() + 62 * 60_000).toISOString())
-    for (const m of due ?? []) {
-      if (!(await claim('reminder', m.id))) continue
-      results[`match_${m.id}`] = await broadcast({
-        title: `⚽️ ${team(m.home_team, m.home_code)} – ${team(m.away_team, m.away_code)} dans 1 h`,
-        body: 'Envoie ton prono avant le coup d’envoi !',
-        url: `/BetUs/#/match/${m.id}`,
-        tag: `reminder-${m.id}`,
-      })
-    }
+  if (task === 'tick') {
+    // Tick périodique (pg_cron toutes les 5 min) : rappels + coup d'envoi + animation salon
+    await runReminders(results)
+    await runKickoff(results)
+    await runSalon(results)
+  } else if (task === 'reminders') {
+    await runReminders(results)
   } else if (task === 'result') {
     const matchId = Number(body.match_id)
     const { data: m } = await supabase.from('matches').select('*').eq('id', matchId).single()

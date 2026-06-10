@@ -36,6 +36,8 @@ export default function MatchCard({
     (match.away_score > match.home_score || (match.home_score === match.away_score && match.winner_override === 'away'))
   const cd = countdown(match.kickoff_at, now)
   const amb = ambiance(match.kickoff_at, match.status, now)
+  // Score affiché dès qu'il est connu en cours de match (live), pas seulement à la fin
+  const showScore = (finished || amb === 'live') && match.home_score !== null
 
   return (
     <Link
@@ -72,8 +74,8 @@ export default function MatchCard({
         )}
       </div>
       <div className="space-y-2">
-        <TeamRow name={match.home_team} code={match.home_code} score={finished ? match.home_score : null} winner={homeWins} />
-        <TeamRow name={match.away_team} code={match.away_code} score={finished ? match.away_score : null} winner={awayWins} />
+        <TeamRow name={match.home_team} code={match.home_code} score={showScore ? match.home_score : null} winner={homeWins} />
+        <TeamRow name={match.away_team} code={match.away_code} score={showScore ? match.away_score : null} winner={awayWins} />
       </div>
     </Link>
   )

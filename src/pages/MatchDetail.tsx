@@ -145,6 +145,16 @@ export default function MatchDetail() {
               <span className="tnum text-[34px] font-bold">
                 {match.home_score} – {match.away_score}
               </span>
+            ) : started && match.home_score !== null ? (
+              <>
+                <span className="tnum text-[34px] font-bold">
+                  {match.home_score} – {match.away_score}
+                </span>
+                <span className="mt-1 inline-flex items-center gap-1 text-[12px] font-semibold uppercase tracking-wide text-warning">
+                  <span className="live-dot inline-block size-1.5 rounded-full bg-warning" />
+                  En direct
+                </span>
+              </>
             ) : started ? (
               <Badge tone="warning">
                 <span className="live-dot mr-0.5 inline-block size-1.5 rounded-full bg-warning" />
