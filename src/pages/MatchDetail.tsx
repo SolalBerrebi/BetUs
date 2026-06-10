@@ -220,12 +220,12 @@ export default function MatchDetail() {
 
           <div className="space-y-6">
             <div>
-              <p className="mb-2 text-[13px] font-medium text-ink-2">Vainqueur · 1 pt</p>
+              <p className="mb-2 text-[13px] font-medium text-ink-2">Vainqueur · 2 pts</p>
               <Segmented options={winnerOptions} value={winner} onChange={setWinner} />
             </div>
 
             <div>
-              <p className="mb-2 text-[13px] font-medium text-ink-2">Score exact · 5 pts</p>
+              <p className="mb-2 text-[13px] font-medium text-ink-2">Score exact · 6 pts</p>
               <div className="flex items-start justify-center gap-8">
                 <ScoreStepper
                   label={teamName(match.home_team, match.home_code)}
@@ -242,7 +242,7 @@ export default function MatchDetail() {
             </div>
 
             <PlayerInput
-              label="Buteur · 3 pts"
+              label="Buteur · 4 pts"
               value={scorer}
               onChange={setScorer}
               placeholder="Tape un nom…"
@@ -250,7 +250,7 @@ export default function MatchDetail() {
               hint="Choisis dans la liste, ou tape le nom de famille."
             />
             <PlayerInput
-              label="Passeur décisif · 3 pts"
+              label="Passeur décisif · 4 pts"
               value={assister}
               onChange={setAssister}
               placeholder="Tape un nom…"

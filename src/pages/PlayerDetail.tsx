@@ -39,13 +39,13 @@ function commentTime(iso: string): string {
   return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 }
 
-const TOURNAMENT_ITEMS: { slot: number; item: string; get: (t: TournamentPrediction) => string | null }[] = [
-  { slot: 1, item: 'Meilleur buteur', get: (t) => t.top_scorer },
-  { slot: 2, item: 'Meilleur passeur', get: (t) => t.top_assister },
-  { slot: 3, item: 'Meilleur gardien', get: (t) => t.best_keeper },
-  { slot: 4, item: 'Finale', get: (t) => [t.finalist_a, t.finalist_b].filter(Boolean).join(' – ') || null },
-  { slot: 5, item: 'Équipe gagnante', get: (t) => t.winner },
-  { slot: 6, item: 'Meilleur joueur', get: (t) => t.best_player },
+const TOURNAMENT_ITEMS: { slot: number; item: string; max: number; get: (t: TournamentPrediction) => string | null }[] = [
+  { slot: 1, item: 'Meilleur buteur', max: 6, get: (t) => t.top_scorer },
+  { slot: 2, item: 'Meilleur passeur', max: 8, get: (t) => t.top_assister },
+  { slot: 3, item: 'Meilleur gardien', max: 10, get: (t) => t.best_keeper },
+  { slot: 4, item: 'Finale', max: 20, get: (t) => [t.finalist_a, t.finalist_b].filter(Boolean).join(' – ') || null },
+  { slot: 5, item: 'Équipe gagnante', max: 15, get: (t) => t.winner },
+  { slot: 6, item: 'Meilleur joueur', max: 6, get: (t) => t.best_player },
 ]
 
 export default function PlayerDetail() {
@@ -248,7 +248,7 @@ export default function PlayerDetail() {
                       : 'Pas de pronostic'
                   }
                   won={(b?.points ?? 0) > 0}
-                  max={3}
+                  max={it.max}
                 />
               )
             })
@@ -292,25 +292,25 @@ export default function PlayerDetail() {
                           label="Vainqueur"
                           detail={predWinner}
                           won={mp.winner_pts > 0}
-                          max={1}
+                          max={2}
                         />
                         <PointLine
                           label="Score exact"
                           detail={pred.pred_home_score !== null ? `${pred.pred_home_score}–${pred.pred_away_score}` : '—'}
                           won={mp.exact_pts > 0}
-                          max={5}
+                          max={6}
                         />
                         <PointLine
                           label="Buteur"
                           detail={pred.scorer || '—'}
                           won={mp.scorer_pts > 0}
-                          max={3}
+                          max={4}
                         />
                         <PointLine
                           label="Passeur"
                           detail={pred.assister || '—'}
                           won={mp.assister_pts > 0}
-                          max={3}
+                          max={4}
                         />
                       </div>
                     ) : (

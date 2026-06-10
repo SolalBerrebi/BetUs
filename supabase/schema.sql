@@ -274,16 +274,16 @@ select
   p.user_id,
   p.match_id,
   m.status,
-  (p.winner is not null and p.winner = public.actual_outcome(m))::int                  as winner_pts,
+  (p.winner is not null and p.winner = public.actual_outcome(m))::int * 2              as winner_pts,
   case when exists (
     select 1 from unnest(m.scorers) s where public.name_matches(s, p.scorer)
-  ) then 3 else 0 end                                                                  as scorer_pts,
+  ) then 4 else 0 end                                                                  as scorer_pts,
   case when exists (
     select 1 from unnest(m.assisters) a where public.name_matches(a, p.assister)
-  ) then 3 else 0 end                                                                  as assister_pts,
+  ) then 4 else 0 end                                                                  as assister_pts,
   case when p.pred_home_score is not null and m.status = 'finished'
         and p.pred_home_score = m.home_score and p.pred_away_score = m.away_score
-  then 5 else 0 end                                                                    as exact_pts
+  then 6 else 0 end                                                                    as exact_pts
 from public.predictions p
 join public.matches m on m.id = p.match_id
 where m.status = 'finished';
@@ -292,16 +292,16 @@ create or replace function public.tournament_points(uid uuid) returns int
 language sql stable as $$
   select coalesce((
     select
-      3 * (public.name_matches(tp.top_scorer, tr.top_scorer)::int
-         + public.name_matches(tp.top_assister, tr.top_assister)::int
-         + public.name_matches(tp.best_keeper, tr.best_keeper)::int
-         + (public.norm_name(tp.winner) = public.norm_name(tr.winner) and tr.winner is not null)::int
-         + public.name_matches(tp.best_player, tr.best_player)::int
-         -- finale : la paire de finalistes, peu importe l'ordre
-         + (tr.finalist_a is not null and tr.finalist_b is not null
+        6  * public.name_matches(tp.top_scorer, tr.top_scorer)::int
+      + 8  * public.name_matches(tp.top_assister, tr.top_assister)::int
+      + 10 * public.name_matches(tp.best_keeper, tr.best_keeper)::int
+      + 15 * (public.norm_name(tp.winner) = public.norm_name(tr.winner) and tr.winner is not null)::int
+      + 6  * public.name_matches(tp.best_player, tr.best_player)::int
+        -- finale : la paire de finalistes, peu importe l'ordre — 20 pts
+      + 20 * (tr.finalist_a is not null and tr.finalist_b is not null
             and public.norm_name(tp.finalist_a) in (public.norm_name(tr.finalist_a), public.norm_name(tr.finalist_b))
             and public.norm_name(tp.finalist_b) in (public.norm_name(tr.finalist_a), public.norm_name(tr.finalist_b))
-            and public.norm_name(tp.finalist_a) <> public.norm_name(tp.finalist_b))::int)
+            and public.norm_name(tp.finalist_a) <> public.norm_name(tp.finalist_b))::int
     from public.tournament_predictions tp
     cross join public.tournament_results tr
     where tp.user_id = uid

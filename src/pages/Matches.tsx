@@ -71,7 +71,7 @@ export default function Matches() {
         >
           <p className="text-[16px] font-semibold">Pronostics d'avant-compétition</p>
           <p className="mt-0.5 text-[14px] text-white/80">
-            6 réponses, 3 pts chacune — ferme dans {countdown(tournamentStart!, now) ?? 'quelques minutes'}.
+            6 réponses, jusqu'à 65 pts — ferme dans {countdown(tournamentStart!, now) ?? 'quelques minutes'}.
           </p>
         </Link>
       )}
