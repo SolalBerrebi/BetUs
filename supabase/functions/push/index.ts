@@ -194,17 +194,37 @@ Deno.serve(async (req) => {
       ])
       const prevRank = new Map((before ?? []).map((r) => [r.user_id, r.rank]))
       const cur = new Map((after ?? []).map((r) => [r.user_id, r]))
+      const rows = [...cur.values()]
+
+      // "Léa", "Léa et Max", "Léa, Max et 2 autres"
+      const nameList = (arr: { display_name: string }[]): string => {
+        const n = arr.map((r) => r.display_name)
+        if (n.length === 1) return n[0]
+        if (n.length === 2) return `${n[0]} et ${n[1]}`
+        return `${n[0]}, ${n[1]} et ${n.length - 2} autre${n.length - 2 > 1 ? 's' : ''}`
+      }
 
       results[`match_${m.id}`] = await broadcastPerUser((userId) => {
         const c = cur.get(userId)
         if (!c) return null
         const prev = prevRank.get(userId)
         let body = 'Résultat saisi, classement mis à jour — viens voir tes points.'
-        if (prev && prev !== c.rank) {
-          body =
-            c.rank < prev
-              ? `🔼 Tu remontes ${prev}e → ${c.rank}e au classement !`
-              : `🔽 Tu descends ${prev}e → ${c.rank}e. Reprends-toi !`
+        if (prev && c.rank < prev) {
+          // Monté : qui ai-je doublé ? (était au-dessus avant, en-dessous maintenant)
+          const passed = rows
+            .filter((o) => o.user_id !== userId && (prevRank.get(o.user_id) ?? 1e9) < prev && o.rank > c.rank)
+            .sort((a, b) => a.rank - b.rank)
+          body = passed.length
+            ? `🔼 Tu doubles ${nameList(passed)} — te voilà ${c.rank}e !`
+            : `🔼 Tu remontes ${prev}e → ${c.rank}e au classement !`
+        } else if (prev && c.rank > prev) {
+          // Descendu : qui m'a doublé ? (était en-dessous avant, au-dessus maintenant)
+          const passedBy = rows
+            .filter((o) => o.user_id !== userId && (prevRank.get(o.user_id) ?? 0) > prev && o.rank < c.rank)
+            .sort((a, b) => b.rank - a.rank)
+          body = passedBy.length
+            ? `🔽 ${nameList(passedBy)} ${passedBy.length > 1 ? 'te passent' : 'te passe'} devant — tu tombes ${c.rank}e.`
+            : `🔽 Tu descends ${prev}e → ${c.rank}e. Reprends-toi !`
         } else if (prev && prev === c.rank && c.rank === 1) {
           body = '👑 Toujours en tête du classement !'
         }
