@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { useApp, useNow } from '../lib/AppContext'
+import { useApp } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
 import type { MatchPoints, Prediction, TournamentBreakdownRow, TournamentPrediction } from '../lib/types'
 import { teamFlag, teamName } from '../lib/teams'
@@ -41,8 +41,7 @@ const TOURNAMENT_ITEMS: { slot: number; item: string; get: (t: TournamentPredict
 
 export default function PlayerDetail() {
   const { id } = useParams()
-  const { matches, profiles, session, tournamentStart } = useApp()
-  const now = useNow()
+  const { matches, profiles, session } = useApp()
   const [points, setPoints] = useState<MatchPoints[] | null>(null)
   const [preds, setPreds] = useState<Map<number, Prediction>>(new Map())
   const [tournament, setTournament] = useState<TournamentBreakdownRow[]>([])
@@ -68,9 +67,7 @@ export default function PlayerDetail() {
     })
   }, [id])
 
-  // Verrou anti-copie : pronos d'avant-compét des autres visibles au coup d'envoi du tournoi.
-  const locked = tournamentStart ? now < new Date(tournamentStart).getTime() : true
-  const canSeePre = isMe || !locked
+  // Pronos d'avant-compétition visibles par tout le monde.
   const resultsKnown = tournament.length > 0
   const tBySlot = useMemo(() => new Map(tournament.map((t) => [t.slot, t])), [tournament])
   const preItems = tpred ? TOURNAMENT_ITEMS.map((x) => ({ ...x, pick: x.get(tpred) })) : []
@@ -120,11 +117,7 @@ export default function PlayerDetail() {
       <section className="mb-6">
         <h2 className="mb-2 px-1 text-[15px] font-semibold text-ink-2">Avant-compétition</h2>
         <Card className="px-4 py-2">
-          {!canSeePre ? (
-            <p className="py-3 text-center text-[14px] text-ink-2">
-              🔒 Pronos visibles au coup d'envoi du tournoi.
-            </p>
-          ) : !hasPicks ? (
+          {!hasPicks ? (
             <p className="py-3 text-center text-[14px] text-ink-2">
               {isMe ? (
                 <>
