@@ -82,6 +82,14 @@ export interface MatchPoints {
   exact_pts: number
 }
 
+export interface Message {
+  id: number
+  match_id: number
+  user_id: string
+  body: string
+  created_at: string
+}
+
 export interface TournamentBreakdownRow {
   user_id: string
   slot: number

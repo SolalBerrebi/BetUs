@@ -4,6 +4,7 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import Matches from './pages/Matches'
 import MatchDetail from './pages/MatchDetail'
+import ChatRoom from './pages/ChatRoom'
 import Leaderboard from './pages/Leaderboard'
 import PlayerDetail from './pages/PlayerDetail'
 import MyPredictions from './pages/MyPredictions'
@@ -29,6 +30,8 @@ function Shell() {
 
   return (
     <Routes>
+      {/* Salon plein écran, hors tab bar */}
+      <Route path="match/:id/chat" element={<ChatRoom />} />
       <Route element={<Layout />}>
         <Route index element={<Matches />} />
         <Route path="match/:id" element={<MatchDetail />} />

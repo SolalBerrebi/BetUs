@@ -190,6 +190,19 @@ export default function MatchDetail() {
         )}
       </Card>
 
+      {started && (
+        <Link
+          to={`/match/${match.id}/chat`}
+          className="mb-4 flex items-center justify-between rounded-(--radius-card) bg-accent p-4 text-white shadow-(--shadow-float) transition-transform duration-150 active:scale-[0.98]"
+        >
+          <span className="flex items-center gap-2.5">
+            <span className="live-dot inline-block size-2 rounded-full bg-white" />
+            <span className="text-[16px] font-semibold">Salon en direct</span>
+          </span>
+          <span className="text-[14px] text-white/85">Réagissez ensemble ›</span>
+        </Link>
+      )}
+
       {!started ? (
         <Card className="p-5">
           <h2 className="text-[20px] font-bold tracking-tight">Mon pronostic</h2>
