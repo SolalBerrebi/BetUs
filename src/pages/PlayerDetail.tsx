@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { useApp } from '../lib/AppContext'
+import { useApp, useNow } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
-import type { MatchPoints, Prediction, TournamentBreakdownRow } from '../lib/types'
+import type { MatchPoints, Prediction, TournamentBreakdownRow, TournamentPrediction } from '../lib/types'
 import { teamFlag, teamName } from '../lib/teams'
 import { dayLabel } from '../lib/format'
 import { Badge, Card, EmptyState, PageTitle, Spinner } from '../components/ui'
@@ -20,12 +20,33 @@ function PointLine({ label, detail, won, max }: { label: string; detail: string;
   )
 }
 
+/** Ligne d'un prono d'avant-compétition (avant que les résultats ne soient connus). */
+function PickLine({ label, pick }: { label: string; pick: string | null }) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-1.5">
+      <p className="shrink-0 text-[14px] font-medium">{label}</p>
+      <span className="truncate text-right text-[14px] font-semibold text-ink-2">{pick || '—'}</span>
+    </div>
+  )
+}
+
+const TOURNAMENT_ITEMS: { slot: number; item: string; get: (t: TournamentPrediction) => string | null }[] = [
+  { slot: 1, item: 'Meilleur buteur', get: (t) => t.top_scorer },
+  { slot: 2, item: 'Meilleur passeur', get: (t) => t.top_assister },
+  { slot: 3, item: 'Meilleur gardien', get: (t) => t.best_keeper },
+  { slot: 4, item: 'Finale', get: (t) => [t.finalist_a, t.finalist_b].filter(Boolean).join(' – ') || null },
+  { slot: 5, item: 'Équipe gagnante', get: (t) => t.winner },
+  { slot: 6, item: 'Meilleur joueur', get: (t) => t.best_player },
+]
+
 export default function PlayerDetail() {
   const { id } = useParams()
-  const { matches, profiles, session } = useApp()
+  const { matches, profiles, session, tournamentStart } = useApp()
+  const now = useNow()
   const [points, setPoints] = useState<MatchPoints[] | null>(null)
   const [preds, setPreds] = useState<Map<number, Prediction>>(new Map())
   const [tournament, setTournament] = useState<TournamentBreakdownRow[]>([])
+  const [tpred, setTpred] = useState<TournamentPrediction | null>(null)
 
   const player = profiles.find((p) => p.id === id)
   const isMe = id === session?.user.id
@@ -33,16 +54,27 @@ export default function PlayerDetail() {
   useEffect(() => {
     if (!id) return
     setPoints(null)
+    setTpred(null)
     Promise.all([
       supabase.from('match_points').select('*').eq('user_id', id),
       supabase.from('predictions').select('*').eq('user_id', id),
       supabase.from('tournament_breakdown').select('*').eq('user_id', id).order('slot'),
-    ]).then(([mp, pr, tb]) => {
+      supabase.from('tournament_predictions').select('*').eq('user_id', id).maybeSingle(),
+    ]).then(([mp, pr, tb, tp]) => {
       setPoints((mp.data as MatchPoints[]) ?? [])
       setPreds(new Map(((pr.data as Prediction[]) ?? []).map((x) => [x.match_id, x])))
       setTournament((tb.data as TournamentBreakdownRow[]) ?? [])
+      setTpred((tp.data as TournamentPrediction) ?? null)
     })
   }, [id])
+
+  // Verrou anti-copie : pronos d'avant-compét des autres visibles au coup d'envoi du tournoi.
+  const locked = tournamentStart ? now < new Date(tournamentStart).getTime() : true
+  const canSeePre = isMe || !locked
+  const resultsKnown = tournament.length > 0
+  const tBySlot = useMemo(() => new Map(tournament.map((t) => [t.slot, t])), [tournament])
+  const preItems = tpred ? TOURNAMENT_ITEMS.map((x) => ({ ...x, pick: x.get(tpred) })) : []
+  const hasPicks = preItems.some((i) => i.pick)
 
   const matchById = useMemo(() => new Map(matches.map((m) => [m.id, m])), [matches])
 
@@ -85,26 +117,48 @@ export default function PlayerDetail() {
         {player?.display_name ?? 'Joueur'} {isMe && <span className="text-[18px] font-normal text-ink-3">(moi)</span>}
       </PageTitle>
 
-      {tournament.some((t) => t.points > 0 || t.pick) && (
-        <section className="mb-6">
-          <h2 className="mb-2 px-1 text-[15px] font-semibold text-ink-2">Avant-compétition</h2>
-          <Card className="px-4 py-2">
-            {tournament.map((t) => (
-              <PointLine
-                key={t.slot}
-                label={t.item}
-                detail={
-                  t.pick
-                    ? `${t.pick}${t.answer && t.points === 0 ? ` — réel : ${t.answer}` : ''}`
-                    : 'Pas de pronostic'
-                }
-                won={t.points > 0}
-                max={3}
-              />
-            ))}
-          </Card>
-        </section>
-      )}
+      <section className="mb-6">
+        <h2 className="mb-2 px-1 text-[15px] font-semibold text-ink-2">Avant-compétition</h2>
+        <Card className="px-4 py-2">
+          {!canSeePre ? (
+            <p className="py-3 text-center text-[14px] text-ink-2">
+              🔒 Pronos visibles au coup d'envoi du tournoi.
+            </p>
+          ) : !hasPicks ? (
+            <p className="py-3 text-center text-[14px] text-ink-2">
+              {isMe ? (
+                <>
+                  Tu n'as pas encore fait tes pronos —{' '}
+                  <Link to="/avant-competition" className="font-medium text-accent">les remplir</Link>.
+                </>
+              ) : (
+                "Pas de pronostic d'avant-compétition."
+              )}
+            </p>
+          ) : resultsKnown ? (
+            // Résultats connus → affichage avec points
+            preItems.map((it) => {
+              const b = tBySlot.get(it.slot)
+              return (
+                <PointLine
+                  key={it.slot}
+                  label={it.item}
+                  detail={
+                    it.pick
+                      ? `${it.pick}${b?.answer && (b?.points ?? 0) === 0 ? ` — réel : ${b.answer}` : ''}`
+                      : 'Pas de pronostic'
+                  }
+                  won={(b?.points ?? 0) > 0}
+                  max={3}
+                />
+              )
+            })
+          ) : (
+            // Avant les résultats → on montre juste les pronos
+            preItems.map((it) => <PickLine key={it.slot} label={it.item} pick={it.pick} />)
+          )}
+        </Card>
+      </section>
 
       <section>
         <h2 className="mb-2 px-1 text-[15px] font-semibold text-ink-2">Matchs comptés</h2>

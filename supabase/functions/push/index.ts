@@ -239,6 +239,14 @@ Deno.serve(async (req) => {
       ),
     )
     results.direct = sent
+  } else if (task === 'announce') {
+    // Annonce libre à tout le monde (titre/corps personnalisés)
+    results.announce = await broadcast({
+      title: String(body.title ?? 'BetUs 🏆'),
+      body: String(body.body ?? ''),
+      url: String(body.url ?? '/BetUs/'),
+      tag: 'announce',
+    })
   } else if (task === 'test') {
     results.test = await broadcast({
       title: 'BetUs 🏆',
