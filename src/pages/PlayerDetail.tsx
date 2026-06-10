@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useApp } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
-import type { MatchPoints, Prediction, TournamentBreakdownRow, TournamentPrediction } from '../lib/types'
+import type { MatchPoints, PlayerComment, Prediction, TournamentBreakdownRow, TournamentPrediction } from '../lib/types'
 import { teamFlag, teamName } from '../lib/teams'
 import { dayLabel } from '../lib/format'
-import { Badge, Card, EmptyState, PageTitle, Spinner } from '../components/ui'
+import { Badge, Button, Card, EmptyState, PageTitle, Spinner } from '../components/ui'
 
 /** Pastille d'un poste de points : verte si gagné, grise sinon. */
 function PointLine({ label, detail, won, max }: { label: string; detail: string; won: boolean; max: number }) {
@@ -30,6 +30,15 @@ function PickLine({ label, pick }: { label: string; pick: string | null }) {
   )
 }
 
+function commentTime(iso: string): string {
+  const d = new Date(iso)
+  const diff = (Date.now() - d.getTime()) / 1000
+  if (diff < 60) return "à l'instant"
+  if (diff < 3600) return `il y a ${Math.floor(diff / 60)} min`
+  if (diff < 86400) return `il y a ${Math.floor(diff / 3600)} h`
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+}
+
 const TOURNAMENT_ITEMS: { slot: number; item: string; get: (t: TournamentPrediction) => string | null }[] = [
   { slot: 1, item: 'Meilleur buteur', get: (t) => t.top_scorer },
   { slot: 2, item: 'Meilleur passeur', get: (t) => t.top_assister },
@@ -41,14 +50,76 @@ const TOURNAMENT_ITEMS: { slot: number; item: string; get: (t: TournamentPredict
 
 export default function PlayerDetail() {
   const { id } = useParams()
-  const { matches, profiles, session } = useApp()
+  const { matches, profiles, session, refresh } = useApp()
   const [points, setPoints] = useState<MatchPoints[] | null>(null)
   const [preds, setPreds] = useState<Map<number, Prediction>>(new Map())
   const [tournament, setTournament] = useState<TournamentBreakdownRow[]>([])
   const [tpred, setTpred] = useState<TournamentPrediction | null>(null)
+  const [comments, setComments] = useState<PlayerComment[]>([])
+  const [commentDraft, setCommentDraft] = useState('')
+  const [posting, setPosting] = useState(false)
+  const [noteDraft, setNoteDraft] = useState('')
+  const [savingNote, setSavingNote] = useState(false)
 
   const player = profiles.find((p) => p.id === id)
   const isMe = id === session?.user.id
+  const me = session?.user.id
+  const names = useMemo(() => new Map(profiles.map((p) => [p.id, p.display_name])), [profiles])
+
+  // Commentaires de la fiche + temps réel
+  useEffect(() => {
+    if (!id) return
+    supabase
+      .from('player_comments')
+      .select('*')
+      .eq('target_user_id', id)
+      .order('created_at')
+      .then(({ data }) => setComments((data as PlayerComment[]) ?? []))
+    const ch = supabase
+      .channel(`pc-${id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'player_comments', filter: `target_user_id=eq.${id}` },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const c = payload.new as PlayerComment
+            setComments((prev) => (prev.some((x) => x.id === c.id) ? prev : [...prev, c]))
+          } else if (payload.eventType === 'DELETE') {
+            const old = payload.old as PlayerComment
+            setComments((prev) => prev.filter((x) => x.id !== old.id))
+          }
+        },
+      )
+      .subscribe()
+    return () => {
+      supabase.removeChannel(ch)
+    }
+  }, [id])
+
+  useEffect(() => setNoteDraft(player?.pronos_note ?? ''), [player?.pronos_note])
+
+  async function saveNote() {
+    if (!me) return
+    setSavingNote(true)
+    await supabase.from('profiles').update({ pronos_note: noteDraft.trim() || null }).eq('id', me)
+    await refresh()
+    setSavingNote(false)
+  }
+
+  async function postComment() {
+    if (!me || !id || !commentDraft.trim()) return
+    setPosting(true)
+    const { error } = await supabase
+      .from('player_comments')
+      .insert({ target_user_id: id, author_id: me, body: commentDraft.trim() })
+    if (!error) setCommentDraft('')
+    setPosting(false)
+  }
+
+  async function deleteComment(cid: number) {
+    setComments((prev) => prev.filter((x) => x.id !== cid))
+    await supabase.from('player_comments').delete().eq('id', cid)
+  }
 
   useEffect(() => {
     if (!id) return
@@ -113,6 +184,41 @@ export default function PlayerDetail() {
       >
         {player?.display_name ?? 'Joueur'} {isMe && <span className="text-[18px] font-normal text-ink-3">(moi)</span>}
       </PageTitle>
+
+      {/* Mot du pronostiqueur : note perso (éditable par soi) */}
+      {isMe ? (
+        <section className="mb-6">
+          <h2 className="mb-2 px-1 text-[15px] font-semibold text-ink-2">Ton mot sur tes pronos</h2>
+          <Card className="p-4">
+            <textarea
+              value={noteDraft}
+              onChange={(e) => setNoteDraft(e.target.value)}
+              maxLength={200}
+              rows={2}
+              placeholder="Une punchline sur tes pronos… (ex. « La France ramène la coupe 🇫🇷 »)"
+              className="w-full resize-none rounded-xl bg-surface-2 px-3 py-2 text-[15px] outline-none focus:ring-2 focus:ring-accent"
+            />
+            <div className="mt-2 flex items-center justify-between">
+              <span className="text-[12px] text-ink-3">{noteDraft.length}/200 · visible par tous</span>
+              <Button
+                variant="secondary"
+                onClick={saveNote}
+                loading={savingNote}
+                disabled={noteDraft.trim() === (player?.pronos_note ?? '')}
+                className="px-4 py-1.5 text-[14px]"
+              >
+                Enregistrer
+              </Button>
+            </div>
+          </Card>
+        </section>
+      ) : (
+        player?.pronos_note && (
+          <Card className="mb-6 p-4">
+            <p className="text-[15px] italic text-ink">« {player.pronos_note} »</p>
+          </Card>
+        )
+      )}
 
       <section className="mb-6">
         <h2 className="mb-2 px-1 text-[15px] font-semibold text-ink-2">Avant-compétition</h2>
@@ -216,6 +322,66 @@ export default function PlayerDetail() {
             })}
           </div>
         )}
+      </section>
+
+      <section className="mt-6">
+        <h2 className="mb-2 px-1 text-[15px] font-semibold text-ink-2">
+          Commentaires {comments.length > 0 && <span className="text-ink-3">({comments.length})</span>}
+        </h2>
+        <Card className="p-4">
+          {comments.length === 0 ? (
+            <p className="pb-3 text-center text-[14px] text-ink-2">
+              Aucun commentaire. {isMe ? 'Les copains vont sûrement réagir 😏' : 'Lance la chambre ! 🔥'}
+            </p>
+          ) : (
+            <div className="mb-3 space-y-3">
+              {comments.map((c) => {
+                const mine = c.author_id === me
+                return (
+                  <div key={c.id} className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-ink-2">
+                        {names.get(c.author_id) ?? '?'}
+                        <span className="ml-1.5 font-normal text-ink-3">{commentTime(c.created_at)}</span>
+                      </p>
+                      <p className="whitespace-pre-wrap break-words text-[15px]">{c.body}</p>
+                    </div>
+                    {mine && (
+                      <button
+                        onClick={() => deleteComment(c.id)}
+                        aria-label="Supprimer"
+                        className="shrink-0 text-[18px] leading-none text-ink-3 active:text-danger"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <input
+              value={commentDraft}
+              onChange={(e) => setCommentDraft(e.target.value)}
+              maxLength={500}
+              placeholder={isMe ? 'Réponds ou commente…' : 'Commente ses pronos…'}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && commentDraft.trim()) postComment()
+              }}
+              className="h-10 flex-1 rounded-full bg-surface-2 px-4 text-[15px] outline-none focus:ring-2 focus:ring-accent"
+            />
+            <Button
+              variant="secondary"
+              onClick={postComment}
+              loading={posting}
+              disabled={!commentDraft.trim()}
+              className="px-4 py-1.5 text-[14px]"
+            >
+              Envoyer
+            </Button>
+          </div>
+        </Card>
       </section>
     </div>
   )

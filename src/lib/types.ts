@@ -12,6 +12,15 @@ export interface Profile {
   display_name: string
   is_admin: boolean
   has_paid: boolean
+  pronos_note: string | null
+}
+
+export interface PlayerComment {
+  id: number
+  target_user_id: string
+  author_id: string
+  body: string
+  created_at: string
 }
 
 export interface Match {
