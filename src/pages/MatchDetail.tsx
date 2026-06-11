@@ -9,6 +9,20 @@ import { ambiance, countdown, dayLabel, hasStarted, timeLabel } from '../lib/for
 import { Badge, Button, Card, Segmented, Spinner } from '../components/ui'
 import PlayerInput from '../components/PlayerInput'
 
+// Vainqueur déduit d'un score complet. `null` = indéterminé :
+//   - score incomplet → on laisse le joueur choisir le vainqueur seul ;
+//   - nul en élimination → départage aux tirs au but, le joueur choisit qui se qualifie.
+function impliedWinner(
+  hs: number | null,
+  as_: number | null,
+  stage: string,
+): 'home' | 'draw' | 'away' | null {
+  if (hs === null || as_ === null) return null
+  if (hs > as_) return 'home'
+  if (hs < as_) return 'away'
+  return stage === 'group' ? 'draw' : null
+}
+
 function ScoreStepper({ label, value, onChange, disabled }: {
   label: string
   value: number | null
@@ -75,6 +89,18 @@ export default function MatchDetail() {
     }
   }, [match, started, match?.status])
 
+  // Cohérence vainqueur / score : dès qu'un score complet détermine l'issue, on aligne
+  // (et on verrouille côté UI) le vainqueur dessus. Empêche les pronos contradictoires.
+  useEffect(() => {
+    if (!match) return
+    const imp = impliedWinner(hs, as_, match.stage)
+    if (imp !== null && winner !== imp) setWinner(imp)
+    // Nul prédit en élimination : 'draw' n'a pas de sens (départage aux TAB), on le retire.
+    else if (hs !== null && as_ !== null && hs === as_ && match.stage !== 'group' && winner === 'draw') {
+      setWinner(null)
+    }
+  }, [hs, as_, match, winner])
+
   const names = useMemo(() => new Map(profiles.map((p) => [p.id, p.display_name])), [profiles])
 
   if (!match) {
@@ -121,6 +147,12 @@ export default function MatchDetail() {
           { value: 'home', label: teamName(match.home_team, match.home_code) },
           { value: 'away', label: teamName(match.away_team, match.away_code) },
         ]
+
+  const scoreSet = hs !== null && as_ !== null
+  // Score complet qui fixe l'issue → vainqueur verrouillé sur la déduction.
+  const winnerLocked = scoreSet && impliedWinner(hs, as_, match.stage) !== null
+  // Nul prédit en élimination → vainqueur libre (qui passe aux tirs au but).
+  const koTie = scoreSet && hs === as_ && match.stage !== 'group'
 
   return (
     <div>
@@ -220,8 +252,15 @@ export default function MatchDetail() {
 
           <div className="space-y-6">
             <div>
-              <p className="mb-2 text-[13px] font-medium text-ink-2">Vainqueur · 2 pts</p>
-              <Segmented options={winnerOptions} value={winner} onChange={setWinner} />
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="text-[13px] font-medium text-ink-2">Vainqueur · 2 pts</p>
+                {winnerLocked ? (
+                  <span className="text-[12px] font-medium text-ink-3">déduit du score</span>
+                ) : koTie ? (
+                  <span className="text-[12px] font-medium text-ink-3">qui se qualifie aux t.a.b. ?</span>
+                ) : null}
+              </div>
+              <Segmented options={winnerOptions} value={winner} onChange={setWinner} disabled={winnerLocked} />
             </div>
 
             <div>

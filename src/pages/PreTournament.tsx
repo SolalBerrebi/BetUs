@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp, useNow } from '../lib/AppContext'
 import { Button, Card, PageTitle } from '../components/ui'
@@ -10,11 +10,13 @@ const TEAM_OPTIONS = Object.values(ALL_TEAMS)
   .map((t) => t.name)
   .sort((a, b) => a.localeCompare(b))
 
-function TeamSelect({ label, value, onChange, disabled }: {
+function TeamSelect({ label, value, onChange, disabled, options = TEAM_OPTIONS, placeholder = 'Choisir…' }: {
   label: string
   value: string
   onChange: (v: string) => void
   disabled?: boolean
+  options?: string[]
+  placeholder?: string
 }) {
   const id = label.toLowerCase().replace(/\W+/g, '-')
   return (
@@ -27,8 +29,8 @@ function TeamSelect({ label, value, onChange, disabled }: {
         disabled={disabled}
         className="h-12 w-full appearance-none rounded-xl bg-surface-2 px-4 text-[17px] text-ink outline-none transition-shadow duration-150 focus:ring-2 focus:ring-accent disabled:opacity-50"
       >
-        <option value="">Choisir…</option>
-        {TEAM_OPTIONS.map((t) => (
+        <option value="">{placeholder}</option>
+        {options.map((t) => (
           <option key={t} value={t}>
             {t}
           </option>
@@ -55,6 +57,18 @@ export default function PreTournament() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Cohérence finale / vainqueur :
+  //   • les deux finalistes doivent être différents → on retire l'un de la liste de l'autre ;
+  //   • le vainqueur est forcément l'un des deux finalistes → on restreint la liste à ceux-ci.
+  const finalistAOptions = TEAM_OPTIONS.filter((t) => t !== finalistB)
+  const finalistBOptions = TEAM_OPTIONS.filter((t) => t !== finalistA)
+  const winnerOptions = [finalistA, finalistB].filter(Boolean)
+
+  // Si le vainqueur choisi n'est plus un finaliste (finaliste changé), on le réinitialise.
+  useEffect(() => {
+    if (winner && winner !== finalistA && winner !== finalistB) setWinner('')
+  }, [finalistA, finalistB, winner])
 
   async function submit() {
     if (!session) return
@@ -122,11 +136,23 @@ export default function PreTournament() {
           <div>
             <p className="mb-2 text-[13px] font-medium text-ink-2">Finale · 20 pts (les deux équipes, peu importe l'ordre)</p>
             <div className="grid grid-cols-2 gap-3">
-              <TeamSelect label="Finaliste 1" value={finalistA} onChange={setFinalistA} disabled={locked} />
-              <TeamSelect label="Finaliste 2" value={finalistB} onChange={setFinalistB} disabled={locked} />
+              <TeamSelect label="Finaliste 1" value={finalistA} onChange={setFinalistA} disabled={locked} options={finalistAOptions} />
+              <TeamSelect label="Finaliste 2" value={finalistB} onChange={setFinalistB} disabled={locked} options={finalistBOptions} />
             </div>
           </div>
-          <TeamSelect label="Équipe gagnante · 15 pts" value={winner} onChange={setWinner} disabled={locked} />
+          <div>
+            <TeamSelect
+              label="Équipe gagnante · 15 pts"
+              value={winner}
+              onChange={setWinner}
+              disabled={locked || winnerOptions.length === 0}
+              options={winnerOptions}
+              placeholder={winnerOptions.length ? 'Choisir…' : 'Choisis d’abord les finalistes'}
+            />
+            {!locked && winnerOptions.length === 0 && (
+              <p className="mt-1 text-[12px] text-ink-3">Le vainqueur doit être l'un des deux finalistes.</p>
+            )}
+          </div>
           <PlayerInput
             label="Meilleur joueur · 6 pts"
             value={bestPlayer}

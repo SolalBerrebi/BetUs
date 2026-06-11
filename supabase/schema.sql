@@ -172,6 +172,72 @@ drop trigger if exists tournament_predictions_touch on public.tournament_predict
 create trigger tournament_predictions_touch before update on public.tournament_predictions
 for each row execute function public.touch_updated_at();
 
+-- Cohérence vainqueur / score : on refuse tout prono contradictoire (ex. « Nul » + 2-1).
+-- Garde-fou serveur : l'UI déduit déjà le vainqueur du score, ceci bloque les appels directs.
+create or replace function public.check_prediction_coherence() returns trigger
+language plpgsql as $$
+declare
+  v_stage text;
+  implied text;
+begin
+  -- Vérifie seulement quand un score complet ET un vainqueur sont fournis.
+  if new.winner is null or new.pred_home_score is null or new.pred_away_score is null then
+    return new;
+  end if;
+
+  select stage into v_stage from public.matches where id = new.match_id;
+
+  if new.pred_home_score > new.pred_away_score then
+    implied := 'home';
+  elsif new.pred_home_score < new.pred_away_score then
+    implied := 'away';
+  else
+    -- Score nul : en phase de groupes l'issue est « nul » ; en élimination, départage aux
+    -- tirs au but → le vainqueur (qui se qualifie) reste libre (home/away), jamais 'draw'.
+    implied := case when v_stage = 'group' then 'draw' else null end;
+  end if;
+
+  if implied is not null and new.winner <> implied then
+    raise exception 'Prono incohérent : le vainqueur (%) ne correspond pas au score %-%.',
+      new.winner, new.pred_home_score, new.pred_away_score
+      using errcode = 'check_violation';
+  end if;
+
+  if implied is null and new.winner = 'draw' then
+    raise exception 'Prono incohérent : en élimination directe, un nul ne peut pas être l''issue.'
+      using errcode = 'check_violation';
+  end if;
+
+  return new;
+end $$;
+
+drop trigger if exists predictions_coherence on public.predictions;
+create trigger predictions_coherence before insert or update on public.predictions
+for each row execute function public.check_prediction_coherence();
+
+-- Cohérence des pronos d'avant-compétition : finalistes distincts, vainqueur = un finaliste.
+create or replace function public.check_tournament_coherence() returns trigger
+language plpgsql as $$
+begin
+  if new.finalist_a is not null and new.finalist_b is not null
+     and new.finalist_a = new.finalist_b then
+    raise exception 'Prono incohérent : les deux finalistes doivent être différents.'
+      using errcode = 'check_violation';
+  end if;
+  if new.winner is not null
+     and (new.finalist_a is not null or new.finalist_b is not null)
+     and new.winner is distinct from new.finalist_a
+     and new.winner is distinct from new.finalist_b then
+    raise exception 'Prono incohérent : le vainqueur doit être l''un des deux finalistes.'
+      using errcode = 'check_violation';
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists tournament_predictions_coherence on public.tournament_predictions;
+create trigger tournament_predictions_coherence before insert or update on public.tournament_predictions
+for each row execute function public.check_tournament_coherence();
+
 -- ---------------------------------------------------------------------------
 -- RLS — le règlement est appliqué par la base
 -- ---------------------------------------------------------------------------
