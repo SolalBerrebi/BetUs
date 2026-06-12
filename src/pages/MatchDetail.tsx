@@ -65,8 +65,9 @@ export default function MatchDetail() {
 
   const mine = match ? myPredictions.get(match.id) : undefined
   const [winner, setWinner] = useState<'home' | 'draw' | 'away' | null>(mine?.winner ?? null)
-  const [hs, setHs] = useState<number | null>(mine?.pred_home_score ?? null)
-  const [as_, setAs] = useState<number | null>(mine?.pred_away_score ?? null)
+  // Score toujours renseigné : on démarre à 0-0, jamais d'état « – » (plus de prono partiel).
+  const [hs, setHs] = useState<number | null>(mine?.pred_home_score ?? 0)
+  const [as_, setAs] = useState<number | null>(mine?.pred_away_score ?? 0)
   const [scorer, setScorer] = useState(mine?.scorer ?? '')
   const [assister, setAssister] = useState(mine?.assister ?? '')
   const [saving, setSaving] = useState(false)
@@ -234,7 +235,7 @@ export default function MatchDetail() {
             {[match.venue, match.city].filter(Boolean).join(' · ')}
           </p>
         )}
-        {finished && match.scorers.length > 0 && (
+        {started && match.scorers.length > 0 && (
           <div className="mt-4 border-t border-line/70 pt-3 text-center text-[13px] text-ink-2">
             <p>⚽️ {match.scorers.join(', ')}</p>
             {match.assisters.length > 0 && <p className="mt-1">🅰️ {match.assisters.join(', ')}</p>}

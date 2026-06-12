@@ -79,8 +79,12 @@ create table if not exists public.matches (
   away_score int,
   winner_override text check (winner_override in ('home','away')),  -- vainqueur aux tirs au but
   scorers text[] not null default '{}',
-  assisters text[] not null default '{}'
+  assisters text[] not null default '{}',
+  subs jsonb not null default '[]'                                  -- remplacements [{out, in}] (auto, livescore)
 );
+
+-- Idempotence sur base existante (create table if not exists n'ajoute pas la colonne)
+alter table public.matches add column if not exists subs jsonb not null default '[]';
 
 create table if not exists public.predictions (
   id bigint generated always as identity primary key,
@@ -348,11 +352,12 @@ create policy settings_admin_write on public.settings for all to authenticated
 -- Scoring — vues calculées (source de vérité unique)
 -- ---------------------------------------------------------------------------
 
--- Issue réelle d'un match terminé ('home'/'draw'/'away'), TAB inclus via winner_override
+-- Issue d'un match en cours ou terminé ('home'/'draw'/'away'), TAB inclus via winner_override.
+-- Sur un match 'live' c'est l'issue provisoire : le classement bouge en direct.
 create or replace function public.actual_outcome(m public.matches) returns text
 language sql stable as $$
   select case
-    when m.status <> 'finished' or m.home_score is null or m.away_score is null then null
+    when m.status = 'scheduled' or m.home_score is null or m.away_score is null then null
     when m.home_score > m.away_score then 'home'
     when m.home_score < m.away_score then 'away'
     else coalesce(m.winner_override, 'draw')
@@ -362,6 +367,8 @@ $$;
 drop view if exists public.leaderboard;
 drop view if exists public.match_points;
 
+-- Les matchs 'live' comptent (classement en direct, points provisoires) ; un joueur
+-- pronostiqué crédité aussi si son REMPLAÇANT marque/passe (m.subs : [{out, in}]).
 create view public.match_points
 with (security_invoker = on) as
 select
@@ -369,18 +376,28 @@ select
   p.match_id,
   m.status,
   (p.winner is not null and p.winner = public.actual_outcome(m))::int * 2              as winner_pts,
-  case when exists (
-    select 1 from unnest(m.scorers) s where public.name_matches(s, p.scorer)
+  case when p.scorer is not null and (
+    exists (select 1 from unnest(m.scorers) s where public.name_matches(s, p.scorer))
+    or exists (
+      select 1 from jsonb_array_elements(m.subs) sub
+      where public.name_matches(sub->>'out', p.scorer)
+        and exists (select 1 from unnest(m.scorers) s where public.name_matches(s, sub->>'in'))
+    )
   ) then 4 else 0 end                                                                  as scorer_pts,
-  case when exists (
-    select 1 from unnest(m.assisters) a where public.name_matches(a, p.assister)
+  case when p.assister is not null and (
+    exists (select 1 from unnest(m.assisters) a where public.name_matches(a, p.assister))
+    or exists (
+      select 1 from jsonb_array_elements(m.subs) sub
+      where public.name_matches(sub->>'out', p.assister)
+        and exists (select 1 from unnest(m.assisters) a where public.name_matches(a, sub->>'in'))
+    )
   ) then 4 else 0 end                                                                  as assister_pts,
-  case when p.pred_home_score is not null and m.status = 'finished'
+  case when p.pred_home_score is not null and m.status in ('live', 'finished')
         and p.pred_home_score = m.home_score and p.pred_away_score = m.away_score
   then 6 else 0 end                                                                    as exact_pts
 from public.predictions p
 join public.matches m on m.id = p.match_id
-where m.status = 'finished';
+where m.status in ('live', 'finished');
 
 create or replace function public.tournament_points(uid uuid) returns int
 language sql stable as $$
