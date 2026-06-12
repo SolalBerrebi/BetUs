@@ -261,7 +261,7 @@ export default function ChatRoom() {
       </header>
 
       {view === 'pronos' ? (
-        <div className="flex-1 space-y-2.5 overflow-y-auto px-4 py-4">
+        <div className="flex-1 space-y-2.5 overflow-y-auto overscroll-contain px-4 py-4">
           {preds === null ? (
             <div className="py-10 text-center">
               <Spinner />
@@ -328,7 +328,7 @@ export default function ChatRoom() {
         </div>
       ) : (
       /* Fil de messages */
-      <div ref={listRef} className="flex-1 space-y-2 overflow-y-auto px-4 py-4">
+      <div ref={listRef} className="flex-1 space-y-2 overflow-y-auto overscroll-contain px-4 py-4">
         {messages === null ? (
           <div className="py-10 text-center">
             <Spinner />
@@ -354,7 +354,7 @@ export default function ChatRoom() {
                     mine ? 'bg-accent text-white' : 'bg-surface text-ink shadow-(--shadow-card)'
                   }`}
                 >
-                  <span className="whitespace-pre-wrap break-words">{m.body}</span>
+                  <span className="selectable whitespace-pre-wrap break-words">{m.body}</span>
                 </div>
                 <span className="mt-0.5 px-2 text-[10px] text-ink-3">{timeLabel(m.created_at)}</span>
               </div>

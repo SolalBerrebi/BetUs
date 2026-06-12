@@ -26,7 +26,7 @@ export function Button({ variant = 'primary', loading, className = '', children,
   }
   return (
     <button className={`${base} ${variants[variant]} ${className}`} disabled={disabled || loading} {...rest}>
-      {loading && <Spinner className="size-4 border-white/40 border-t-white" />}
+      {loading && <Spinner className="on-accent" />}
       {children}
     </button>
   )
@@ -34,9 +34,11 @@ export function Button({ variant = 'primary', loading, className = '', children,
 
 export function Spinner({ className = '' }: { className?: string }) {
   return (
-    <span
-      className={`inline-block size-5 animate-spin rounded-full border-2 border-line border-t-ink-2 ${className}`}
-    />
+    <span className={`ios-spinner ${className}`} role="status" aria-label="Chargement">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <i key={i} style={{ transform: `rotate(${i * 45}deg) translateY(-120%)`, opacity: (i + 1) / 8 }} />
+      ))}
+    </span>
   )
 }
 

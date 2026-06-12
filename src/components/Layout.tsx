@@ -85,7 +85,7 @@ export default function Layout() {
         className="fixed inset-x-0 bottom-0 z-20"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <div className="mx-auto max-w-lg px-4 pb-2.5">
+        <div className="tabbar mx-auto max-w-lg px-4 pb-2.5">
           <div className="liquid-glass flex rounded-[26px] p-1.5">
             {tabs.map((t) => (
               <NavLink

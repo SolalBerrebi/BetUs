@@ -27,6 +27,8 @@
 
 html {
   background: var(--color-bg);
+  -webkit-text-size-adjust: 100%;   /* pas de regonflage du texte en paysage */
+  overscroll-behavior-y: none;      /* coupe le rubber-band / pull-to-refresh du navigateur */
 }
 
 body {
@@ -34,6 +36,21 @@ body {
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;      /* pas de menu loupe à l'appui long sur le chrome */
+  user-select: none;
+  overscroll-behavior-y: none;
+}
+
+/* Réautoriser sélection + copier-coller là où c'est utile (saisie, messages) */
+input, textarea, [contenteditable], .selectable {
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-touch-callout: default;
+}
+
+/* Supprime le délai de tap (300 ms) et le double-tap-zoom sur l'interactif */
+button, a, label, select, [role="button"], [role="radio"], [role="tab"] {
+  touch-action: manipulation;
 }
 
 /* Tab bar flottante façon Liquid Glass : translucidité saturée + reflet supérieur */
@@ -77,9 +94,63 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
+/* Activity indicator iOS : 8 traits radiaux qui s'estompent, rotation par crans */
+.ios-spinner {
+  position: relative;
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-ink-3);
+  animation: ios-spin 0.8s steps(8, end) infinite;
+}
+.ios-spinner.on-accent { color: #fff; }
+.ios-spinner > i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 11%;
+  height: 27%;
+  margin: -13.5% 0 0 -5.5%;
+  border-radius: 9999px;
+  background: currentColor;
+}
+@keyframes ios-spin { to { transform: rotate(1turn); } }
+
+/* Transitions de page façon UINavigationController : push (depuis la droite),
+   pop (vers la droite), fondu entre onglets. Pilotées par html[data-nav]. */
+@keyframes vt-from-right { from { transform: translateX(100%); } }
+@keyframes vt-to-left    { to   { transform: translateX(-22%); } }
+@keyframes vt-from-left  { from { transform: translateX(-22%); } }
+@keyframes vt-to-right   { to   { transform: translateX(100%); } }
+@keyframes vt-fade-in    { from { opacity: 0; } }
+@keyframes vt-fade-out   { to   { opacity: 0; } }
+
+::view-transition-group(root) { animation-duration: 320ms; }
+html[data-nav="forward"]::view-transition-old(root) {
+  animation: vt-to-left 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+html[data-nav="forward"]::view-transition-new(root) {
+  z-index: 1;
+  animation: vt-from-right 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+html[data-nav="back"]::view-transition-old(root) {
+  z-index: 1;
+  animation: vt-to-right 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+html[data-nav="back"]::view-transition-new(root) {
+  animation: vt-from-left 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+html[data-nav="fade"]::view-transition-old(root) { animation: vt-fade-out 180ms ease both; }
+html[data-nav="fade"]::view-transition-new(root) { animation: vt-fade-in 180ms ease both; }
+/* La tab bar a son propre groupe → elle ne glisse pas avec le contenu */
+.tabbar { view-transition-name: tabbar; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
 }
