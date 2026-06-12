@@ -17,14 +17,16 @@ interface Props {
 }
 
 /**
- * Champ joueur avec autocomplete sur les effectifs officiels. La saisie libre
- * reste possible (filet de sécurité) : ce qui est tapé est toujours la valeur,
- * les suggestions ne font que pré-remplir le nom de famille.
+ * Champ joueur strict sur les effectifs officiels : taper filtre la liste, mais la
+ * valeur enregistrée vient toujours d'une sélection. Une saisie libre non reconnue
+ * est effacée au blur — l'orthographe ne peut donc jamais invalider un prono.
+ * (Les valeurs venant de la base sont conservées tant que l'utilisateur n'y touche pas.)
  */
 export default function PlayerInput({ label, value, onChange, placeholder, hint, teams, disabled }: Props) {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(0)
   const blurTimer = useRef<number | undefined>(undefined)
+  const dirty = useRef(false)
   const id = label.toLowerCase().replace(/\W+/g, '-')
 
   const codes = useMemo(() => (teams ? teams.filter((c): c is string => !!c) : []), [teams])
@@ -47,8 +49,19 @@ export default function PlayerInput({ label, value, onChange, placeholder, hint,
   const showList = open && suggestions.length > 0 && !exactPick
 
   function pick(s: string) {
+    dirty.current = false
     onChange(s)
     setOpen(false)
+  }
+
+  // Au blur après une frappe : on canonicalise (s ou nom complet reconnu → s), sinon on efface.
+  function settle() {
+    if (!dirty.current) return
+    dirty.current = false
+    const q = norm(value)
+    if (!q) return
+    const exact = pool.find((p) => norm(p.s) === q || norm(p.f) === q)
+    onChange(exact ? exact.s : '')
   }
 
   return (
@@ -61,13 +74,17 @@ export default function PlayerInput({ label, value, onChange, placeholder, hint,
           disabled={disabled}
           autoComplete="off"
           onChange={(e) => {
+            dirty.current = true
             onChange(e.target.value)
             setOpen(true)
             setActive(0)
           }}
           onFocus={() => setOpen(true)}
           onBlur={() => {
-            blurTimer.current = window.setTimeout(() => setOpen(false), 150)
+            blurTimer.current = window.setTimeout(() => {
+              setOpen(false)
+              settle()
+            }, 150)
           }}
           onKeyDown={(e) => {
             if (!showList) return

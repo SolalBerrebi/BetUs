@@ -10,14 +10,24 @@ create extension if not exists fuzzystrmatch with schema extensions;
 -- Helpers
 -- ---------------------------------------------------------------------------
 
--- Comparaison de noms insensible casse/accents/espaces ("Konaté " = "konate")
+-- Comparaison de noms insensible casse/accents/espaces ("Konaté " = "konate").
+-- Retire aussi une initiale en tête ("L. Kang-In" → "kang in"), format fréquent de l'API,
+-- et assimile tirets/apostrophes/points à des espaces ("Al-Dawsari" = "Al Dawsari").
 create or replace function public.norm_name(t text) returns text
 language sql stable as
-$$ select lower(trim(regexp_replace(extensions.unaccent(coalesce(t, '')), '\s+', ' ', 'g'))) $$;
+$$ select trim(regexp_replace(
+     translate(
+       regexp_replace(
+         lower(trim(regexp_replace(extensions.unaccent(coalesce(t, '')), '\s+', ' ', 'g'))),
+         '^[a-z]\. ', ''),
+       '-''.’', '    '),
+     '\s+', ' ', 'g')) $$;
 
--- Comparaison tolérante aux fautes de frappe : égalité après normalisation, ou
--- distance de Levenshtein ≤ 1 (noms ≥ 5 lettres) / ≤ 2 (noms ≥ 9 lettres), à
--- condition que la première lettre corresponde (évite Hernandez ↔ Fernandez).
+-- Comparaison tolérante : égalité après normalisation ; ou l'un est contenu dans l'autre
+-- en mots entiers ("Hyeon-gyu" ⊂ "Oh Hyeon-Gyu", "Cubarsí" ⊂ "Pau Cubarsí Paredes") ;
+-- ou distance de Levenshtein ≤ 1 (noms ≥ 5 lettres) / ≤ 2 (noms ≥ 9 lettres), à
+-- condition que la première lettre corresponde (évite Hernandez ↔ Fernandez,
+-- Giménez ↔ Jiménez).
 create or replace function public.name_matches(a text, b text) returns boolean
 language sql stable as $$
   select case
@@ -25,6 +35,8 @@ language sql stable as $$
     else (
       with n as (select public.norm_name(a) as x, public.norm_name(b) as y)
       select x = y
+        or (length(x) >= 4 and ' ' || y || ' ' like '% ' || x || ' %')
+        or (length(y) >= 4 and ' ' || x || ' ' like '% ' || y || ' %')
         or (left(x, 1) = left(y, 1)
             and greatest(length(x), length(y)) >= 5
             and extensions.levenshtein(x, y) <=
@@ -172,16 +184,25 @@ drop trigger if exists tournament_predictions_touch on public.tournament_predict
 create trigger tournament_predictions_touch before update on public.tournament_predictions
 for each row execute function public.touch_updated_at();
 
--- Cohérence vainqueur / score : on refuse tout prono contradictoire (ex. « Nul » + 2-1).
--- Garde-fou serveur : l'UI déduit déjà le vainqueur du score, ceci bloque les appels directs.
+-- Cohérence vainqueur / score : on complète un vainqueur manquant à partir du score, et on
+-- refuse tout prono contradictoire (ex. « Nul » + 2-1, ou un buteur/passeur sur un 0-0).
+-- Garde-fou serveur : l'UI déduit déjà le vainqueur du score et verrouille buteur/passeur
+-- sur 0-0, ceci couvre les appels directs et les anciens clients.
 create or replace function public.check_prediction_coherence() returns trigger
 language plpgsql as $$
 declare
   v_stage text;
   implied text;
 begin
-  -- Vérifie seulement quand un score complet ET un vainqueur sont fournis.
-  if new.winner is null or new.pred_home_score is null or new.pred_away_score is null then
+  -- 0-0 prédit : aucun but, donc ni buteur ni passeur possibles (indépendant du vainqueur).
+  if new.pred_home_score = 0 and new.pred_away_score = 0
+     and (new.scorer is not null or new.assister is not null) then
+    raise exception 'Prono incohérent : pas de buteur ni de passeur sur un 0-0.'
+      using errcode = 'check_violation';
+  end if;
+
+  -- La suite ne concerne que les pronos avec un score complet.
+  if new.pred_home_score is null or new.pred_away_score is null then
     return new;
   end if;
 
@@ -195,6 +216,13 @@ begin
     -- Score nul : en phase de groupes l'issue est « nul » ; en élimination, départage aux
     -- tirs au but → le vainqueur (qui se qualifie) reste libre (home/away), jamais 'draw'.
     implied := case when v_stage = 'group' then 'draw' else null end;
+  end if;
+
+  -- Vainqueur manquant : on le déduit du score plutôt que de laisser un prono incomplet.
+  -- (Nul en élimination : impossible à déduire, le joueur doit choisir qui passe aux t.a.b.)
+  if new.winner is null then
+    new.winner := implied;
+    return new;
   end if;
 
   if implied is not null and new.winner <> implied then

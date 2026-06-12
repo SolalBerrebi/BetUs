@@ -101,6 +101,14 @@ export default function MatchDetail() {
     }
   }, [hs, as_, match, winner])
 
+  // Cohérence buteur / score : un 0-0 prédit n'a ni buteur ni passeur, on efface et on verrouille.
+  useEffect(() => {
+    if (hs === 0 && as_ === 0) {
+      if (scorer) setScorer('')
+      if (assister) setAssister('')
+    }
+  }, [hs, as_, scorer, assister])
+
   const names = useMemo(() => new Map(profiles.map((p) => [p.id, p.display_name])), [profiles])
 
   if (!match) {
@@ -153,6 +161,8 @@ export default function MatchDetail() {
   const winnerLocked = scoreSet && impliedWinner(hs, as_, match.stage) !== null
   // Nul prédit en élimination → vainqueur libre (qui passe aux tirs au but).
   const koTie = scoreSet && hs === as_ && match.stage !== 'group'
+  // 0-0 prédit → aucun but, donc buteur et passeur verrouillés.
+  const goalless = hs === 0 && as_ === 0
 
   return (
     <div>
@@ -284,16 +294,19 @@ export default function MatchDetail() {
               label="Buteur · 4 pts"
               value={scorer}
               onChange={setScorer}
-              placeholder="Tape un nom…"
+              placeholder={goalless ? '—' : 'Tape un nom…'}
               teams={[match.home_code, match.away_code]}
-              hint="Choisis dans la liste, ou tape le nom de famille."
+              disabled={goalless}
+              hint={goalless ? 'Pas de but sur un 0-0 : pas de buteur.' : 'Tape pour filtrer, puis choisis dans la liste.'}
             />
             <PlayerInput
               label="Passeur décisif · 4 pts"
               value={assister}
               onChange={setAssister}
-              placeholder="Tape un nom…"
+              placeholder={goalless ? '—' : 'Tape un nom…'}
               teams={[match.home_code, match.away_code]}
+              disabled={goalless}
+              hint={goalless ? 'Pas de but sur un 0-0 : pas de passeur.' : undefined}
             />
 
             {error && <p className="text-[14px] font-medium text-negative">{error}</p>}

@@ -116,7 +116,7 @@ export default function PreTournament() {
             value={topScorer}
             onChange={setTopScorer}
             placeholder="Tape un nom…"
-            hint="Choisis dans la liste, ou tape le nom de famille."
+            hint="Tape pour filtrer, puis choisis dans la liste."
             disabled={locked}
           />
           <PlayerInput

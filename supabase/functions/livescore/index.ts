@@ -46,11 +46,17 @@ function lev(a: string, b: string): number {
       d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1))
   return d[m][n]
 }
-const nrm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim()
+const nrm = (s: string) =>
+  s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim()
+    .replace(/^[a-z]\. /, '')
+    .replace(/[-'.’]/g, ' ').replace(/\s+/g, ' ').trim()
 function nameMatch(a: string | null, b: string | null): boolean {
   if (!a || !b) return false
   const x = nrm(a), y = nrm(b)
   if (x === y) return true
+  // L'un est contenu dans l'autre en mots entiers ("Hyeon-gyu" ⊂ "Oh Hyeon-Gyu")
+  if (x.length >= 4 && ` ${y} `.includes(` ${x} `)) return true
+  if (y.length >= 4 && ` ${x} `.includes(` ${y} `)) return true
   return x[0] === y[0] && Math.max(x.length, y.length) >= 5 &&
     lev(x, y) <= (Math.max(x.length, y.length) >= 9 ? 2 : 1)
 }
@@ -74,11 +80,51 @@ async function apiGet(path: string): Promise<any[]> {
   return json.response ?? []
 }
 
-// "K. Mbappé" → "Mbappé" ; "A. Mac Allister" → "Mac Allister" ; sinon tel quel
+// L'API translittère certains noms autrement que les effectifs officiels (arabe surtout)
+// ou utilise un surnom : on ramène au nom canonique de notre liste (src/lib/players.ts)
+// pour que les pronos des joueurs valident. Clés = nom API normalisé (nrm, initiale ôtée).
+const PLAYER_ALIAS: Record<string, string> = {
+  'hassan tambakti': 'Al-Tambakti', tambakti: 'Al-Tambakti', // KSA
+  'feras al brikan': 'Al-Buraikan', 'al brikan': 'Al-Buraikan', // KSA
+  'ala al haji': 'Al-Hejji', 'al haji': 'Al-Hejji', // KSA
+  'mousa tamari': 'Al-Taamari', tamari: 'Al-Taamari', // JOR
+  'yazid abu layla': 'Abulaila', 'abu layla': 'Abulaila', // JOR
+  'abu al dahab': 'Abu Dahab', // JOR
+  'hossein kanani': 'Kanaanizadegan', kanani: 'Kanaanizadegan', // IRN
+  'ben doak': 'Gannon-Doak', doak: 'Gannon-Doak', // SCO
+  'lawrence zigi': 'Ati-Zigi', zigi: 'Ati-Zigi', // GHA
+  'oston orunov': 'Urunov', orunov: 'Urunov', // UZB
+  'zaid ismaeel': 'Ismail', ismaeel: 'Ismail', // IRQ
+  'sultan al braik': 'Al-Brake', 'al braik': 'Al-Brake', // QAT
+  'ahmed alaa': 'Alaaeldin', // QAT
+  'sabri ben hsan': 'Ben Hessen', 'ben hsan': 'Ben Hessen', // TUN
+  abdelmouhib: 'Chamakh', // TUN — Mouhib Chamakh
+  pico: 'Lopes', // CPV — Roberto « Pico » Lopes
+  'vinicius junior': 'Vini Jr.', // BRA
+  'park jin seop': 'Jin-seob', 'jin seop': 'Jin-seob', // KOR
+  'mostafa zico': 'Ziko', zico: 'Ziko', // EGY
+  'van de ven': 'Ven', // NED
+  'jose sa': 'Sá', // POR
+  'mohammed abu zurayq': 'Abu Zrayq', 'abu zurayq': 'Abu Zrayq', // JOR
+  'abdallah naseeb': 'Nasib', naseeb: 'Nasib', // JOR
+  'ibrahim sa deh': 'Sadeh', 'sa deh': 'Sadeh', // JOR
+  'mustafa saadoun': 'Saadoon', saadoun: 'Saadoon', // IRQ
+  'rebin solaka': 'Sulaka', solaka: 'Sulaka', // IRQ
+  'munaf younus': 'Younis', younus: 'Younis', // IRQ
+  'ahmed fathi': 'Fathy', // QAT (clé complète : un autre Fathy existe en Égypte)
+  // Noms trop courts pour le containment (< 4 lettres) : clés complètes uniquement
+  'almoez ali': 'Ali', // QAT
+  'hussein ali': 'Ali', 'mohanad ali': 'Ali', // IRQ
+  'ricardo ade': 'Adé', // HAI
+}
+
+// "K. Mbappé" → "Mbappé" ; "A. Mac Allister" → "Mac Allister" ; sinon tel quel.
+// Applique ensuite PLAYER_ALIAS pour ramener au nom canonique.
 function surname(name: string | null): string | null {
   if (!name) return null
   const m = name.match(/^\p{L}+\.\s+(.+)$/u)
-  return (m ? m[1] : name).trim()
+  const stripped = (m ? m[1] : name).trim()
+  return PLAYER_ALIAS[nrm(stripped)] ?? stripped
 }
 
 const minuteKey = (iso: string) => new Date(iso).toISOString().slice(0, 16)
