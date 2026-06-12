@@ -172,21 +172,30 @@ async function buildMap(): Promise<Record<string, number>> {
   return { fixtures: fixtures.length, mapped: rows.length, unmatched: unmatched as unknown as number }
 }
 
+interface GoalEvent {
+  min: number
+  team: 'home' | 'away'
+  scorer: string | null
+  assist: string | null
+}
 interface ParsedEvents {
   scorers: string[]
   assisters: string[]
   ownGoals: string[]
   subs: Array<{ out: string; in: string }>
+  timeline: GoalEvent[]
 }
 
-/** Buteurs/passeurs/CSC (TAB exclus) + remplacements depuis les events d'un fixture.
- *  Les chaînes de remplacements sont aplaties : A sorti pour B, B sorti pour C →
- *  paires (A,B), (B,C) et (A,C), pour créditer le prono du joueur sorti. */
-function parseEvents(events: any[]): ParsedEvents {
+/** Buteurs/passeurs/CSC (TAB exclus) + remplacements + timeline des buts depuis les
+ *  events d'un fixture. Les chaînes de remplacements sont aplaties : A sorti pour B,
+ *  B sorti pour C → paires (A,B), (B,C) et (A,C), pour créditer le prono du joueur sorti.
+ *  homeId = id de l'équipe à domicile, pour ranger chaque but du bon côté. */
+function parseEvents(events: any[], homeId?: number): ParsedEvents {
   const scorers: string[] = []
   const assisters: string[] = []
   const ownGoals: string[] = []
   const subs: Array<{ out: string; in: string }> = []
+  const timeline: GoalEvent[] = []
   for (const e of events) {
     if (e.type === 'subst') {
       // API-Football : player = sortant, assist = entrant
@@ -203,26 +212,38 @@ function parseEvents(events: any[]): ParsedEvents {
     if (e.comments === 'Penalty Shootout') continue // tirs au but : hors score
     if (e.detail === 'Missed Penalty') continue
     const sc = surname(e.player?.name)
+    const min = (e.time?.elapsed ?? 0) + (e.time?.extra ?? 0)
+    const scoringTeamIsHome = e.team?.id === homeId
     if (e.detail === 'Own Goal') {
       if (sc) ownGoals.push(sc)
+      // Un CSC compte pour l'équipe adverse au tableau d'affichage
+      timeline.push({
+        min,
+        team: scoringTeamIsHome ? 'away' : 'home',
+        scorer: sc ? `${sc} (csc)` : null,
+        assist: null,
+      })
       continue // un CSC n'est pas un "buteur" pronostiquable
     }
     if (sc) scorers.push(sc)
     const as = surname(e.assist?.name)
     if (as) assisters.push(as)
+    timeline.push({ min, team: scoringTeamIsHome ? 'home' : 'away', scorer: sc, assist: as })
   }
+  timeline.sort((a, b) => a.min - b.min)
   return {
     scorers: [...new Set(scorers)],
     assisters: [...new Set(assisters)],
     ownGoals: [...new Set(ownGoals)],
     subs,
+    timeline,
   }
 }
 
 /** Construit le brouillon de résultat à partir des events (buteurs/passeurs). */
 async function importDraft(matchId: number, fixtureId: number, f: any): Promise<void> {
   const events = await apiGet(`/fixtures/events?fixture=${fixtureId}`)
-  const { scorers, assisters, ownGoals, subs } = parseEvents(events)
+  const { scorers, assisters, ownGoals, subs, timeline } = parseEvents(events, f.teams?.home?.id)
   // Qualifié aux tirs au but (phases finales) si match nul après prolongation
   let override: 'home' | 'away' | null = null
   const pen = f.score?.penalty
@@ -241,10 +262,22 @@ async function importDraft(matchId: number, fixtureId: number, f: any): Promise<
     fetched_at: new Date().toISOString(),
   })
   // Score + buteurs/passeurs/remplacements finaux : le classement compte le match
-  // dès la fin (statut 'live' tant que l'admin n'a pas validé — il reste souverain)
+  // dès la fin (statut 'live' tant que l'admin n'a pas validé — il reste souverain).
+  // winner_override inclus → les pts vainqueur sur un match aux t.a.b. sont justes en live.
   await supabase
     .from('matches')
-    .update({ home_score: f.goals.home, away_score: f.goals.away, scorers, assisters, subs, status: 'live' })
+    .update({
+      home_score: f.goals.home,
+      away_score: f.goals.away,
+      scorers,
+      assisters,
+      subs,
+      goals_timeline: timeline,
+      winner_override: override,
+      minute: null, // match terminé : plus de minute qui tourne
+      period: f.fixture.status.short,
+      status: 'live',
+    })
     .eq('id', matchId)
     .neq('status', 'finished')
 }
@@ -340,19 +373,25 @@ async function live(): Promise<Record<string, number>> {
     if (LIVE_STATUS.has(st) && f.goals.home != null) {
       const oldTotal = (m.home_score ?? 0) + (m.away_score ?? 0)
       const newTotal = f.goals.home + f.goals.away
+      // Minute + statut : gratuits (déjà dans la réponse), mis à jour chaque tick
+      // pour que la minute tourne dans le salon.
+      const elapsed = f.fixture.status.elapsed
       const patch: Record<string, unknown> = {
         home_score: f.goals.home,
         away_score: f.goals.away,
+        minute: elapsed != null ? elapsed + (f.fixture.status.extra ?? 0) : null,
+        period: st,
         status: 'live',
       }
       // But marqué : on récupère les events (1 appel) pour buteurs/passeurs/remplacements
-      // en direct → le classement bouge pendant le match.
+      // + timeline en direct → le classement et le fil du salon bougent pendant le match.
       let parsed: ParsedEvents | null = null
       if (newTotal > oldTotal) {
-        parsed = parseEvents(await apiGet(`/fixtures/events?fixture=${f.fixture.id}`))
+        parsed = parseEvents(await apiGet(`/fixtures/events?fixture=${f.fixture.id}`), f.teams.home.id)
         patch.scorers = parsed.scorers
         patch.assisters = parsed.assisters
         patch.subs = parsed.subs
+        patch.goals_timeline = parsed.timeline
       }
       await supabase.from('matches').update(patch).eq('id', ourId).neq('status', 'finished')
       live++

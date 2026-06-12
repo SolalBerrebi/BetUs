@@ -80,11 +80,17 @@ create table if not exists public.matches (
   winner_override text check (winner_override in ('home','away')),  -- vainqueur aux tirs au but
   scorers text[] not null default '{}',
   assisters text[] not null default '{}',
-  subs jsonb not null default '[]'                                  -- remplacements [{out, in}] (auto, livescore)
+  subs jsonb not null default '[]',                                 -- remplacements [{out, in}] (auto, livescore)
+  minute int,                                                       -- minute de jeu en direct (null hors live)
+  period text,                                                      -- statut API court : 1H/HT/2H/ET/BT/P/FT/AET/PEN
+  goals_timeline jsonb not null default '[]'                        -- buts [{min, team, scorer, assist}] (auto, livescore)
 );
 
 -- Idempotence sur base existante (create table if not exists n'ajoute pas la colonne)
 alter table public.matches add column if not exists subs jsonb not null default '[]';
+alter table public.matches add column if not exists minute int;
+alter table public.matches add column if not exists period text;
+alter table public.matches add column if not exists goals_timeline jsonb not null default '[]';
 
 create table if not exists public.predictions (
   id bigint generated always as identity primary key,
@@ -288,6 +294,11 @@ $$ select now() >= (select tournament_start from public.settings where id) $$;
 create or replace function public.match_started(p_match_id int) returns boolean
 language sql stable as
 $$ select exists (select 1 from public.matches m where m.id = p_match_id and now() >= m.kickoff_at) $$;
+
+-- Match clos = résultat validé par l'admin (status 'finished'). Le salon se ferme alors.
+create or replace function public.match_finished(p_match_id int) returns boolean
+language sql stable as
+$$ select exists (select 1 from public.matches m where m.id = p_match_id and m.status = 'finished') $$;
 
 -- profiles
 drop policy if exists profiles_select on public.profiles;

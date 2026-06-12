@@ -18,10 +18,15 @@ drop policy if exists messages_select on public.messages;
 create policy messages_select on public.messages for select to authenticated
   using (user_id = auth.uid() or public.is_admin() or public.match_started(match_id));
 
--- Écriture : ses propres messages, uniquement à partir du coup d'envoi
+-- Écriture : ses propres messages, du coup d'envoi jusqu'à la clôture du match.
+-- Le salon se ferme quand l'admin valide le résultat (status 'finished').
 drop policy if exists messages_insert on public.messages;
 create policy messages_insert on public.messages for insert to authenticated
-  with check (user_id = auth.uid() and public.match_started(match_id));
+  with check (
+    user_id = auth.uid()
+    and public.match_started(match_id)
+    and not public.match_finished(match_id)
+  );
 
 -- Suppression : son propre message, ou l'admin (modération)
 drop policy if exists messages_delete on public.messages;

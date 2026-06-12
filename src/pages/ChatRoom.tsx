@@ -29,6 +29,33 @@ function timeLabel(iso: string): string {
   return new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(iso))
 }
 
+// Statut court API → libellé FR pour le bandeau live
+const PERIOD_LABEL: Record<string, string> = {
+  HT: 'Mi-temps', BT: 'Pause prolong.', P: 'Tirs au but',
+  FT: 'Terminé', AET: 'Terminé (a.p.)', PEN: 'Terminé (t.a.b.)',
+}
+/** Badge live : "67'", "MI-TEMPS", "T.A.B."… selon période + minute. */
+function liveBadge(period: string | null, minute: number | null): string | null {
+  if (!period) return minute != null ? `${minute}'` : null
+  if (period === 'HT') return 'MI-TEMPS'
+  if (period === 'BT') return 'PAUSE'
+  if (period === 'P') return 'T.A.B.'
+  if (period === '1H' || period === '2H' || period === 'ET') return minute != null ? `${minute}'` : null
+  return PERIOD_LABEL[period] ?? (minute != null ? `${minute}'` : null)
+}
+
+const normName = (s: string) =>
+  s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim()
+/** Le nom pronostiqué figure-t-il parmi les buteurs/passeurs live (souple) ? */
+function nameIn(list: string[], name: string | null): boolean {
+  if (!name) return false
+  const q = normName(name)
+  return list.some((s) => {
+    const x = normName(s)
+    return x === q || (q.length >= 4 && ` ${x} `.includes(` ${q} `)) || (x.length >= 4 && ` ${q} `.includes(` ${x} `))
+  })
+}
+
 export default function ChatRoom() {
   const { id } = useParams()
   const matchId = Number(id)
@@ -48,6 +75,8 @@ export default function ChatRoom() {
 
   const names = useMemo(() => new Map(profiles.map((p) => [p.id, p.display_name])), [profiles])
   const started = match ? hasStarted(match.kickoff_at, now) : false
+  // Salon clos quand l'admin a validé le résultat : lecture seule, plus de messages.
+  const closed = match?.status === 'finished'
 
   // Pronos de tout le monde (visibles une fois le match commencé, comme la fiche match)
   useEffect(() => {
@@ -150,6 +179,16 @@ export default function ChatRoom() {
     match.home_score !== null && match.away_score !== null
       ? `${match.home_score} – ${match.away_score}`
       : null
+  const isLive = match.status === 'live'
+  const badge = started ? liveBadge(match.period, match.minute) : null
+  const liveOutcome: 'home' | 'draw' | 'away' | null =
+    match.home_score === null || match.away_score === null
+      ? null
+      : match.home_score > match.away_score
+        ? 'home'
+        : match.home_score < match.away_score
+          ? 'away'
+          : 'draw'
 
   return (
     <div className="flex h-dvh flex-col">
@@ -167,6 +206,29 @@ export default function ChatRoom() {
           <span className="text-[15px] font-semibold">{teamName(match.away_team, match.away_code)}</span>
           <span className="text-[22px]">{teamFlag(match.away_code)}</span>
         </div>
+        {badge && (
+          <div className="mt-1.5 flex items-center justify-center">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wide ${
+                isLive ? 'bg-positive/12 text-positive' : 'bg-surface-2 text-ink-2'
+              }`}
+            >
+              {isLive && <span className="live-dot inline-block size-1.5 rounded-full bg-positive" />}
+              {badge}
+            </span>
+          </div>
+        )}
+        {match.goals_timeline.length > 0 && (
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-2 text-[12px] text-ink-2">
+            {match.goals_timeline.map((g, i) => (
+              <span key={i} className="inline-flex items-center gap-1 whitespace-nowrap">
+                <span className="text-[13px]">{teamFlag(g.team === 'home' ? match.home_code : match.away_code)}</span>
+                <span className="tnum font-semibold">{g.min}'</span>
+                <span>⚽️ {g.scorer ?? '—'}</span>
+              </span>
+            ))}
+          </div>
+        )}
         <div className="mt-2 flex items-center justify-center gap-2">
           <span className="live-dot inline-block size-2 rounded-full bg-positive" />
           <span className="text-[13px] font-medium text-ink-2">
@@ -210,32 +272,58 @@ export default function ChatRoom() {
             preds
               .slice()
               .sort((a, b) => (names.get(a.user_id) ?? '').localeCompare(names.get(b.user_id) ?? ''))
-              .map((p) => (
-                <div key={p.user_id} className="rounded-2xl bg-surface px-4 py-3 shadow-(--shadow-card)">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[15px] font-semibold">
-                      {names.get(p.user_id) ?? '?'}
-                      {p.user_id === me && <span className="font-normal text-ink-3"> (moi)</span>}
-                    </span>
-                    {p.pred_home_score !== null && (
-                      <span className="tnum text-[14px] font-semibold text-ink-2">
-                        {p.pred_home_score}–{p.pred_away_score}
+              .map((p) => {
+                // Badges « en cours » calculés depuis le score/buteurs live du match
+                const badges: string[] = []
+                if (isLive && score) {
+                  if (
+                    p.pred_home_score === match.home_score &&
+                    p.pred_away_score === match.away_score
+                  )
+                    badges.push('🎯 score exact')
+                  if (nameIn(match.scorers, p.scorer)) badges.push('⚽️ buteur')
+                  if (nameIn(match.assisters, p.assister)) badges.push('🅰️ passeur')
+                  if (p.winner && p.winner === liveOutcome) badges.push('🟢 vainqueur')
+                }
+                return (
+                  <div key={p.user_id} className="rounded-2xl bg-surface px-4 py-3 shadow-(--shadow-card)">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[15px] font-semibold">
+                        {names.get(p.user_id) ?? '?'}
+                        {p.user_id === me && <span className="font-normal text-ink-3"> (moi)</span>}
                       </span>
+                      {p.pred_home_score !== null && (
+                        <span className="tnum text-[14px] font-semibold text-ink-2">
+                          {p.pred_home_score}–{p.pred_away_score}
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 text-[13px] text-ink-2">
+                      {p.winner
+                        ? p.winner === 'draw'
+                          ? 'Nul'
+                          : p.winner === 'home'
+                            ? teamName(match.home_team, match.home_code)
+                            : teamName(match.away_team, match.away_code)
+                        : '—'}
+                      {p.scorer && ` · ⚽️ ${p.scorer}`}
+                      {p.assister && ` · 🅰️ ${p.assister}`}
+                    </p>
+                    {badges.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {badges.map((b) => (
+                          <span
+                            key={b}
+                            className="rounded-full bg-positive/12 px-2 py-0.5 text-[11px] font-semibold text-positive"
+                          >
+                            {b}
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </div>
-                  <p className="mt-1 text-[13px] text-ink-2">
-                    {p.winner
-                      ? p.winner === 'draw'
-                        ? 'Nul'
-                        : p.winner === 'home'
-                          ? teamName(match.home_team, match.home_code)
-                          : teamName(match.away_team, match.away_code)
-                      : '—'}
-                    {p.scorer && ` · ⚽️ ${p.scorer}`}
-                    {p.assister && ` · 🅰️ ${p.assister}`}
-                  </p>
-                </div>
-              ))
+                )
+              })
           )}
         </div>
       ) : (
@@ -280,6 +368,10 @@ export default function ChatRoom() {
       {!started ? (
         <div className="border-t border-line/60 px-4 py-4 text-center text-[14px] text-ink-2">
           Le salon ouvre au coup d'envoi — dans {countdown(match.kickoff_at, now)}.
+        </div>
+      ) : closed ? (
+        <div className="border-t border-line/60 px-4 py-4 text-center text-[14px] text-ink-2">
+          🔒 Match terminé, le salon est fermé. Rendez-vous au prochain match !
         </div>
       ) : view === 'chat' ? (
         <form

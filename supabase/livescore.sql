@@ -31,3 +31,14 @@ alter table public.result_draft enable row level security;
 drop policy if exists result_draft_admin on public.result_draft;
 create policy result_draft_admin on public.result_draft for select to authenticated
   using (public.is_admin());
+
+-- Dédup des notifs de but en direct : 1 envoi par (match, joueur, type).
+-- Écrite uniquement par l'Edge Function livescore (service role) ; RLS sans policy.
+create table if not exists public.live_notif (
+  match_id int not null references public.matches(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  kind text not null,
+  sent_at timestamptz not null default now(),
+  primary key (match_id, user_id, kind)
+);
+alter table public.live_notif enable row level security;  -- service role uniquement

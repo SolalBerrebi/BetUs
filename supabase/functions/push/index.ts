@@ -19,6 +19,46 @@ const FR: Record<string, string> = {
 
 const team = (name: string, code: string | null) => (code && FR[code]) || name
 
+// Roasts — vannes entre potes, bien crues (pour ~17 amis qui se chambrent). Pas de
+// méchanceté gratuite (rien sur la famille / le physique réel), juste du foot et du classement.
+const ROASTS = {
+  // 0 point sur le match : il s'est planté sur toute la ligne
+  zero: [
+    'Zéro pointé sur ce match. Même mon chat en cochant au hasard ferait mieux. 🐱',
+    '0 point. T\'as regardé le match les yeux fermés ou t\'as juste aucune idée du foot ? 🙈',
+    'Rien. Nada. Que dalle. Ton prono part direct à la benne. 🗑️',
+    '0 sur ce match. À ce stade c\'est plus de la malchance, c\'est un talent rare. 🎁',
+    'Gros 0 bien rond. Ton cerveau était en mode avion pendant le match ? ✈️',
+    'Tu finis bredouille. Tu joues aux pronos ou tu tires à pile ou face ? 🪙',
+  ],
+  // a reculé au classement
+  dropped: [
+    'Tu dégringoles au classement. Chute libre, et t\'as oublié le parachute. 🪂',
+    'Plus tu joues, plus tu recules. Franchement impressionnant, dans le mauvais sens. 📉',
+    'Tu descends comme une pierre dans l\'eau. Il te reste un peu de dignité ? 🥴',
+    'Encore un rang de perdu. Continue comme ça et tu sors du classement par le bas. 🕳️',
+  ],
+  // bon dernier au général
+  last: [
+    'Bon dernier au classement. Quelqu\'un doit tenir la lanterne rouge, et le destin t\'a choisi. 🏮',
+    'Dernier. Tes 30 balles, considère ça comme un généreux don à la cagnotte des autres. 💸',
+    'Lanterne rouge officielle. T\'es là pour jouer ou pour faire de la figuration ? 🎬',
+  ],
+  // gros score : éloge ironique « t'es un tigre »
+  fire: [
+    'Gros carton sur ce match. T\'es un tigre la vérité — profites-en, ça durera pas. 🐯',
+    'Là pour le coup, chapeau bas. Savoure, demain tu redeviens nul comme d\'hab. 🎩',
+    'Énorme score. Le talent ou la chatte ? On le saura jamais vraiment. 🍀',
+  ],
+  // n'a pas pronostiqué ce match
+  noshow: [
+    'T\'as même pas pronostiqué ce match. Tu participes ou tu regardes les autres jouer ? 👀',
+    'Aucun prono de ta part. Trop occupé à perdre, ou juste aux abonnés absents ? 📭',
+    'Zéro prono sur ce match. Difficile de gagner quand on joue pas, mon grand. 🤷',
+  ],
+}
+const pick = (arr: string[]): string => arr[Math.floor(Math.random() * arr.length)]
+
 webpush.setVapidDetails(
   'mailto:solal@verss.ai',
   Deno.env.get('VAPID_PUBLIC_KEY')!,
@@ -187,14 +227,26 @@ Deno.serve(async (req) => {
       const title = `🔔 ${team(m.home_team, m.home_code)} ${m.home_score} – ${m.away_score} ${team(m.away_team, m.away_code)}`
       const url = `/BetUs/#/match/${m.id}`
 
-      // Rangs avant (snapshot) vs après (classement courant)
-      const [{ data: before }, { data: after }] = await Promise.all([
+      // Rangs avant (snapshot) vs après (classement courant) + points de CE match par joueur
+      const [{ data: before }, { data: after }, { data: mp }] = await Promise.all([
         supabase.from('rank_snapshot').select('user_id, rank'),
         supabase.from('ranked_leaderboard').select('user_id, rank, total_points, display_name'),
+        supabase
+          .from('match_points')
+          .select('user_id, winner_pts, scorer_pts, assister_pts, exact_pts')
+          .eq('match_id', m.id),
       ])
       const prevRank = new Map((before ?? []).map((r) => [r.user_id, r.rank]))
       const cur = new Map((after ?? []).map((r) => [r.user_id, r]))
       const rows = [...cur.values()]
+      const lastRank = rows.length ? Math.max(...rows.map((r) => r.rank)) : 0
+      // points marqués sur ce match ; absent de la map = n'a pas pronostiqué
+      const matchPts = new Map(
+        (mp ?? []).map((r) => [
+          r.user_id,
+          r.winner_pts + r.scorer_pts + r.assister_pts + r.exact_pts,
+        ]),
+      )
 
       // "Léa", "Léa et Max", "Léa, Max et 2 autres"
       const nameList = (arr: { display_name: string }[]): string => {
@@ -208,8 +260,15 @@ Deno.serve(async (req) => {
         const c = cur.get(userId)
         if (!c) return null
         const prev = prevRank.get(userId)
-        let body = 'Résultat saisi, classement mis à jour — viens voir tes points.'
-        if (prev && c.rank < prev) {
+        const pts = matchPts.get(userId) // undefined = n'a pas pronostiqué ce match
+        let body: string
+        if (pts === undefined) {
+          // Pas de prono sur ce match → petite vanne d'absent
+          body = pick(ROASTS.noshow)
+        } else if (pts === 0) {
+          // Tout faux sur le match → roast cru, peu importe le classement
+          body = pick(ROASTS.zero)
+        } else if (prev && c.rank < prev) {
           // Monté : qui ai-je doublé ? (était au-dessus avant, en-dessous maintenant)
           const passed = rows
             .filter((o) => o.user_id !== userId && (prevRank.get(o.user_id) ?? 1e9) < prev && o.rank > c.rank)
@@ -218,15 +277,18 @@ Deno.serve(async (req) => {
             ? `🔼 Tu doubles ${nameList(passed)} — te voilà ${c.rank}e !`
             : `🔼 Tu remontes ${prev}e → ${c.rank}e au classement !`
         } else if (prev && c.rank > prev) {
-          // Descendu : qui m'a doublé ? (était en-dessous avant, au-dessus maintenant)
-          const passedBy = rows
-            .filter((o) => o.user_id !== userId && (prevRank.get(o.user_id) ?? 0) > prev && o.rank < c.rank)
-            .sort((a, b) => b.rank - a.rank)
-          body = passedBy.length
-            ? `🔽 ${nameList(passedBy)} ${passedBy.length > 1 ? 'te passent' : 'te passe'} devant — tu tombes ${c.rank}e.`
-            : `🔽 Tu descends ${prev}e → ${c.rank}e. Reprends-toi !`
+          // Descendu → roast cru sur la chute
+          body = pick(ROASTS.dropped)
+        } else if (c.rank === lastRank && lastRank > 1) {
+          // Bon dernier → roast lanterne rouge
+          body = pick(ROASTS.last)
         } else if (prev && prev === c.rank && c.rank === 1) {
           body = '👑 Toujours en tête du classement !'
+        } else if (pts >= 8) {
+          // Gros score sur le match → éloge ironique
+          body = pick(ROASTS.fire)
+        } else {
+          body = 'Résultat saisi, classement mis à jour — viens voir tes points.'
         }
         return { title, body, url, tag: `result-${m.id}` }
       })
@@ -259,6 +321,23 @@ Deno.serve(async (req) => {
       ),
     )
     results.direct = sent
+  } else if (task === 'roast') {
+    // Roast à la demande : vanne chaque joueur selon sa place au classement général.
+    // Le dernier prend cher, le 1er se fait charrier ironiquement, le reste a une vanne.
+    const { data: ranked } = await supabase
+      .from('ranked_leaderboard')
+      .select('user_id, rank, display_name')
+    const byUser = new Map((ranked ?? []).map((r) => [r.user_id, r]))
+    const lastRank = ranked?.length ? Math.max(...ranked.map((r) => r.rank)) : 0
+    results.roast = await broadcastPerUser((userId) => {
+      const r = byUser.get(userId)
+      if (!r) return null
+      let bodyTxt: string
+      if (r.rank === 1) bodyTxt = pick(ROASTS.fire)
+      else if (r.rank === lastRank && lastRank > 1) bodyTxt = pick(ROASTS.last)
+      else bodyTxt = pick(ROASTS.dropped)
+      return { title: '🔥 Petit point classement', body: bodyTxt, url: '/BetUs/#/classement', tag: 'roast' }
+    })
   } else if (task === 'announce') {
     // Annonce libre à tout le monde (titre/corps personnalisés)
     results.announce = await broadcast({

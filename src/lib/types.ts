@@ -40,6 +40,16 @@ export interface Match {
   winner_override: 'home' | 'away' | null
   scorers: string[]
   assisters: string[]
+  minute: number | null
+  period: string | null
+  goals_timeline: GoalEvent[]
+}
+
+export interface GoalEvent {
+  min: number
+  team: 'home' | 'away'
+  scorer: string | null
+  assist: string | null
 }
 
 export interface Prediction {
