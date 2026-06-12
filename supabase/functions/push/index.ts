@@ -19,42 +19,47 @@ const FR: Record<string, string> = {
 
 const team = (name: string, code: string | null) => (code && FR[code]) || name
 
-// Roasts — vannes entre potes, bien crues (pour ~17 amis qui se chambrent). Pas de
-// méchanceté gratuite (rien sur la famille / le physique réel), juste du foot et du classement.
+// Roasts — vannes entre potes, travaillées, avec des clins d'œil à la commu (Chabbat,
+// Kippour, Pessah, mazal, kiddouch…) façon auto-dérision affectueuse. Banter d'in-group :
+// que du foot, du classement et de la vie de la commu — rien de méchant ni de physique.
 const ROASTS = {
   // 0 point sur le match : il s'est planté sur toute la ligne
   zero: [
-    'Zéro pointé sur ce match. Même mon chat en cochant au hasard ferait mieux. 🐱',
-    '0 point. T\'as regardé le match les yeux fermés ou t\'as juste aucune idée du foot ? 🙈',
-    'Rien. Nada. Que dalle. Ton prono part direct à la benne. 🗑️',
-    '0 sur ce match. À ce stade c\'est plus de la malchance, c\'est un talent rare. 🎁',
-    'Gros 0 bien rond. Ton cerveau était en mode avion pendant le match ? ✈️',
-    'Tu finis bredouille. Tu joues aux pronos ou tu tires à pile ou face ? 🪙',
+    'Zéro pointé. Même le jour de Kippour on a le droit de marquer un point — toi t\'as fait grève totale. 🕯️',
+    'Ta grille, c\'est le ménage de Pessah : tu jures avoir tout couvert, en vrai il reste du \'hametz dans tous les coins. 🧹',
+    'Rien, nada, walou. T\'as pronostiqué avec l\'élégance d\'un schlemiel qui fait tomber sa tartine côté beurre. 🍞',
+    'Zéro point, zéro mazal. À ce stade c\'est plus la poisse, c\'est carrément un mauvais œil — sors le hamsa. 🧿',
+    '0/6. T\'as bossé tes compos comme certains bossent la paracha : de loin, vite fait, en pensant au repas. 📖',
+    'Un zéro grand comme la table d\'un soir de Chabbat. Impressionnant de vide. 🍽️',
   ],
   // a reculé au classement
   dropped: [
-    'Tu dégringoles au classement. Chute libre, et t\'as oublié le parachute. 🪂',
-    'Plus tu joues, plus tu recules. Franchement impressionnant, dans le mauvais sens. 📉',
-    'Tu descends comme une pierre dans l\'eau. Il te reste un peu de dignité ? 🥴',
-    'Encore un rang de perdu. Continue comme ça et tu sors du classement par le bas. 🕳️',
+    'Tu dégringoles plus vite que la maison se vide une fois le dernier plat de Chabbat servi. 🏃',
+    'Tu chutes façon soufflé de ta tante : magnifique deux secondes, puis ça s\'effondre dès qu\'on ouvre le four. 🥘',
+    'Encore un rang de perdu. À ce rythme tu sors du classement avant même le birkat. 🪑',
+    'Tu recules, tu recules… on dirait la queue au supermarché casher la veille de Roch Hachana. 🛒',
+    'En pleine glissade. Garde un peu de dignité, là c\'est balagan complet. 🌀',
   ],
   // bon dernier au général
   last: [
-    'Bon dernier au classement. Quelqu\'un doit tenir la lanterne rouge, et le destin t\'a choisi. 🏮',
-    'Dernier. Tes 30 balles, considère ça comme un généreux don à la cagnotte des autres. 💸',
-    'Lanterne rouge officielle. T\'es là pour jouer ou pour faire de la figuration ? 🎬',
+    'Bon dernier. Comme à la synagogue, y\'en a toujours un qui ferme la marche — et c\'est encore toi. 🚪',
+    'Lanterne rouge. Tes 30 balles, vois ça comme un don à la cagnotte des autres : au moins ça te fait une mitsva. 😇',
+    'Dernier du classement avec le niveau d\'un invité qui débarque à un dîner de gala avec une bouteille à 3 €. 🍷',
+    'Tout en bas du tableau. T\'es le nebech officiel de la compét, et ça se joue pas à grand-chose : personne d\'autre n\'en veut. 🎖️',
   ],
   // gros score : éloge ironique « t'es un tigre »
   fire: [
-    'Gros carton sur ce match. T\'es un tigre la vérité — profites-en, ça durera pas. 🐯',
-    'Là pour le coup, chapeau bas. Savoure, demain tu redeviens nul comme d\'hab. 🎩',
-    'Énorme score. Le talent ou la chatte ? On le saura jamais vraiment. 🍀',
+    'Énorme score. On dirait que t\'as récité le bon mizmor avant le match — t\'es béni là, profite. 🙏',
+    'Carton plein. Savoure ton quart d\'heure de gloire, demain tu redeviens le nebech qu\'on connaît. ✨',
+    'Gros match. Le talent ou un coup de mazal du Ciel ? Vu ton niveau habituel, on parie tous sur le Ciel. 🍀',
+    'T\'es un tigre la vérité. Encadre la notif, ça reviendra pas avant la sortie d\'Égypte. 🐯',
   ],
   // n'a pas pronostiqué ce match
   noshow: [
-    'T\'as même pas pronostiqué ce match. Tu participes ou tu regardes les autres jouer ? 👀',
-    'Aucun prono de ta part. Trop occupé à perdre, ou juste aux abonnés absents ? 📭',
-    'Zéro prono sur ce match. Difficile de gagner quand on joue pas, mon grand. 🤷',
+    'T\'as zappé ce match. Aux abonnés absents, comme à l\'office du vendredi soir quand y\'a un gros match à la télé. 📺',
+    'Zéro prono. Toujours présent pour le kiddouch, jamais pour le boulot, hein. 🍷',
+    'Pas de prono de ta part. T\'es venu jouer ou juste pour le buffet ? 🥗',
+    'Match zappé. T\'arrives toujours au moment du dessert, jamais pour mettre la table. 🍰',
   ],
 }
 const pick = (arr: string[]): string => arr[Math.floor(Math.random() * arr.length)]
