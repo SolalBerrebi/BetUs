@@ -3,6 +3,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { AppProvider, useApp } from './lib/AppContext'
 import Layout from './components/Layout'
+import NotifGate from './components/NotifGate'
 import Login from './pages/Login'
 import Matches from './pages/Matches'
 import MatchDetail from './pages/MatchDetail'
@@ -99,7 +100,12 @@ function Shell() {
 
   if (!session) return <Login />
 
-  return <AppRoutes isAdmin={!!profile?.is_admin} />
+  // Gate strict : app verrouillée tant que pas installée + notifications actives
+  return (
+    <NotifGate userId={session.user.id}>
+      <AppRoutes isAdmin={!!profile?.is_admin} />
+    </NotifGate>
+  )
 }
 
 export default function App() {
