@@ -196,11 +196,12 @@ const mapLineupTeam = (t: any): TeamLineup => ({
 })
 
 // L'API renvoie un tableau de 2 équipes (vide tant que les compos ne sont pas
-// publiées, ~40 min avant le coup d'envoi). On range home/away via l'id d'équipe.
-function parseLineups(resp: any[], homeId: number | undefined): { home: TeamLineup; away: TeamLineup } | null {
+// publiées, ~40-90 min avant le coup d'envoi). On range home/away via le nom
+// d'équipe (teamKey) → fonctionne sans la réponse /fixtures (préchargement).
+function parseLineups(resp: any[], homeKey: string): { home: TeamLineup; away: TeamLineup } | null {
   if (!resp || resp.length < 2) return null
   if (!(resp[0]?.startXI?.length)) return null // compos pas encore dispo
-  const homeEntry = resp.find((t) => t.team?.id === homeId) ?? resp[0]
+  const homeEntry = resp.find((t) => teamKey(t.team?.name ?? '') === homeKey) ?? resp[0]
   const awayEntry = resp.find((t) => t !== homeEntry) ?? resp[1]
   return { home: mapLineupTeam(homeEntry), away: mapLineupTeam(awayEntry) }
 }
@@ -225,6 +226,46 @@ const teamKey = (name: string) => {
 // Clé d'un match : heure + équipes (orientation domicile/extérieur conservée)
 const matchKey = (iso: string, home: string, away: string) =>
   `${minuteKey(iso)}|${home}|${away}`
+
+// Préchargement des compositions pour les prochains matchs, indépendamment du
+// score live. On vise les ~4 prochains matchs jusqu'à 3 h avant le coup d'envoi
+// et on les sonde dès maintenant : dès que l'API publie les compos (~40-90 min
+// avant), on les stocke. Cadence réduite quand c'est loin (> 90 min) pour
+// préserver le quota — un appel /fixtures/lineups par match et par tentative.
+const PREFETCH_HORIZON_MIN = 180 // jusqu'à 3 h avant le coup d'envoi
+const PREFETCH_MAX_MATCHES = 4
+async function prefetchLineups(now: number, minute: number): Promise<number> {
+  const { data: ups } = await supabase
+    .from('matches')
+    .select('id, home_team, kickoff_at')
+    .neq('status', 'finished')
+    .is('lineups', null)
+    .gte('kickoff_at', new Date(now - 150 * 60_000).toISOString()) // inclut les matchs en cours
+    .lte('kickoff_at', new Date(now + PREFETCH_HORIZON_MIN * 60_000).toISOString())
+    .order('kickoff_at')
+    .limit(PREFETCH_MAX_MATCHES)
+  if (!ups?.length) return 0
+
+  const { data: mapRows } = await supabase.from('match_api').select('match_id, fixture_id')
+  const fxByMatch = new Map((mapRows ?? []).map((r) => [r.match_id, r.fixture_id]))
+
+  let added = 0
+  for (const m of ups) {
+    const fx = fxByMatch.get(m.id)
+    if (!fx) continue
+    const toKo = new Date(m.kickoff_at).getTime() - now
+    // Loin du coup d'envoi (> 90 min) : on ne tente qu'une fois tous les ~15 min.
+    if (toKo > 90 * 60_000 && minute % 15 !== 0) continue
+    try {
+      const lu = parseLineups(await apiGet(`/fixtures/lineups?fixture=${fx}`), teamKey(m.home_team))
+      if (lu) {
+        await supabase.from('matches').update({ lineups: lu }).eq('id', m.id)
+        added++
+      }
+    } catch { /* compos indispo : prochain tick */ }
+  }
+  return added
+}
 
 async function buildMap(): Promise<Record<string, number>> {
   const fixtures = await apiGet(`/fixtures?league=${LEAGUE}&season=${SEASON}`)
@@ -371,8 +412,6 @@ interface WindowMatch {
   away_team: string
   home_code: string | null
   away_code: string | null
-  kickoff_at: string
-  lineups: unknown | null
 }
 
 // Notifs personnalisées au moment d'un but (buteur trouvé, score exact, vainqueur en bonne voie).
@@ -426,15 +465,18 @@ async function liveGoalNotifs(m: WindowMatch, h: number, a: number, parsed: Pars
 
 async function live(): Promise<Record<string, number>> {
   const now = Date.now()
-  // Garde-fou quota : n'appelle l'API que s'il y a un match dans sa fenêtre, non encore validé.
-  // Fenêtre élargie côté pré-match (+50 min) pour récupérer les compos avant le coup d'envoi.
+  // Préchargement des compos des prochains matchs (jusqu'à 3 h avant), indépendant
+  // du score live → tourne même quand aucun match n'est en cours.
+  const lineupsAdded = await prefetchLineups(now, new Date(now).getUTCMinutes())
+
+  // Garde-fou quota : n'appelle l'API score que s'il y a un match dans sa fenêtre, non encore validé.
   const { data: windowRows } = await supabase
     .from('matches')
-    .select('id, home_score, away_score, home_team, away_team, home_code, away_code, kickoff_at, lineups')
+    .select('id, home_score, away_score, home_team, away_team, home_code, away_code')
     .neq('status', 'finished')
     .gte('kickoff_at', new Date(now - 200 * 60_000).toISOString())
-    .lte('kickoff_at', new Date(now + 50 * 60_000).toISOString())
-  if (!windowRows?.length) return { skipped: 1 }
+    .lte('kickoff_at', new Date(now + 10 * 60_000).toISOString())
+  if (!windowRows?.length) return { skipped: 1, lineupsAdded }
 
   const [{ data: mapRows }, { data: drafts }] = await Promise.all([
     supabase.from('match_api').select('match_id, fixture_id'),
@@ -449,31 +491,11 @@ async function live(): Promise<Record<string, number>> {
   let live = 0
   let imported = 0
   let notified = 0
-  let lineupsAdded = 0
   for (const f of fixtures) {
     const ourId = ourIdByFixture.get(f.fixture.id)
     const m = ourId ? matchById.get(ourId) : undefined
     if (!ourId || !m) continue
     const st = f.fixture.status.short
-
-    // Compos : une fois, dès qu'elles sont publiées (≤ 50 min avant le coup d'envoi
-    // et pendant tout le match). L'API renvoie un tableau vide tant qu'elles manquent.
-    if (m.lineups == null) {
-      const toKo = new Date(m.kickoff_at).getTime() - now
-      if (toKo <= 50 * 60_000 && toKo >= -150 * 60_000) {
-        try {
-          const lu = parseLineups(
-            await apiGet(`/fixtures/lineups?fixture=${f.fixture.id}`),
-            f.teams.home.id,
-          )
-          if (lu) {
-            await supabase.from('matches').update({ lineups: lu }).eq('id', ourId)
-            m.lineups = lu
-            lineupsAdded++
-          }
-        } catch { /* compos indispo : on réessaiera au prochain tick */ }
-      }
-    }
     if (LIVE_STATUS.has(st) && f.goals.home != null) {
       const oldTotal = (m.home_score ?? 0) + (m.away_score ?? 0)
       const newTotal = f.goals.home + f.goals.away
@@ -513,6 +535,8 @@ async function live(): Promise<Record<string, number>> {
   }
   return { live, imported, notified, lineupsAdded }
 }
+
+// (lineupsAdded provient du préchargement en tête de live().)
 
 Deno.serve(async (req) => {
   if (req.headers.get('x-push-secret') !== Deno.env.get('PUSH_SECRET')) {
