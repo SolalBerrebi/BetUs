@@ -457,10 +457,10 @@ async function live(): Promise<Record<string, number>> {
     const st = f.fixture.status.short
 
     // Compos : une fois, dès qu'elles sont publiées (≤ 50 min avant le coup d'envoi
-    // jusqu'au coup d'envoi). L'API renvoie un tableau vide tant qu'elles manquent.
+    // et pendant tout le match). L'API renvoie un tableau vide tant qu'elles manquent.
     if (m.lineups == null) {
       const toKo = new Date(m.kickoff_at).getTime() - now
-      if (toKo <= 50 * 60_000 && toKo >= -15 * 60_000) {
+      if (toKo <= 50 * 60_000 && toKo >= -150 * 60_000) {
         try {
           const lu = parseLineups(
             await apiGet(`/fixtures/lineups?fixture=${f.fixture.id}`),

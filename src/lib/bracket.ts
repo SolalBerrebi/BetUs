@@ -92,6 +92,27 @@ export function groupStandings(matches: Match[]): GroupTable[] {
   return out
 }
 
+// Résout un placeholder de 16e ('1A' = 1er du groupe A, '2B' = 2e du groupe B…)
+// vers l'équipe qui occupe actuellement cette place au classement. `provisional`
+// vrai tant que le groupe n'a pas joué tous ses matchs.
+// Les meilleurs 3es ('3C/D/F/G/H') ne sont pas résolus (combinatoire FIFA).
+export function resolveGroupSlot(
+  raw: string,
+  standings: GroupTable[],
+): { code: string | null; name: string; provisional: boolean } | null {
+  const m = raw.match(/^([12])([A-L])$/)
+  if (!m) return null
+  const pos = Number(m[1]) - 1
+  const group = standings.find((g) => g.group === m[2])
+  if (!group) return null
+  const row = group.rows[pos]
+  if (!row || !row.code) return null // pas encore d'équipe réelle à cette place
+  const started = group.rows.some((r) => r.played > 0)
+  if (!started) return null // groupe pas commencé : on garde le placeholder
+  const complete = group.rows.every((r) => r.played >= 3)
+  return { code: row.code, name: row.team, provisional: !complete }
+}
+
 // ---------------------------------------------------------------------------
 // Arbre du tableau final
 // ---------------------------------------------------------------------------

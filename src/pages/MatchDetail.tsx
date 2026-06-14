@@ -257,16 +257,24 @@ export default function MatchDetail() {
         </Link>
       )}
 
-      {match.lineups && (
-        <Card className="mb-4 p-5">
-          <h2 className="mb-4 text-[20px] font-bold tracking-tight">Compositions</h2>
-          <Lineup
-            lineups={match.lineups}
-            home={{ name: match.home_team, code: match.home_code }}
-            away={{ name: match.away_team, code: match.away_code }}
-          />
-        </Card>
-      )}
+      <Card className="mb-4 p-5">
+        <h2 className="text-[20px] font-bold tracking-tight">Compositions</h2>
+        {match.lineups ? (
+          <div className="mt-4">
+            <Lineup
+              lineups={match.lineups}
+              home={{ name: match.home_team, code: match.home_code }}
+              away={{ name: match.away_team, code: match.away_code }}
+            />
+          </div>
+        ) : (
+          <p className="mt-1 text-[14px] text-ink-2">
+            {started
+              ? 'Compositions indisponibles pour ce match.'
+              : 'Les compositions officielles s’afficheront ici environ 40 min avant le coup d’envoi.'}
+          </p>
+        )}
+      </Card>
 
       {!started ? (
         <Card className="p-5">

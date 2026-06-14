@@ -6,8 +6,10 @@ import { teamFlag, teamName, isPlaceholder } from '../lib/teams'
 import {
   buildBracket,
   groupStandings,
+  resolveGroupSlot,
   ROUND_LABEL,
   ROUND_ORDER,
+  type GroupTable,
   type StandingRow,
 } from '../lib/bracket'
 
@@ -28,27 +30,43 @@ function winnerSide(m: Match): 'home' | 'away' | null {
   return m.winner_override
 }
 
+// Équipe à afficher pour un côté : l'équipe réelle si connue, sinon résolution
+// du placeholder de 16e via le classement de groupe (provisoire si groupe en cours).
+function effectiveTeam(
+  code: string | null,
+  name: string,
+  standings: GroupTable[],
+): { code: string | null; name: string; provisional: boolean } {
+  if (!isPlaceholder(code)) return { code, name, provisional: false }
+  const r = resolveGroupSlot(name, standings)
+  return r ?? { code, name, provisional: false }
+}
+
 function TeamRow({
-  code,
-  name,
+  eff,
   score,
   win,
 }: {
-  code: string | null
-  name: string
+  eff: { code: string | null; name: string; provisional: boolean }
   score: number | null
   win: boolean
 }) {
-  const tbd = isPlaceholder(code)
+  const tbd = isPlaceholder(eff.code)
   return (
     <div className="flex items-center gap-1.5 px-2">
-      <span className="w-4 shrink-0 text-center text-[13px]">{teamFlag(code)}</span>
+      <span className="w-4 shrink-0 text-center text-[13px]">{teamFlag(eff.code)}</span>
       <span
         className={`min-w-0 flex-1 truncate text-[12px] ${
-          tbd ? 'text-ink-3' : win ? 'font-bold text-ink' : 'font-medium text-ink-2'
+          tbd
+            ? 'text-ink-3'
+            : win
+              ? 'font-bold text-ink'
+              : eff.provisional
+                ? 'font-medium italic text-ink-2'
+                : 'font-medium text-ink-2'
         }`}
       >
-        {teamName(name, code)}
+        {teamName(eff.name, eff.code)}
       </span>
       <span className={`tnum shrink-0 text-[12px] ${win ? 'font-bold text-ink' : 'text-ink-3'}`}>
         {score ?? ''}
@@ -61,15 +79,19 @@ function MatchCard({
   m,
   x,
   y,
+  standings,
   onTap,
 }: {
   m: Match
   x: number
   y: number
+  standings: GroupTable[]
   onTap: () => void
 }) {
   const win = winnerSide(m)
   const live = m.status === 'live'
+  const home = effectiveTeam(m.home_code, m.home_team, standings)
+  const away = effectiveTeam(m.away_code, m.away_team, standings)
   return (
     <button
       type="button"
@@ -80,14 +102,14 @@ function MatchCard({
       {live && (
         <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-warning live-dot" />
       )}
-      <TeamRow code={m.home_code} name={m.home_team} score={m.home_score} win={win === 'home'} />
+      <TeamRow eff={home} score={m.home_score} win={win === 'home'} />
       <div className="mx-2 my-[3px] h-px bg-line/60" />
-      <TeamRow code={m.away_code} name={m.away_team} score={m.away_score} win={win === 'away'} />
+      <TeamRow eff={away} score={m.away_score} win={win === 'away'} />
     </button>
   )
 }
 
-function KnockoutCanvas({ matches }: { matches: Match[] }) {
+function KnockoutCanvas({ matches, standings }: { matches: Match[]; standings: GroupTable[] }) {
   const navigate = useNavigate()
   const { nodes, leafCount, thirdPlace, final } = useMemo(() => buildBracket(matches), [matches])
 
@@ -150,6 +172,7 @@ function KnockoutCanvas({ matches }: { matches: Match[] }) {
           m={n.match}
           x={colX(n.col)}
           y={rowY(n.row)}
+          standings={standings}
           onTap={() => navigate(`/match/${n.match.id}`)}
         />
       ))}
@@ -166,6 +189,7 @@ function KnockoutCanvas({ matches }: { matches: Match[] }) {
             m={thirdPlace}
             x={colX(ROUND_ORDER.length - 1)}
             y={thirdY}
+            standings={standings}
             onTap={() => navigate(`/match/${thirdPlace.id}`)}
           />
         </>
@@ -308,7 +332,7 @@ export default function Bracket() {
           className="grow overflow-auto px-4 pt-7"
           style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.5rem)' }}
         >
-          <KnockoutCanvas matches={matches} />
+          <KnockoutCanvas matches={matches} standings={groups} />
         </div>
       )}
     </div>
