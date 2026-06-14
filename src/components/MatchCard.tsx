@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import type { Match, Prediction } from '../lib/types'
 import { teamFlag, teamName } from '../lib/teams'
 import { ambiance, countdown, timeLabel } from '../lib/format'
+import { glowGradient } from '../lib/teamColors'
 import { Badge } from './ui'
 
 function TeamRow({ name, code, score, winner }: { name: string; code: string | null; score: number | null; winner: boolean }) {
@@ -40,12 +41,19 @@ export default function MatchCard({
   const showScore = (finished || amb === 'live') && match.home_score !== null
 
   return (
-    <Link
-      to={`/match/${match.id}`}
-      className={`block rounded-(--radius-card) bg-surface p-4 shadow-(--shadow-card) transition-transform duration-150 active:scale-[0.98] ${
-        amb === 'imminent' ? 'imminent-glow' : ''
-      }`}
-    >
+    <div className="relative">
+      {/* Halo léger aux couleurs des deux équipes, flouté derrière la carte */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-0.5 rounded-[20px] opacity-35 blur-[9px]"
+        style={{ backgroundImage: glowGradient(match.home_code, match.away_code) }}
+      />
+      <Link
+        to={`/match/${match.id}`}
+        className={`relative block rounded-(--radius-card) bg-surface p-4 shadow-(--shadow-card) transition-transform duration-150 active:scale-[0.98] ${
+          amb === 'imminent' ? 'imminent-glow' : ''
+        }`}
+      >
       <div className="mb-2.5 flex items-center justify-between">
         <span className="text-[12px] font-medium uppercase tracking-wide text-ink-3">
           {match.group_name ? `Groupe ${match.group_name}` : ''}
@@ -77,6 +85,7 @@ export default function MatchCard({
         <TeamRow name={match.home_team} code={match.home_code} score={showScore ? match.home_score : null} winner={homeWins} />
         <TeamRow name={match.away_team} code={match.away_code} score={showScore ? match.away_score : null} winner={awayWins} />
       </div>
-    </Link>
+      </Link>
+    </div>
   )
 }

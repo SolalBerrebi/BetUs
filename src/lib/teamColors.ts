@@ -101,6 +101,16 @@ export const GRAIN_DATA_URI =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")"
 
 /**
+ * Halo léger pour les cartes de la liste : fondu horizontal des deux couleurs
+ * d'équipe (vives, sans voile), à poser flouté en arrière-plan de la carte.
+ */
+export function glowGradient(homeCode: string | null, awayCode: string | null): string {
+  const h = teamColor(homeCode)
+  const a = teamColor(awayCode)
+  return `linear-gradient(100deg, ${h} 0%, ${a} 100%)`
+}
+
+/**
  * Dégradé d'en-tête d'un match : couleur domicile → extérieur en diagonale douce,
  * bloom central, voile sombre pour la lisibilité du texte blanc. À poser en
  * `style` sur le conteneur ; ajouter par-dessus un calque de grain (GRAIN_DATA_URI).
