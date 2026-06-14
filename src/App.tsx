@@ -12,6 +12,7 @@ import Leaderboard from './pages/Leaderboard'
 import PlayerDetail from './pages/PlayerDetail'
 import MyPredictions from './pages/MyPredictions'
 import PreTournament from './pages/PreTournament'
+import Bracket from './pages/Bracket'
 import Profile from './pages/Profile'
 import Admin from './pages/Admin'
 import AdminMatch from './pages/AdminMatch'
@@ -64,8 +65,9 @@ function AppRoutes({ isAdmin }: { isAdmin: boolean }) {
   const display = useAnimatedLocation()
   return (
     <Routes location={display}>
-      {/* Salon plein écran, hors tab bar */}
+      {/* Salon + tableau plein écran, hors tab bar */}
       <Route path="match/:id/chat" element={<ChatRoom />} />
+      <Route path="tableau" element={<Bracket />} />
       <Route element={<Layout />}>
         <Route index element={<Matches />} />
         <Route path="match/:id" element={<MatchDetail />} />

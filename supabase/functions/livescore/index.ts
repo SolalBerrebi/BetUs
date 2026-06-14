@@ -7,6 +7,7 @@
 //   { "task": "map" }   → (re)construit match_api depuis les fixtures CdM 2026 (à relancer pour les phases finales).
 //   { "task": "live" }  → poll des scores + brouillons de fin de match (appelé par pg_cron, garde-fou inclus).
 import { createClient } from 'npm:@supabase/supabase-js@2'
+import { PLAYERS, type PlayerEntry } from '../../../src/lib/players.ts'
 
 const API = 'https://v3.football.api-sports.io'
 const KEY = Deno.env.get('APISPORTS_KEY')!
@@ -118,13 +119,90 @@ const PLAYER_ALIAS: Record<string, string> = {
   'ricardo ade': 'Adé', // HAI
 }
 
-// "K. Mbappé" → "Mbappé" ; "A. Mac Allister" → "Mac Allister" ; sinon tel quel.
-// Applique ensuite PLAYER_ALIAS pour ramener au nom canonique.
-function surname(name: string | null): string | null {
+// Roster officiel indexé par équipe, pour résoudre les noms de l'API.
+const ROSTER_BY_TEAM = (() => {
+  const m = new Map<string, PlayerEntry[]>()
+  for (const p of PLAYERS) {
+    const arr = m.get(p.t)
+    if (arr) arr.push(p)
+    else m.set(p.t, [p])
+  }
+  return m
+})()
+// Pool de joueurs candidats = effectifs des (deux) équipes concernées par le match.
+const poolFor = (...codes: (string | null)[]): PlayerEntry[] =>
+  codes.filter(Boolean).flatMap((c) => ROSTER_BY_TEAM.get(c as string) ?? [])
+
+// Ramène un nom renvoyé par l'API au nom de famille canonique du roster — c.-à-d. la
+// valeur EXACTE choisie dans le dropdown par les joueurs — en le cherchant parmi les
+// effectifs des deux équipes du match (≈ 50 candidats, donc fuzzy sans faux positifs).
+// Gère "K. Mbappé"→"Mbappé", "Vinicius Junior"→"Vini Jr.", translittérations (Younus/Younis).
+// Retombe sur l'alias manuel puis sur le nom brut si aucun candidat ne correspond.
+function resolveRoster(name: string | null, pool: PlayerEntry[]): string | null {
   if (!name) return null
-  const m = name.match(/^\p{L}+\.\s+(.+)$/u)
-  const stripped = (m ? m[1] : name).trim()
-  return PLAYER_ALIAS[nrm(stripped)] ?? stripped
+  const mInit = name.match(/^\p{L}+\.\s+(.+)$/u)
+  const stripped = (mInit ? mInit[1] : name).trim()
+  const aliased = PLAYER_ALIAS[nrm(stripped)] ?? stripped
+  const q = nrm(aliased)     // nom de famille recherché (alias appliqué)
+  const full = nrm(stripped) // nom complet renvoyé par l'API (initiale ôtée)
+  let bestS: string | null = null
+  let bestD = Infinity
+  for (const p of pool) {
+    const s = nrm(p.s), f = nrm(p.f)
+    if (s === q) return p.s // nom de famille identique : match parfait
+    // 1) nom de famille contenu en mots entiers ("Hyeon-gyu" ⊂ "Oh Hyeon-Gyu")
+    // 2) le nom complet API correspond-il au nom complet du joueur ?
+    //    ("Vinicius Junior" = f ; "Kylian Mbappe" ⊃ "mbappe")
+    // 3) tolérance orthographe sur le nom de famille (même initiale, distance courte)
+    const contained = (q.length >= 4 && ` ${q} `.includes(` ${s} `)) ||
+      (s.length >= 4 && ` ${s} `.includes(` ${q} `))
+    const fullHit = f === full || (full.length >= 5 && (f.includes(full) || full.includes(f)))
+    const d = lev(s, q)
+    const fuzzy = s[0] === q[0] && Math.max(s.length, q.length) >= 5 &&
+      d <= (Math.max(s.length, q.length) >= 9 ? 2 : 1)
+    if ((contained || fullHit || fuzzy) && d < bestD) {
+      bestD = d
+      bestS = p.s
+    }
+  }
+  return bestS ?? aliased
+}
+
+// --- Compositions --------------------------------------------------------
+interface LineupPlayer {
+  n: number | null
+  name: string
+  pos: string | null
+  grid: string | null
+}
+interface TeamLineup {
+  formation: string | null
+  coach: string | null
+  startXI: LineupPlayer[]
+  subs: LineupPlayer[]
+}
+
+const mapLineupPlayer = (p: any): LineupPlayer => ({
+  n: p?.number ?? null,
+  name: p?.name ?? '',
+  pos: p?.pos ?? null,
+  grid: p?.grid ?? null,
+})
+const mapLineupTeam = (t: any): TeamLineup => ({
+  formation: t?.formation ?? null,
+  coach: t?.coach?.name ?? null,
+  startXI: (t?.startXI ?? []).map((e: any) => mapLineupPlayer(e.player)),
+  subs: (t?.substitutes ?? []).map((e: any) => mapLineupPlayer(e.player)),
+})
+
+// L'API renvoie un tableau de 2 équipes (vide tant que les compos ne sont pas
+// publiées, ~40 min avant le coup d'envoi). On range home/away via l'id d'équipe.
+function parseLineups(resp: any[], homeId: number | undefined): { home: TeamLineup; away: TeamLineup } | null {
+  if (!resp || resp.length < 2) return null
+  if (!(resp[0]?.startXI?.length)) return null // compos pas encore dispo
+  const homeEntry = resp.find((t) => t.team?.id === homeId) ?? resp[0]
+  const awayEntry = resp.find((t) => t !== homeEntry) ?? resp[1]
+  return { home: mapLineupTeam(homeEntry), away: mapLineupTeam(awayEntry) }
 }
 
 const minuteKey = (iso: string) => new Date(iso).toISOString().slice(0, 16)
@@ -189,8 +267,9 @@ interface ParsedEvents {
 /** Buteurs/passeurs/CSC (TAB exclus) + remplacements + timeline des buts depuis les
  *  events d'un fixture. Les chaînes de remplacements sont aplaties : A sorti pour B,
  *  B sorti pour C → paires (A,B), (B,C) et (A,C), pour créditer le prono du joueur sorti.
- *  homeId = id de l'équipe à domicile, pour ranger chaque but du bon côté. */
-function parseEvents(events: any[], homeId?: number): ParsedEvents {
+ *  homeId = id de l'équipe à domicile, pour ranger chaque but du bon côté.
+ *  pool = effectifs des deux équipes, pour résoudre les noms API vers le roster. */
+function parseEvents(events: any[], homeId: number | undefined, pool: PlayerEntry[]): ParsedEvents {
   const scorers: string[] = []
   const assisters: string[] = []
   const ownGoals: string[] = []
@@ -199,8 +278,8 @@ function parseEvents(events: any[], homeId?: number): ParsedEvents {
   for (const e of events) {
     if (e.type === 'subst') {
       // API-Football : player = sortant, assist = entrant
-      const out = surname(e.player?.name)
-      const inn = surname(e.assist?.name)
+      const out = resolveRoster(e.player?.name, pool)
+      const inn = resolveRoster(e.assist?.name, pool)
       if (!out || !inn) continue
       for (const s of [...subs]) {
         if (nameMatch(s.in, out)) subs.push({ out: s.out, in: inn })
@@ -211,7 +290,7 @@ function parseEvents(events: any[], homeId?: number): ParsedEvents {
     if (e.type !== 'Goal') continue
     if (e.comments === 'Penalty Shootout') continue // tirs au but : hors score
     if (e.detail === 'Missed Penalty') continue
-    const sc = surname(e.player?.name)
+    const sc = resolveRoster(e.player?.name, pool)
     const min = (e.time?.elapsed ?? 0) + (e.time?.extra ?? 0)
     const scoringTeamIsHome = e.team?.id === homeId
     if (e.detail === 'Own Goal') {
@@ -226,7 +305,7 @@ function parseEvents(events: any[], homeId?: number): ParsedEvents {
       continue // un CSC n'est pas un "buteur" pronostiquable
     }
     if (sc) scorers.push(sc)
-    const as = surname(e.assist?.name)
+    const as = resolveRoster(e.assist?.name, pool)
     if (as) assisters.push(as)
     timeline.push({ min, team: scoringTeamIsHome ? 'home' : 'away', scorer: sc, assist: as })
   }
@@ -241,9 +320,11 @@ function parseEvents(events: any[], homeId?: number): ParsedEvents {
 }
 
 /** Construit le brouillon de résultat à partir des events (buteurs/passeurs). */
-async function importDraft(matchId: number, fixtureId: number, f: any): Promise<void> {
+async function importDraft(m: WindowMatch, fixtureId: number, f: any): Promise<void> {
+  const matchId = m.id
   const events = await apiGet(`/fixtures/events?fixture=${fixtureId}`)
-  const { scorers, assisters, ownGoals, subs, timeline } = parseEvents(events, f.teams?.home?.id)
+  const pool = poolFor(m.home_code, m.away_code)
+  const { scorers, assisters, ownGoals, subs, timeline } = parseEvents(events, f.teams?.home?.id, pool)
   // Qualifié aux tirs au but (phases finales) si match nul après prolongation
   let override: 'home' | 'away' | null = null
   const pen = f.score?.penalty
@@ -290,6 +371,8 @@ interface WindowMatch {
   away_team: string
   home_code: string | null
   away_code: string | null
+  kickoff_at: string
+  lineups: unknown | null
 }
 
 // Notifs personnalisées au moment d'un but (buteur trouvé, score exact, vainqueur en bonne voie).
@@ -344,12 +427,13 @@ async function liveGoalNotifs(m: WindowMatch, h: number, a: number, parsed: Pars
 async function live(): Promise<Record<string, number>> {
   const now = Date.now()
   // Garde-fou quota : n'appelle l'API que s'il y a un match dans sa fenêtre, non encore validé.
+  // Fenêtre élargie côté pré-match (+50 min) pour récupérer les compos avant le coup d'envoi.
   const { data: windowRows } = await supabase
     .from('matches')
-    .select('id, home_score, away_score, home_team, away_team, home_code, away_code')
+    .select('id, home_score, away_score, home_team, away_team, home_code, away_code, kickoff_at, lineups')
     .neq('status', 'finished')
     .gte('kickoff_at', new Date(now - 200 * 60_000).toISOString())
-    .lte('kickoff_at', new Date(now + 10 * 60_000).toISOString())
+    .lte('kickoff_at', new Date(now + 50 * 60_000).toISOString())
   if (!windowRows?.length) return { skipped: 1 }
 
   const [{ data: mapRows }, { data: drafts }] = await Promise.all([
@@ -365,11 +449,31 @@ async function live(): Promise<Record<string, number>> {
   let live = 0
   let imported = 0
   let notified = 0
+  let lineupsAdded = 0
   for (const f of fixtures) {
     const ourId = ourIdByFixture.get(f.fixture.id)
     const m = ourId ? matchById.get(ourId) : undefined
     if (!ourId || !m) continue
     const st = f.fixture.status.short
+
+    // Compos : une fois, dès qu'elles sont publiées (≤ 50 min avant le coup d'envoi
+    // jusqu'au coup d'envoi). L'API renvoie un tableau vide tant qu'elles manquent.
+    if (m.lineups == null) {
+      const toKo = new Date(m.kickoff_at).getTime() - now
+      if (toKo <= 50 * 60_000 && toKo >= -15 * 60_000) {
+        try {
+          const lu = parseLineups(
+            await apiGet(`/fixtures/lineups?fixture=${f.fixture.id}`),
+            f.teams.home.id,
+          )
+          if (lu) {
+            await supabase.from('matches').update({ lineups: lu }).eq('id', ourId)
+            m.lineups = lu
+            lineupsAdded++
+          }
+        } catch { /* compos indispo : on réessaiera au prochain tick */ }
+      }
+    }
     if (LIVE_STATUS.has(st) && f.goals.home != null) {
       const oldTotal = (m.home_score ?? 0) + (m.away_score ?? 0)
       const newTotal = f.goals.home + f.goals.away
@@ -387,7 +491,11 @@ async function live(): Promise<Record<string, number>> {
       // + timeline en direct → le classement et le fil du salon bougent pendant le match.
       let parsed: ParsedEvents | null = null
       if (newTotal > oldTotal) {
-        parsed = parseEvents(await apiGet(`/fixtures/events?fixture=${f.fixture.id}`), f.teams.home.id)
+        parsed = parseEvents(
+          await apiGet(`/fixtures/events?fixture=${f.fixture.id}`),
+          f.teams.home.id,
+          poolFor(m.home_code, m.away_code),
+        )
         patch.scorers = parsed.scorers
         patch.assisters = parsed.assisters
         patch.subs = parsed.subs
@@ -399,11 +507,11 @@ async function live(): Promise<Record<string, number>> {
         notified += await liveGoalNotifs(m, f.goals.home, f.goals.away, parsed)
       }
     } else if (DONE_STATUS.has(st) && !drafted.has(ourId)) {
-      await importDraft(ourId, f.fixture.id, f)
+      await importDraft(m, f.fixture.id, f)
       imported++
     }
   }
-  return { live, imported, notified }
+  return { live, imported, notified, lineupsAdded }
 }
 
 Deno.serve(async (req) => {

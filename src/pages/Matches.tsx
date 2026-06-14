@@ -62,7 +62,16 @@ export default function Matches() {
 
   return (
     <div>
-      <PageTitle sub="Coupe du Monde 2026">Matchs</PageTitle>
+      <div className="relative">
+        <PageTitle sub="Coupe du Monde 2026">Matchs</PageTitle>
+        <Link
+          to="/tableau"
+          className="absolute right-0 top-3 inline-flex items-center gap-1 rounded-full bg-surface px-3.5 py-2 text-[14px] font-semibold text-accent shadow-(--shadow-card) transition-transform duration-150 active:scale-95"
+        >
+          Tableau
+          <span aria-hidden="true" className="text-[15px] leading-none">›</span>
+        </Link>
+      </div>
 
       {tournamentNotStarted && !preTournamentDone && (
         <Link

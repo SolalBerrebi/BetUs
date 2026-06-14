@@ -31,6 +31,9 @@ export interface Match {
   away_team: string
   home_code: string | null
   away_code: string | null
+  // Slots d'origine du tableau final ('W73', 'L101'…) — stables, pour câbler le bracket.
+  home_slot: string | null
+  away_slot: string | null
   kickoff_at: string
   city: string | null
   venue: string | null
@@ -43,6 +46,26 @@ export interface Match {
   minute: number | null
   period: string | null
   goals_timeline: GoalEvent[]
+  lineups: MatchLineups | null
+}
+
+export interface LineupPlayer {
+  n: number | null // numéro de maillot
+  name: string // nom affiché (tel que renvoyé par l'API)
+  pos: string | null // G/D/M/F
+  grid: string | null // "ligne:colonne" depuis le but (1 = gardien)
+}
+
+export interface TeamLineup {
+  formation: string | null // ex. "4-3-3"
+  coach: string | null
+  startXI: LineupPlayer[]
+  subs: LineupPlayer[]
+}
+
+export interface MatchLineups {
+  home: TeamLineup
+  away: TeamLineup
 }
 
 export interface GoalEvent {

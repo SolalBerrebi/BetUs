@@ -8,6 +8,7 @@ import { teamFlag, teamName } from '../lib/teams'
 import { ambiance, countdown, dayLabel, hasStarted, timeLabel } from '../lib/format'
 import { Badge, Button, Card, Segmented, Spinner } from '../components/ui'
 import PlayerInput from '../components/PlayerInput'
+import Lineup from '../components/Lineup'
 
 // Vainqueur déduit d'un score complet. `null` = indéterminé :
 //   - score incomplet → on laisse le joueur choisir le vainqueur seul ;
@@ -254,6 +255,17 @@ export default function MatchDetail() {
           </span>
           <span className="text-[14px] text-white/85">Réagissez ensemble ›</span>
         </Link>
+      )}
+
+      {match.lineups && (
+        <Card className="mb-4 p-5">
+          <h2 className="mb-4 text-[20px] font-bold tracking-tight">Compositions</h2>
+          <Lineup
+            lineups={match.lineups}
+            home={{ name: match.home_team, code: match.home_code }}
+            away={{ name: match.away_team, code: match.away_code }}
+          />
+        </Card>
       )}
 
       {!started ? (
