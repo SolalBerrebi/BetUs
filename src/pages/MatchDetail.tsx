@@ -6,6 +6,7 @@ import type { MatchPoints, Prediction } from '../lib/types'
 import { STAGE_LABELS } from '../lib/types'
 import { teamFlag, teamName } from '../lib/teams'
 import { ambiance, countdown, dayLabel, hasStarted, timeLabel } from '../lib/format'
+import { matchGradient, GRAIN_DATA_URI } from '../lib/teamColors'
 import { Badge, Button, Card, Segmented, Spinner } from '../components/ui'
 import PlayerInput from '../components/PlayerInput'
 import Lineup from '../components/Lineup'
@@ -172,77 +173,87 @@ export default function MatchDetail() {
         ‹ Matchs
       </Link>
 
-      <Card className="mb-4 p-5">
-        <p className="text-center text-[12px] font-medium uppercase tracking-wide text-ink-3">
-          {match.group_name ? `Groupe ${match.group_name}` : STAGE_LABELS[match.stage]} ·{' '}
-          {dayLabel(match.kickoff_at)} · {timeLabel(match.kickoff_at)}
-        </p>
-        <div className="mt-4 flex items-center justify-center gap-5">
-          <div className="flex w-28 flex-col items-center gap-1.5">
-            <span className="text-5xl">{teamFlag(match.home_code)}</span>
-            <span className="text-center text-[15px] font-semibold leading-tight">
-              {teamName(match.home_team, match.home_code)}
-            </span>
-          </div>
-          <div className="flex shrink-0 flex-col items-center">
-            {finished ? (
-              <span className="tnum whitespace-nowrap text-[34px] font-bold">
-                {match.home_score} – {match.away_score}
+      <div
+        className="relative mb-4 overflow-hidden rounded-(--radius-card) p-5 text-white shadow-(--shadow-card)"
+        style={matchGradient(match.home_code, match.away_code)}
+      >
+        {/* Grain léger pour la texture organique du dégradé */}
+        <div
+          className="pointer-events-none absolute inset-0 mix-blend-overlay"
+          style={{ backgroundImage: GRAIN_DATA_URI, opacity: 0.06 }}
+        />
+        <div className="relative">
+          <p className="text-center text-[12px] font-medium uppercase tracking-wide text-white/70">
+            {match.group_name ? `Groupe ${match.group_name}` : STAGE_LABELS[match.stage]} ·{' '}
+            {dayLabel(match.kickoff_at)} · {timeLabel(match.kickoff_at)}
+          </p>
+          <div className="mt-4 flex items-center justify-center gap-5">
+            <div className="flex w-28 flex-col items-center gap-1.5">
+              <span className="text-5xl drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)]">{teamFlag(match.home_code)}</span>
+              <span className="text-center text-[15px] font-semibold leading-tight">
+                {teamName(match.home_team, match.home_code)}
               </span>
-            ) : started && match.home_score !== null ? (
-              <>
+            </div>
+            <div className="flex shrink-0 flex-col items-center">
+              {finished ? (
                 <span className="tnum whitespace-nowrap text-[34px] font-bold">
                   {match.home_score} – {match.away_score}
                 </span>
-                <span className="mt-1 inline-flex items-center gap-1 text-[12px] font-semibold uppercase tracking-wide text-warning">
-                  <span className="live-dot inline-block size-1.5 rounded-full bg-warning" />
-                  En direct
-                </span>
-              </>
-            ) : started ? (
-              <Badge tone="warning">
-                <span className="live-dot mr-0.5 inline-block size-1.5 rounded-full bg-warning" />
-                En cours
-              </Badge>
-            ) : (
-              <>
-                <span className="text-[15px] font-medium text-ink-2">dans</span>
-                <span className={`tnum whitespace-nowrap text-[20px] font-bold ${amb === 'imminent' ? 'text-warning' : ''}`}>{cd}</span>
-                {amb === 'imminent' && (
-                  <span className="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-warning">
-                    ça ferme bientôt
+              ) : started && match.home_score !== null ? (
+                <>
+                  <span className="tnum whitespace-nowrap text-[34px] font-bold">
+                    {match.home_score} – {match.away_score}
                   </span>
-                )}
-              </>
-            )}
+                  <span className="mt-1 inline-flex items-center gap-1 text-[12px] font-semibold uppercase tracking-wide text-white">
+                    <span className="live-dot inline-block size-1.5 rounded-full bg-white" />
+                    En direct
+                  </span>
+                </>
+              ) : started ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[12px] font-semibold text-white backdrop-blur-sm">
+                  <span className="live-dot inline-block size-1.5 rounded-full bg-white" />
+                  En cours
+                </span>
+              ) : (
+                <>
+                  <span className="text-[15px] font-medium text-white/75">dans</span>
+                  <span className="tnum whitespace-nowrap text-[20px] font-bold">{cd}</span>
+                  {amb === 'imminent' && (
+                    <span className="mt-0.5 text-[11px] font-semibold uppercase tracking-wide text-white/85">
+                      ça ferme bientôt
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
+            <div className="flex w-28 flex-col items-center gap-1.5">
+              <span className="text-5xl drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)]">{teamFlag(match.away_code)}</span>
+              <span className="text-center text-[15px] font-semibold leading-tight">
+                {teamName(match.away_team, match.away_code)}
+              </span>
+            </div>
           </div>
-          <div className="flex w-28 flex-col items-center gap-1.5">
-            <span className="text-5xl">{teamFlag(match.away_code)}</span>
-            <span className="text-center text-[15px] font-semibold leading-tight">
-              {teamName(match.away_team, match.away_code)}
-            </span>
-          </div>
+          {finished && match.winner_override && (
+            <p className="mt-2 text-center text-[13px] text-white/80">
+              Qualifié aux tirs au but :{' '}
+              {match.winner_override === 'home'
+                ? teamName(match.home_team, match.home_code)
+                : teamName(match.away_team, match.away_code)}
+            </p>
+          )}
+          {(match.venue || match.city) && (
+            <p className="mt-3 text-center text-[13px] text-white/70">
+              {[match.venue, match.city].filter(Boolean).join(' · ')}
+            </p>
+          )}
+          {started && match.scorers.length > 0 && (
+            <div className="mt-4 border-t border-white/20 pt-3 text-center text-[13px] text-white/85">
+              <p>⚽️ {match.scorers.join(', ')}</p>
+              {match.assisters.length > 0 && <p className="mt-1">🅰️ {match.assisters.join(', ')}</p>}
+            </div>
+          )}
         </div>
-        {finished && match.winner_override && (
-          <p className="mt-2 text-center text-[13px] text-ink-2">
-            Qualifié aux tirs au but :{' '}
-            {match.winner_override === 'home'
-              ? teamName(match.home_team, match.home_code)
-              : teamName(match.away_team, match.away_code)}
-          </p>
-        )}
-        {(match.venue || match.city) && (
-          <p className="mt-3 text-center text-[13px] text-ink-3">
-            {[match.venue, match.city].filter(Boolean).join(' · ')}
-          </p>
-        )}
-        {started && match.scorers.length > 0 && (
-          <div className="mt-4 border-t border-line/70 pt-3 text-center text-[13px] text-ink-2">
-            <p>⚽️ {match.scorers.join(', ')}</p>
-            {match.assisters.length > 0 && <p className="mt-1">🅰️ {match.assisters.join(', ')}</p>}
-          </div>
-        )}
-      </Card>
+      </div>
 
       {started && (
         <Link
