@@ -628,13 +628,32 @@ async function live(): Promise<Record<string, number>> {
 
 // (lineupsAdded provient du préchargement en tête de live().)
 
+// Récupération des stats pour un match donné (même terminé). Utilitaire ponctuel
+// pour backfill / vérification — { "task": "backfill_stats", "match_id": N }.
+async function backfillStats(matchId: number): Promise<Record<string, unknown>> {
+  const { data: m } = await supabase
+    .from('matches').select('id, home_team').eq('id', matchId).single()
+  if (!m) return { error: 'match introuvable', match_id: matchId }
+  const { data: map } = await supabase
+    .from('match_api').select('fixture_id').eq('match_id', matchId).single()
+  if (!map) return { error: 'fixture non mappé', match_id: matchId }
+  const stats = parseStats(await apiGet(`/fixtures/statistics?fixture=${map.fixture_id}`), teamKey(m.home_team))
+  if (!stats) return { error: 'stats indisponibles', match_id: matchId, fixture_id: map.fixture_id }
+  await supabase.from('matches').update({ stats }).eq('id', matchId)
+  return { ok: true, match_id: matchId, fixture_id: map.fixture_id, stats }
+}
+
 Deno.serve(async (req) => {
   if (req.headers.get('x-push-secret') !== Deno.env.get('PUSH_SECRET')) {
     return new Response('forbidden', { status: 403 })
   }
   const body = await req.json().catch(() => ({}))
   try {
-    const out = body.task === 'map' ? await buildMap() : await live()
+    const out = body.task === 'map'
+      ? await buildMap()
+      : body.task === 'backfill_stats'
+        ? await backfillStats(Number(body.match_id))
+        : await live()
     return new Response(JSON.stringify(out), { headers: { 'Content-Type': 'application/json' } })
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e) }), {
