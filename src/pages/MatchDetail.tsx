@@ -263,6 +263,22 @@ export default function MatchDetail() {
         </div>
       </div>
 
+      {/* Salon toujours accessible pendant le match (sinon personne ne peut l'ouvrir). */}
+      {started && !finished && (
+        <Link
+          to={`/match/${match.id}/chat`}
+          className="mb-4 flex items-center justify-between rounded-(--radius-card) bg-accent p-4 text-white shadow-(--shadow-float) transition-transform duration-150 active:scale-[0.98]"
+        >
+          <span className="flex items-center gap-2.5">
+            <span className="live-dot inline-block size-2 rounded-full bg-white" />
+            <span className="text-[16px] font-semibold">Salon en direct</span>
+          </span>
+          <span className="text-[14px] text-white/85">
+            {msgCount > 0 ? `${msgCount} message${msgCount > 1 ? 's' : ''} ›` : 'Réagissez ensemble ›'}
+          </span>
+        </Link>
+      )}
+
       {started && match.stats && (
         <Card className="mb-4 p-5">
           <div className="flex items-center justify-between">
@@ -282,20 +298,6 @@ export default function MatchDetail() {
             />
           </div>
         </Card>
-      )}
-
-      {/* Le salon n'est mis en avant que s'il y a déjà de l'activité (sinon : place aux stats). */}
-      {started && !finished && msgCount > 0 && (
-        <Link
-          to={`/match/${match.id}/chat`}
-          className="mb-4 flex items-center justify-between rounded-(--radius-card) bg-accent p-4 text-white shadow-(--shadow-float) transition-transform duration-150 active:scale-[0.98]"
-        >
-          <span className="flex items-center gap-2.5">
-            <span className="live-dot inline-block size-2 rounded-full bg-white" />
-            <span className="text-[16px] font-semibold">Salon en direct</span>
-          </span>
-          <span className="text-[14px] text-white/85">{msgCount} message{msgCount > 1 ? 's' : ''} ›</span>
-        </Link>
       )}
 
       <Card className="mb-4 p-5">
