@@ -83,7 +83,8 @@ create table if not exists public.matches (
   subs jsonb not null default '[]',                                 -- remplacements [{out, in}] (auto, livescore)
   minute int,                                                       -- minute de jeu en direct (null hors live)
   period text,                                                      -- statut API court : 1H/HT/2H/ET/BT/P/FT/AET/PEN
-  goals_timeline jsonb not null default '[]'                        -- buts [{min, team, scorer, assist}] (auto, livescore)
+  goals_timeline jsonb not null default '[]',                       -- buts [{min, team, scorer, assist}] (auto, livescore)
+  stats jsonb                                                       -- stats live {home, away} (possession, tirs… auto, livescore)
 );
 
 -- Idempotence sur base existante (create table if not exists n'ajoute pas la colonne)
@@ -91,6 +92,7 @@ alter table public.matches add column if not exists subs jsonb not null default 
 alter table public.matches add column if not exists minute int;
 alter table public.matches add column if not exists period text;
 alter table public.matches add column if not exists goals_timeline jsonb not null default '[]';
+alter table public.matches add column if not exists stats jsonb;
 
 create table if not exists public.predictions (
   id bigint generated always as identity primary key,
@@ -414,13 +416,13 @@ create or replace function public.tournament_points(uid uuid) returns int
 language sql stable as $$
   select coalesce((
     select
-        6  * public.name_matches(tp.top_scorer, tr.top_scorer)::int
-      + 8  * public.name_matches(tp.top_assister, tr.top_assister)::int
-      + 10 * public.name_matches(tp.best_keeper, tr.best_keeper)::int
-      + 15 * (public.norm_name(tp.winner) = public.norm_name(tr.winner) and tr.winner is not null)::int
-      + 6  * public.name_matches(tp.best_player, tr.best_player)::int
-        -- finale : la paire de finalistes, peu importe l'ordre — 20 pts
-      + 20 * (tr.finalist_a is not null and tr.finalist_b is not null
+        12 * public.name_matches(tp.top_scorer, tr.top_scorer)::int
+      + 16 * public.name_matches(tp.top_assister, tr.top_assister)::int
+      + 20 * public.name_matches(tp.best_keeper, tr.best_keeper)::int
+      + 30 * (public.norm_name(tp.winner) = public.norm_name(tr.winner) and tr.winner is not null)::int
+      + 12 * public.name_matches(tp.best_player, tr.best_player)::int
+        -- finale : la paire de finalistes, peu importe l'ordre — 40 pts
+      + 40 * (tr.finalist_a is not null and tr.finalist_b is not null
             and public.norm_name(tp.finalist_a) in (public.norm_name(tr.finalist_a), public.norm_name(tr.finalist_b))
             and public.norm_name(tp.finalist_b) in (public.norm_name(tr.finalist_a), public.norm_name(tr.finalist_b))
             and public.norm_name(tp.finalist_a) <> public.norm_name(tp.finalist_b))::int

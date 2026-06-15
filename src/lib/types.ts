@@ -47,6 +47,29 @@ export interface Match {
   period: string | null
   goals_timeline: GoalEvent[]
   lineups: MatchLineups | null
+  stats: MatchStats | null
+}
+
+// Statistiques live d'une équipe (API-Football /fixtures/statistics). null = indispo.
+export interface TeamStats {
+  possession: number | null // %
+  shots_total: number | null
+  shots_on: number | null
+  shots_off: number | null
+  shots_blocked: number | null
+  corners: number | null
+  offsides: number | null
+  fouls: number | null
+  passes_pct: number | null // % de passes réussies
+  saves: number | null // arrêts du gardien
+  yellow: number | null
+  red: number | null
+  xg: number | null // buts attendus (si le plan le fournit)
+}
+
+export interface MatchStats {
+  home: TeamStats
+  away: TeamStats
 }
 
 export interface LineupPlayer {

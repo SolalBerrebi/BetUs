@@ -88,7 +88,7 @@ export default function AdminCompetition() {
       <Link to="/admin" className="mb-4 inline-flex items-center gap-1 text-[16px] font-medium text-accent">
         ‹ Admin
       </Link>
-      <PageTitle sub="À saisir à la fin de la compétition — score les pronos d'avant-compétition (6 à 20 pts selon le poste).">
+      <PageTitle sub="À saisir à la fin de la compétition — score les pronos d'avant-compétition (12 à 40 pts selon le poste).">
         Résultats finaux
       </PageTitle>
 

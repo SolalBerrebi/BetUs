@@ -343,6 +343,17 @@ Deno.serve(async (req) => {
       else bodyTxt = pick(ROASTS.dropped)
       return { title: '🔥 Petit point classement', body: bodyTxt, url: '/BetUs/#/classement', tag: 'roast' }
     })
+  } else if (task === 'lineup') {
+    // Compo officielle publiée (appelée par livescore dès qu'elle sort) → tout le groupe.
+    const matchId = Number(body.match_id)
+    if (await claim('lineup', matchId)) {
+      results.lineup = await broadcast({
+        title: String(body.title ?? '📋 Compo officielle'),
+        body: String(body.body ?? 'La composition vient de tomber.'),
+        url: String(body.url ?? `/BetUs/#/match/${matchId}`),
+        tag: `lineup-${matchId}`,
+      })
+    }
   } else if (task === 'announce') {
     // Annonce libre à tout le monde (titre/corps personnalisés)
     results.announce = await broadcast({

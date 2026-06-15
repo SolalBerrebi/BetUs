@@ -206,6 +206,69 @@ function parseLineups(resp: any[], homeKey: string): { home: TeamLineup; away: T
   return { home: mapLineupTeam(homeEntry), away: mapLineupTeam(awayEntry) }
 }
 
+// --- Statistiques live (/fixtures/statistics) -------------------------------
+interface TeamStats {
+  possession: number | null
+  shots_total: number | null
+  shots_on: number | null
+  shots_off: number | null
+  shots_blocked: number | null
+  corners: number | null
+  offsides: number | null
+  fouls: number | null
+  passes_pct: number | null
+  saves: number | null
+  yellow: number | null
+  red: number | null
+  xg: number | null
+}
+interface MatchStats { home: TeamStats; away: TeamStats }
+
+// Type renvoyé par l'API (en minuscules) → notre clé. Inconnus ignorés.
+const STAT_KEYS: Record<string, keyof TeamStats> = {
+  'ball possession': 'possession',
+  'total shots': 'shots_total',
+  'shots on goal': 'shots_on',
+  'shots off goal': 'shots_off',
+  'blocked shots': 'shots_blocked',
+  'corner kicks': 'corners',
+  offsides: 'offsides',
+  fouls: 'fouls',
+  'passes %': 'passes_pct',
+  'goalkeeper saves': 'saves',
+  'yellow cards': 'yellow',
+  'red cards': 'red',
+  expected_goals: 'xg',
+}
+const emptyStats = (): TeamStats => ({
+  possession: null, shots_total: null, shots_on: null, shots_off: null,
+  shots_blocked: null, corners: null, offsides: null, fouls: null,
+  passes_pct: null, saves: null, yellow: null, red: null, xg: null,
+})
+// "62%" → 62, "1.45" → 1.45, 7 → 7, null → null.
+function statNum(v: unknown): number | null {
+  if (v == null) return null
+  if (typeof v === 'number') return v
+  const n = parseFloat(String(v).replace('%', ''))
+  return Number.isFinite(n) ? n : null
+}
+function mapStatTeam(t: any): TeamStats {
+  const out = emptyStats()
+  for (const s of t?.statistics ?? []) {
+    const key = STAT_KEYS[String(s?.type ?? '').toLowerCase()]
+    if (key) out[key] = statNum(s?.value)
+  }
+  return out
+}
+// L'API renvoie 2 équipes ; rangées home/away via le nom (teamKey), comme les compos.
+function parseStats(resp: any[], homeKey: string): MatchStats | null {
+  if (!resp || resp.length < 2) return null
+  if (!(resp[0]?.statistics?.length)) return null // stats pas encore dispo
+  const homeEntry = resp.find((t) => teamKey(t.team?.name ?? '') === homeKey) ?? resp[0]
+  const awayEntry = resp.find((t) => t !== homeEntry) ?? resp[1]
+  return { home: mapStatTeam(homeEntry), away: mapStatTeam(awayEntry) }
+}
+
 const minuteKey = (iso: string) => new Date(iso).toISOString().slice(0, 16)
 
 const norm = (s: string) =>
@@ -227,17 +290,29 @@ const teamKey = (name: string) => {
 const matchKey = (iso: string, home: string, away: string) =>
   `${minuteKey(iso)}|${home}|${away}`
 
+// Notif « compo officielle » : envoyée à tout le groupe dès que la compo est stockée.
+async function pushLineupNotif(matchId: number, title: string, body: string): Promise<void> {
+  await fetch(PUSH_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-push-secret': Deno.env.get('PUSH_SECRET')! },
+    body: JSON.stringify({ task: 'lineup', match_id: matchId, title, body }),
+  })
+}
+
 // Préchargement des compositions pour les prochains matchs, indépendamment du
 // score live. On vise les ~4 prochains matchs jusqu'à 3 h avant le coup d'envoi
-// et on les sonde dès maintenant : dès que l'API publie les compos (~40-90 min
-// avant), on les stocke. Cadence réduite quand c'est loin (> 90 min) pour
-// préserver le quota — un appel /fixtures/lineups par match et par tentative.
+// et on les sonde le plus tôt possible : dès que l'API publie les compos (~40-90 min
+// avant, parfois plus tôt), on les stocke et on notifie le groupe. On sonde chaque
+// minute jusqu'à 2 h avant pour les attraper au plus vite ; au-delà (2-3 h), cadence
+// réduite (toutes les 5 min) pour préserver le quota — un appel /fixtures/lineups
+// par match et par tentative.
 const PREFETCH_HORIZON_MIN = 180 // jusqu'à 3 h avant le coup d'envoi
+const PREFETCH_FAST_MIN = 120    // sondage chaque minute dans les 2 h avant le coup d'envoi
 const PREFETCH_MAX_MATCHES = 4
 async function prefetchLineups(now: number, minute: number): Promise<number> {
   const { data: ups } = await supabase
     .from('matches')
-    .select('id, home_team, kickoff_at')
+    .select('id, home_team, away_team, home_code, away_code, kickoff_at')
     .neq('status', 'finished')
     .is('lineups', null)
     .gte('kickoff_at', new Date(now - 150 * 60_000).toISOString()) // inclut les matchs en cours
@@ -254,13 +329,18 @@ async function prefetchLineups(now: number, minute: number): Promise<number> {
     const fx = fxByMatch.get(m.id)
     if (!fx) continue
     const toKo = new Date(m.kickoff_at).getTime() - now
-    // Loin du coup d'envoi (> 90 min) : on ne tente qu'une fois tous les ~15 min.
-    if (toKo > 90 * 60_000 && minute % 15 !== 0) continue
+    // Loin du coup d'envoi (> 2 h) : on ne tente qu'une fois tous les ~5 min.
+    if (toKo > PREFETCH_FAST_MIN * 60_000 && minute % 5 !== 0) continue
     try {
       const lu = parseLineups(await apiGet(`/fixtures/lineups?fixture=${fx}`), teamKey(m.home_team))
       if (lu) {
         await supabase.from('matches').update({ lineups: lu }).eq('id', m.id)
         added++
+        const home = team(m.home_team, m.home_code)
+        const away = team(m.away_team, m.away_code)
+        // Dédup côté push (claim 'lineup'/match_id) : un seul envoi même si plusieurs ticks.
+        await pushLineupNotif(m.id, `📋 Compo officielle — ${home}–${away}`,
+          `Les onze de départ viennent de tomber. Va voir les compos 👀`)
       }
     } catch { /* compos indispo : prochain tick */ }
   }
@@ -366,6 +446,10 @@ async function importDraft(m: WindowMatch, fixtureId: number, f: any): Promise<v
   const events = await apiGet(`/fixtures/events?fixture=${fixtureId}`)
   const pool = poolFor(m.home_code, m.away_code)
   const { scorers, assisters, ownGoals, subs, timeline } = parseEvents(events, f.teams?.home?.id, pool)
+  let stats: MatchStats | null = null
+  try {
+    stats = parseStats(await apiGet(`/fixtures/statistics?fixture=${fixtureId}`), teamKey(m.home_team))
+  } catch { /* stats finales indispo */ }
   // Qualifié aux tirs au but (phases finales) si match nul après prolongation
   let override: 'home' | 'away' | null = null
   const pen = f.score?.penalty
@@ -399,6 +483,7 @@ async function importDraft(m: WindowMatch, fixtureId: number, f: any): Promise<v
       minute: null, // match terminé : plus de minute qui tourne
       period: f.fixture.status.short,
       status: 'live',
+      ...(stats ? { stats } : {}),
     })
     .eq('id', matchId)
     .neq('status', 'finished')
@@ -523,6 +608,11 @@ async function live(): Promise<Record<string, number>> {
         patch.subs = parsed.subs
         patch.goals_timeline = parsed.timeline
       }
+      // Stats live (possession, tirs…) : un appel /statistics par tick pendant le match.
+      try {
+        const stats = parseStats(await apiGet(`/fixtures/statistics?fixture=${f.fixture.id}`), teamKey(m.home_team))
+        if (stats) patch.stats = stats
+      } catch { /* stats indispo : prochain tick */ }
       await supabase.from('matches').update(patch).eq('id', ourId).neq('status', 'finished')
       live++
       if (parsed) {

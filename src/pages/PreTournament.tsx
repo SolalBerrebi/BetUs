@@ -102,8 +102,8 @@ export default function PreTournament() {
           locked
             ? 'La compétition a commencé — pronostics verrouillés.'
             : tournamentStart
-              ? `Jusqu'à 65 pts en jeu. Ferme dans ${countdown(tournamentStart, now)}.`
-              : "Jusqu'à 65 pts en jeu."
+              ? `Jusqu'à 130 pts en jeu. Ferme dans ${countdown(tournamentStart, now)}.`
+              : "Jusqu'à 130 pts en jeu."
         }
       >
         Avant-compétition
@@ -112,7 +112,7 @@ export default function PreTournament() {
       <Card className="p-5">
         <div className="space-y-5">
           <PlayerInput
-            label="Meilleur buteur · 6 pts"
+            label="Meilleur buteur · 12 pts"
             value={topScorer}
             onChange={setTopScorer}
             placeholder="Tape un nom…"
@@ -120,21 +120,21 @@ export default function PreTournament() {
             disabled={locked}
           />
           <PlayerInput
-            label="Meilleur passeur · 8 pts"
+            label="Meilleur passeur · 16 pts"
             value={topAssister}
             onChange={setTopAssister}
             placeholder="Tape un nom…"
             disabled={locked}
           />
           <PlayerInput
-            label="Meilleur gardien · 10 pts"
+            label="Meilleur gardien · 20 pts"
             value={bestKeeper}
             onChange={setBestKeeper}
             placeholder="Tape un nom…"
             disabled={locked}
           />
           <div>
-            <p className="mb-2 text-[13px] font-medium text-ink-2">Finale · 20 pts (les deux équipes, peu importe l'ordre)</p>
+            <p className="mb-2 text-[13px] font-medium text-ink-2">Finale · 40 pts (les deux équipes, peu importe l'ordre)</p>
             <div className="grid grid-cols-2 gap-3">
               <TeamSelect label="Finaliste 1" value={finalistA} onChange={setFinalistA} disabled={locked} options={finalistAOptions} />
               <TeamSelect label="Finaliste 2" value={finalistB} onChange={setFinalistB} disabled={locked} options={finalistBOptions} />
@@ -142,7 +142,7 @@ export default function PreTournament() {
           </div>
           <div>
             <TeamSelect
-              label="Équipe gagnante · 15 pts"
+              label="Équipe gagnante · 30 pts"
               value={winner}
               onChange={setWinner}
               disabled={locked || winnerOptions.length === 0}
@@ -154,7 +154,7 @@ export default function PreTournament() {
             )}
           </div>
           <PlayerInput
-            label="Meilleur joueur · 6 pts"
+            label="Meilleur joueur · 12 pts"
             value={bestPlayer}
             onChange={setBestPlayer}
             placeholder="Tape un nom…"

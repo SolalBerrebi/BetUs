@@ -10,6 +10,7 @@ import { matchGradient, GRAIN_DATA_URI } from '../lib/teamColors'
 import { Badge, Button, Card, Segmented, Spinner } from '../components/ui'
 import PlayerInput from '../components/PlayerInput'
 import Lineup from '../components/Lineup'
+import MatchStats from '../components/MatchStats'
 
 // Vainqueur déduit d'un score complet. `null` = indéterminé :
 //   - score incomplet → on laisse le joueur choisir le vainqueur seul ;
@@ -80,11 +81,18 @@ export default function MatchDetail() {
 
   const [others, setOthers] = useState<Prediction[] | null>(null)
   const [points, setPoints] = useState<Map<string, MatchPoints>>(new Map())
+  // Activité du salon : on n'affiche le lien que s'il y a déjà des messages.
+  const [msgCount, setMsgCount] = useState(0)
   useEffect(() => {
     if (!match || !started) return
     supabase.from('predictions').select('*').eq('match_id', match.id).then(({ data }) => {
       if (data) setOthers(data as Prediction[])
     })
+    supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('match_id', match.id)
+      .then(({ count }) => setMsgCount(count ?? 0))
     if (match.status === 'finished') {
       supabase.from('match_points').select('*').eq('match_id', match.id).then(({ data }) => {
         if (data) setPoints(new Map((data as MatchPoints[]).map((r) => [r.user_id, r])))
@@ -255,7 +263,29 @@ export default function MatchDetail() {
         </div>
       </div>
 
-      {started && (
+      {started && match.stats && (
+        <Card className="mb-4 p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[20px] font-bold tracking-tight">Statistiques</h2>
+            {!finished && (
+              <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wide text-ink-3">
+                <span className="live-dot inline-block size-1.5 rounded-full bg-accent" />
+                en direct
+              </span>
+            )}
+          </div>
+          <div className="mt-4">
+            <MatchStats
+              stats={match.stats}
+              home={{ code: match.home_code }}
+              away={{ code: match.away_code }}
+            />
+          </div>
+        </Card>
+      )}
+
+      {/* Le salon n'est mis en avant que s'il y a déjà de l'activité (sinon : place aux stats). */}
+      {started && !finished && msgCount > 0 && (
         <Link
           to={`/match/${match.id}/chat`}
           className="mb-4 flex items-center justify-between rounded-(--radius-card) bg-accent p-4 text-white shadow-(--shadow-float) transition-transform duration-150 active:scale-[0.98]"
@@ -264,7 +294,7 @@ export default function MatchDetail() {
             <span className="live-dot inline-block size-2 rounded-full bg-white" />
             <span className="text-[16px] font-semibold">Salon en direct</span>
           </span>
-          <span className="text-[14px] text-white/85">Réagissez ensemble ›</span>
+          <span className="text-[14px] text-white/85">{msgCount} message{msgCount > 1 ? 's' : ''} ›</span>
         </Link>
       )}
 
