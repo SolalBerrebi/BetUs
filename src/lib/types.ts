@@ -49,6 +49,12 @@ export interface Match {
   lineups: MatchLineups | null
   stats: MatchStats | null
   odds: MatchOdds | null
+  momentum: MomentumPoint[] | null
+}
+
+export interface MomentumPoint {
+  min: number
+  value: number // -100..100, + = domicile pousse
 }
 
 export interface MatchOdds {

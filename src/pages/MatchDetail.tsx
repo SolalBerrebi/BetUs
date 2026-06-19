@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useApp, useNow } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
 import type { MatchPoints, Prediction } from '../lib/types'
@@ -11,6 +11,7 @@ import { Badge, Button, Card, Segmented, Spinner } from '../components/ui'
 import PlayerInput from '../components/PlayerInput'
 import Lineup from '../components/Lineup'
 import MatchStats from '../components/MatchStats'
+import Momentum from '../components/Momentum'
 
 // Vainqueur déduit d'un score complet. `null` = indéterminé :
 //   - score incomplet → on laisse le joueur choisir le vainqueur seul ;
@@ -76,23 +77,18 @@ export default function MatchDetail() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [tab, setTab] = useState<'resume' | 'momentum' | 'compos' | 'stats'>('resume')
+  const navigate = useNavigate()
 
   const started = match ? hasStarted(match.kickoff_at, now) : false
 
   const [others, setOthers] = useState<Prediction[] | null>(null)
   const [points, setPoints] = useState<Map<string, MatchPoints>>(new Map())
-  // Activité du salon : on n'affiche le lien que s'il y a déjà des messages.
-  const [msgCount, setMsgCount] = useState(0)
   useEffect(() => {
     if (!match || !started) return
     supabase.from('predictions').select('*').eq('match_id', match.id).then(({ data }) => {
       if (data) setOthers(data as Prediction[])
     })
-    supabase
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .eq('match_id', match.id)
-      .then(({ count }) => setMsgCount(count ?? 0))
     if (match.status === 'finished') {
       supabase.from('match_points').select('*').eq('match_id', match.id).then(({ data }) => {
         if (data) setPoints(new Map((data as MatchPoints[]).map((r) => [r.user_id, r])))
@@ -133,6 +129,23 @@ export default function MatchDetail() {
   const cd = countdown(match.kickoff_at, now)
   const finished = match.status === 'finished'
   const amb = ambiance(match.kickoff_at, match.status, now)
+
+  // Onglets internes : épuré avant le match, complet une fois lancé.
+  const TABS: { key: 'resume' | 'momentum' | 'compos' | 'stats' | 'salon'; label: string; nav?: boolean }[] =
+    started
+      ? [
+          { key: 'resume', label: 'Résumé' },
+          { key: 'momentum', label: 'Momentum' },
+          { key: 'compos', label: 'Compos' },
+          { key: 'stats', label: 'Stats' },
+          { key: 'salon', label: 'Salon', nav: true },
+        ]
+      : [
+          { key: 'resume', label: 'Résumé' },
+          { key: 'compos', label: 'Compos' },
+        ]
+  const activeTab = TABS.some((t) => t.key === tab) ? tab : 'resume'
+  const momentumGoals = match.goals_timeline.map((g) => ({ min: g.min, team: g.team }))
 
   async function submit() {
     if (!match || !session) return
@@ -263,7 +276,31 @@ export default function MatchDetail() {
         </div>
       </div>
 
-      {!started && match.odds && (
+      {/* Onglets internes — l'en-tête dégradé reste fixe au-dessus */}
+      <div className="mb-4 flex gap-5 overflow-x-auto border-b border-line [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {TABS.map((t) => {
+          const isActive = !t.nav && activeTab === t.key
+          return (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => (t.nav ? navigate(`/match/${match.id}/chat`) : setTab(t.key as typeof tab))}
+              className={`relative shrink-0 pb-2.5 text-[15px] font-semibold transition-colors ${
+                isActive ? 'text-ink' : 'text-ink-3'
+              }`}
+            >
+              <span className="inline-flex items-center gap-1">
+                {t.label}
+                {t.nav && !finished && <span className="live-dot inline-block size-1.5 rounded-full bg-accent" />}
+                {t.nav && <span className="text-[13px] text-ink-3">›</span>}
+              </span>
+              {isActive && <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-accent" />}
+            </button>
+          )
+        })}
+      </div>
+
+      {activeTab === 'resume' && !started && match.odds && (
         <Card className="mb-4 p-4">
           <div className="mb-2.5 flex items-center justify-between">
             <p className="text-[13px] font-semibold text-ink-2">Cotes</p>
@@ -292,23 +329,33 @@ export default function MatchDetail() {
         </Card>
       )}
 
-      {/* Salon toujours accessible pendant le match (sinon personne ne peut l'ouvrir). */}
-      {started && !finished && (
-        <Link
-          to={`/match/${match.id}/chat`}
-          className="mb-4 flex items-center justify-between rounded-(--radius-card) bg-accent p-4 text-white shadow-(--shadow-float) transition-transform duration-150 active:scale-[0.98]"
-        >
-          <span className="flex items-center gap-2.5">
-            <span className="live-dot inline-block size-2 rounded-full bg-white" />
-            <span className="text-[16px] font-semibold">Salon en direct</span>
-          </span>
-          <span className="text-[14px] text-white/85">
-            {msgCount > 0 ? `${msgCount} message${msgCount > 1 ? 's' : ''} ›` : 'Réagissez ensemble ›'}
-          </span>
-        </Link>
+      {activeTab === 'momentum' && (
+        <Card className="mb-4 p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[20px] font-bold tracking-tight">Momentum</h2>
+            {!finished && (
+              <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wide text-ink-3">
+                <span className="live-dot inline-block size-1.5 rounded-full bg-accent" />
+                en direct
+              </span>
+            )}
+          </div>
+          <div className="mt-4">
+            {match.momentum && match.momentum.length > 1 ? (
+              <Momentum
+                home={{ code: match.home_code, name: match.home_team }}
+                away={{ code: match.away_code, name: match.away_team }}
+                data={match.momentum}
+                goals={momentumGoals}
+              />
+            ) : (
+              <p className="text-[14px] text-ink-2">Le momentum s'affiche dès que le jeu se met en route.</p>
+            )}
+          </div>
+        </Card>
       )}
 
-      {started && match.stats && (
+      {activeTab === 'stats' && started && match.stats && (
         <Card className="mb-4 p-5">
           <div className="flex items-center justify-between">
             <h2 className="text-[20px] font-bold tracking-tight">Statistiques</h2>
@@ -329,26 +376,34 @@ export default function MatchDetail() {
         </Card>
       )}
 
-      <Card className="mb-4 p-5">
-        <h2 className="text-[20px] font-bold tracking-tight">Compositions</h2>
-        {match.lineups ? (
-          <div className="mt-4">
-            <Lineup
-              lineups={match.lineups}
-              home={{ name: match.home_team, code: match.home_code }}
-              away={{ name: match.away_team, code: match.away_code }}
-            />
-          </div>
-        ) : (
-          <p className="mt-1 text-[14px] text-ink-2">
-            {started
-              ? 'Compositions indisponibles pour ce match.'
-              : 'Les compositions officielles s’afficheront ici environ 40 min avant le coup d’envoi.'}
-          </p>
-        )}
-      </Card>
+      {activeTab === 'stats' && started && !match.stats && (
+        <Card className="p-5">
+          <p className="text-[14px] text-ink-2">Statistiques indisponibles pour le moment.</p>
+        </Card>
+      )}
 
-      {!started ? (
+      {activeTab === 'compos' && (
+        <Card className="mb-4 p-5">
+          <h2 className="text-[20px] font-bold tracking-tight">Compositions</h2>
+          {match.lineups ? (
+            <div className="mt-4">
+              <Lineup
+                lineups={match.lineups}
+                home={{ name: match.home_team, code: match.home_code }}
+                away={{ name: match.away_team, code: match.away_code }}
+              />
+            </div>
+          ) : (
+            <p className="mt-1 text-[14px] text-ink-2">
+              {started
+                ? 'Compositions indisponibles pour ce match.'
+                : 'Les compositions officielles s’afficheront ici environ 40 min avant le coup d’envoi.'}
+            </p>
+          )}
+        </Card>
+      )}
+
+      {activeTab === 'resume' && (!started ? (
         <Card className="p-5">
           <h2 className="text-[20px] font-bold tracking-tight">Mon pronostic</h2>
           <p className="mb-5 mt-0.5 text-[13px] text-ink-2">Modifiable jusqu'au coup d'envoi.</p>
@@ -467,7 +522,7 @@ export default function MatchDetail() {
             </Card>
           )}
         </section>
-      )}
+      ))}
     </div>
   )
 }

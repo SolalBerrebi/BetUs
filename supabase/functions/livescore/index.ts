@@ -489,6 +489,11 @@ async function importDraft(m: WindowMatch, fixtureId: number, f: any): Promise<v
     .neq('status', 'finished')
 }
 
+interface MomentumSample {
+  min: number
+  value: number
+}
+
 interface WindowMatch {
   id: number
   home_score: number | null
@@ -497,6 +502,34 @@ interface WindowMatch {
   away_team: string
   home_code: string | null
   away_code: string | null
+  stats: MatchStats | null
+  momentum: MomentumSample[] | null
+}
+
+// Momentum du match : on dérive la « pression » de l'évolution des stats (tirs,
+// tirs cadrés, corners, xG) entre deux ticks + un bonus dégressif après un but.
+const clamp100 = (v: number) => Math.max(-100, Math.min(100, v))
+function dangerScore(s: TeamStats | undefined): number {
+  if (!s) return 0
+  return (s.shots_on ?? 0) * 3 + (s.shots_total ?? 0) + (s.corners ?? 0) * 1.5 + (s.xg ?? 0) * 8
+}
+function nextMomentum(
+  prev: MomentumSample[] | null,
+  oldStats: MatchStats | null,
+  newStats: MatchStats,
+  elapsed: number,
+  goalSide: 'home' | 'away' | null,
+): MomentumSample[] {
+  const arr = Array.isArray(prev) ? [...prev] : []
+  const dHome = dangerScore(newStats.home) - dangerScore(oldStats?.home)
+  const dAway = dangerScore(newStats.away) - dangerScore(oldStats?.away)
+  const raw = (dHome - dAway) * 22 + (goalSide === 'home' ? 60 : goalSide === 'away' ? -60 : 0)
+  const last = arr.length ? arr[arr.length - 1].value : 0
+  // Lissage (EMA) + décroissance vers 0 quand le jeu se calme.
+  const value = Math.round(clamp100(last * 0.5 + clamp100(raw) * 0.6))
+  if (arr.length && arr[arr.length - 1].min === elapsed) arr[arr.length - 1] = { min: elapsed, value }
+  else arr.push({ min: elapsed, value })
+  return arr
 }
 
 // Notifs personnalisées au moment d'un but (buteur trouvé, score exact, vainqueur en bonne voie).
@@ -657,7 +690,7 @@ async function live(): Promise<Record<string, number>> {
   // Garde-fou quota : n'appelle l'API score que s'il y a un match dans sa fenêtre, non encore validé.
   const { data: windowRows } = await supabase
     .from('matches')
-    .select('id, home_score, away_score, home_team, away_team, home_code, away_code')
+    .select('id, home_score, away_score, home_team, away_team, home_code, away_code, stats, momentum')
     .neq('status', 'finished')
     .gte('kickoff_at', new Date(now - 200 * 60_000).toISOString())
     .lte('kickoff_at', new Date(now + 10 * 60_000).toISOString())
@@ -709,9 +742,17 @@ async function live(): Promise<Record<string, number>> {
         patch.goals_timeline = parsed.timeline
       }
       // Stats live (possession, tirs…) : un appel /statistics par tick pendant le match.
+      // On en dérive aussi l'échantillon de momentum (pression du jeu).
       try {
         const stats = parseStats(await apiGet(`/fixtures/statistics?fixture=${f.fixture.id}`), teamKey(m.home_team))
-        if (stats) patch.stats = stats
+        if (stats) {
+          patch.stats = stats
+          const elapsed = (f.fixture.status.elapsed ?? 0) + (f.fixture.status.extra ?? 0)
+          const goalSide = newTotal > oldTotal
+            ? (f.goals.home > (m.home_score ?? 0) ? 'home' : 'away')
+            : null
+          patch.momentum = nextMomentum(m.momentum, m.stats, stats, elapsed, goalSide)
+        }
       } catch { /* stats indispo : prochain tick */ }
       await supabase.from('matches').update(patch).eq('id', ourId).neq('status', 'finished')
       live++

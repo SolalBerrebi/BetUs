@@ -1,11 +1,6 @@
 import { teamColor } from '../lib/teamColors'
 import { teamFlag } from '../lib/teams'
-
-// Momentum du match : value ∈ [-100, 100] (+ = domicile pousse, − = extérieur).
-export interface MomentumPoint {
-  min: number
-  value: number
-}
+import type { MomentumPoint } from '../lib/types'
 
 // Lissage Catmull-Rom → courbes de Bézier (courbe douce, façon Sofascore/Apple).
 function smoothPath(pts: [number, number][]): string {
