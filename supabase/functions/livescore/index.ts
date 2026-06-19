@@ -548,11 +548,64 @@ async function liveGoalNotifs(m: WindowMatch, h: number, a: number, parsed: Pars
   return items.length
 }
 
+// Course au Soulier d'Or / Passe d'Or : top buteurs & passeurs du tournoi.
+// On résout chaque joueur API vers notre roster (nom canonique + code équipe) pour
+// que ça matche les paris des joueurs et qu'on ait le drapeau. Rafraîchi 1×/h.
+async function refreshTopPlayers(): Promise<Record<string, number>> {
+  // Map nom d'équipe → code FIFA, depuis nos matchs.
+  const { data: tm } = await supabase
+    .from('matches')
+    .select('home_team, home_code, away_team, away_code')
+  const codeByTeam = new Map<string, string>()
+  for (const m of tm ?? []) {
+    if (m.home_code) codeByTeam.set(teamKey(m.home_team), m.home_code)
+    if (m.away_code) codeByTeam.set(teamKey(m.away_team), m.away_code)
+  }
+
+  const build = async (path: string, category: 'scorer' | 'assister') => {
+    const resp = await apiGet(path)
+    const rows: Array<Record<string, unknown>> = []
+    let rank = 0
+    for (const e of resp.slice(0, 20)) {
+      const st = e.statistics?.[0]
+      const value = category === 'scorer'
+        ? (st?.goals?.total ?? 0)
+        : (st?.goals?.assists ?? 0)
+      if (!value) continue
+      const code = codeByTeam.get(teamKey(st?.team?.name ?? '')) ?? null
+      const canon = code ? resolveRoster(e.player?.name, ROSTER_BY_TEAM.get(code) ?? []) : null
+      rank++
+      rows.push({
+        category,
+        rank,
+        player: canon ?? e.player?.name ?? '?',
+        full_name: e.player?.name ?? null,
+        team_code: code,
+        value,
+      })
+    }
+    if (rows.length) {
+      await supabase.from('top_players').delete().eq('category', category)
+      await supabase.from('top_players').insert(rows)
+    }
+    return rows.length
+  }
+
+  const scorers = await build(`/players/topscorers?league=${LEAGUE}&season=${SEASON}`, 'scorer')
+  const assisters = await build(`/players/topassists?league=${LEAGUE}&season=${SEASON}`, 'assister')
+  return { scorers, assisters }
+}
+
 async function live(): Promise<Record<string, number>> {
   const now = Date.now()
+  const minute = new Date(now).getUTCMinutes()
   // Préchargement des compos des prochains matchs (jusqu'à 3 h avant), indépendant
   // du score live → tourne même quand aucun match n'est en cours.
-  const lineupsAdded = await prefetchLineups(now, new Date(now).getUTCMinutes())
+  const lineupsAdded = await prefetchLineups(now, minute)
+  // Course buteurs/passeurs : rafraîchie une fois par heure (peu coûteux, change peu).
+  if (minute === 0) {
+    try { await refreshTopPlayers() } catch { /* on réessaiera à l'heure suivante */ }
+  }
 
   // Garde-fou quota : n'appelle l'API score que s'il y a un match dans sa fenêtre, non encore validé.
   const { data: windowRows } = await supabase
@@ -653,7 +706,9 @@ Deno.serve(async (req) => {
       ? await buildMap()
       : body.task === 'backfill_stats'
         ? await backfillStats(Number(body.match_id))
-        : await live()
+        : body.task === 'top'
+          ? await refreshTopPlayers()
+          : await live()
     return new Response(JSON.stringify(out), { headers: { 'Content-Type': 'application/json' } })
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e) }), {

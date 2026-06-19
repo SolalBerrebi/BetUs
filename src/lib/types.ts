@@ -147,6 +147,15 @@ export interface MatchPoints {
   exact_pts: number
 }
 
+export interface TopPlayer {
+  category: 'scorer' | 'assister'
+  rank: number
+  player: string
+  full_name: string | null
+  team_code: string | null
+  value: number
+}
+
 export interface Message {
   id: number
   match_id: number

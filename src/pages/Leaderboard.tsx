@@ -4,7 +4,8 @@ import { flushSync } from 'react-dom'
 import { useApp } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
 import type { LeaderboardRow } from '../lib/types'
-import { Card, PageTitle, Spinner } from '../components/ui'
+import { Card, PageTitle, Segmented, Spinner } from '../components/ui'
+import TopPlayers from '../components/TopPlayers'
 
 function rankSort(a: LeaderboardRow, b: LeaderboardRow): number {
   return (
@@ -21,8 +22,11 @@ const MEDALS = ['🥇', '🥈', '🥉']
 const sameOrder = (a: LeaderboardRow[], b: LeaderboardRow[]) =>
   a.length === b.length && a.every((r, i) => r.user_id === b[i].user_id)
 
+type View = 'us' | 'scorer' | 'assister'
+
 export default function Leaderboard() {
-  const { session, matches, profiles } = useApp()
+  const { session, matches, profiles, myTournamentPrediction } = useApp()
+  const [view, setView] = useState<View>('us')
   const [rows, setRows] = useState<LeaderboardRow[] | null>(null)
   // Rang d'avant le(s) match(s) en cours → delta ▲/▼ pendant le live.
   const [prevRank, setPrevRank] = useState<Map<string, number>>(new Map())
@@ -65,6 +69,28 @@ export default function Leaderboard() {
         Classement
       </PageTitle>
 
+      <Segmented
+        options={[
+          { value: 'us', label: 'Nous' },
+          { value: 'scorer', label: 'Buteurs' },
+          { value: 'assister', label: 'Passeurs' },
+        ]}
+        value={view}
+        onChange={setView}
+      />
+
+      <div className="mt-4">
+      {view !== 'us' ? (
+        <TopPlayers
+          category={view}
+          myPick={
+            view === 'scorer'
+              ? myTournamentPrediction?.top_scorer ?? null
+              : myTournamentPrediction?.top_assister ?? null
+          }
+        />
+      ) : (
+        <>
       {live && (
         <div className="mb-3 flex items-center justify-center gap-2 rounded-full bg-warning-soft py-2 text-[12.5px] font-semibold text-[#c77700]">
           <span className="live-dot inline-block size-1.5 rounded-full bg-warning" />
@@ -130,6 +156,9 @@ export default function Leaderboard() {
         <br />
         Égalité départagée par : scores exacts, puis buteurs trouvés, puis passeurs trouvés.
       </p>
+        </>
+      )}
+      </div>
     </div>
   )
 }
