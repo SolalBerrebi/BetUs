@@ -276,8 +276,8 @@ export default function MatchDetail() {
         </div>
       </div>
 
-      {/* Onglets internes — l'en-tête dégradé reste fixe au-dessus */}
-      <div className="mb-4 flex gap-5 overflow-x-auto border-b border-line [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* Onglets internes (segmented iOS) — l'en-tête dégradé reste fixe au-dessus */}
+      <div className="mb-4 flex gap-0.5 rounded-[13px] bg-surface-2 p-1">
         {TABS.map((t) => {
           const isActive = !t.nav && activeTab === t.key
           return (
@@ -285,16 +285,12 @@ export default function MatchDetail() {
               key={t.key}
               type="button"
               onClick={() => (t.nav ? navigate(`/match/${match.id}/chat`) : setTab(t.key as typeof tab))}
-              className={`relative shrink-0 pb-2.5 text-[15px] font-semibold transition-colors ${
-                isActive ? 'text-ink' : 'text-ink-3'
+              className={`flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-[10px] py-1.5 text-[12.5px] font-semibold transition-all duration-150 active:scale-[0.97] ${
+                isActive ? 'bg-surface text-ink shadow-(--shadow-card)' : 'text-ink-2'
               }`}
             >
-              <span className="inline-flex items-center gap-1">
-                {t.label}
-                {t.nav && !finished && <span className="live-dot inline-block size-1.5 rounded-full bg-accent" />}
-                {t.nav && <span className="text-[13px] text-ink-3">›</span>}
-              </span>
-              {isActive && <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-accent" />}
+              {t.label}
+              {t.nav && !finished && <span className="live-dot inline-block size-1.5 rounded-full bg-accent" />}
             </button>
           )
         })}
