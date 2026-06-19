@@ -548,6 +548,51 @@ async function liveGoalNotifs(m: WindowMatch, h: number, a: number, parsed: Pars
   return items.length
 }
 
+// Cotes 1X2 (favori/outsider) depuis /odds — premier bookmaker, marché Vainqueur.
+function parseOdds(resp: any[]): { home: number; draw: number; away: number; book: string | null } | null {
+  const bm = resp?.[0]?.bookmakers?.[0]
+  const bet = bm?.bets?.find((b: any) => b.id === 1 || /match winner/i.test(b.name ?? '')) ?? bm?.bets?.[0]
+  if (!bet?.values) return null
+  const get = (k: string): number | null => {
+    const v = bet.values.find((x: any) => String(x.value).toLowerCase() === k)
+    return v ? parseFloat(v.odd) : null
+  }
+  const home = get('home'), draw = get('draw'), away = get('away')
+  if (home == null || draw == null || away == null) return null
+  return { home, draw, away, book: bm?.name ?? null }
+}
+
+// Préchargement des cotes pour les prochains matchs (jusqu'à 24 h avant), une fois.
+async function prefetchOdds(now: number, minute: number): Promise<number> {
+  // Les cotes existent bien à l'avance → on ne tente qu'aux minutes multiples de 15.
+  if (minute % 15 !== 0) return 0
+  const { data: ups } = await supabase
+    .from('matches')
+    .select('id')
+    .neq('status', 'finished')
+    .is('odds', null)
+    .gte('kickoff_at', new Date(now).toISOString())
+    .lte('kickoff_at', new Date(now + 24 * 3600_000).toISOString())
+    .order('kickoff_at')
+    .limit(6)
+  if (!ups?.length) return 0
+  const { data: mapRows } = await supabase.from('match_api').select('match_id, fixture_id')
+  const fxByMatch = new Map((mapRows ?? []).map((r) => [r.match_id, r.fixture_id]))
+  let added = 0
+  for (const m of ups) {
+    const fx = fxByMatch.get(m.id)
+    if (!fx) continue
+    try {
+      const odds = parseOdds(await apiGet(`/odds?fixture=${fx}&bet=1`))
+      if (odds) {
+        await supabase.from('matches').update({ odds }).eq('id', m.id)
+        added++
+      }
+    } catch { /* cotes indispo : prochain tick */ }
+  }
+  return added
+}
+
 // Course au Soulier d'Or / Passe d'Or : top buteurs & passeurs du tournoi.
 // On résout chaque joueur API vers notre roster (nom canonique + code équipe) pour
 // que ça matche les paris des joueurs et qu'on ait le drapeau. Rafraîchi 1×/h.
@@ -606,6 +651,8 @@ async function live(): Promise<Record<string, number>> {
   if (minute === 0) {
     try { await refreshTopPlayers() } catch { /* on réessaiera à l'heure suivante */ }
   }
+  // Cotes des prochains matchs (une fois, en pré-match).
+  await prefetchOdds(now, minute)
 
   // Garde-fou quota : n'appelle l'API score que s'il y a un match dans sa fenêtre, non encore validé.
   const { data: windowRows } = await supabase
@@ -708,7 +755,9 @@ Deno.serve(async (req) => {
         ? await backfillStats(Number(body.match_id))
         : body.task === 'top'
           ? await refreshTopPlayers()
-          : await live()
+          : body.task === 'odds'
+            ? { odds: await prefetchOdds(Date.now(), 0) }
+            : await live()
     return new Response(JSON.stringify(out), { headers: { 'Content-Type': 'application/json' } })
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e) }), {

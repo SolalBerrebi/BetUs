@@ -263,6 +263,35 @@ export default function MatchDetail() {
         </div>
       </div>
 
+      {!started && match.odds && (
+        <Card className="mb-4 p-4">
+          <div className="mb-2.5 flex items-center justify-between">
+            <p className="text-[13px] font-semibold text-ink-2">Cotes</p>
+            {match.odds.book && <p className="text-[11px] text-ink-3">{match.odds.book}</p>}
+          </div>
+          <div className="flex gap-2">
+            {([
+              { label: teamFlag(match.home_code), odd: match.odds.home },
+              { label: 'Nul', odd: match.odds.draw },
+              { label: teamFlag(match.away_code), odd: match.odds.away },
+            ] as const).map((c, i) => {
+              const fav = c.odd === Math.min(match.odds!.home, match.odds!.draw, match.odds!.away)
+              return (
+                <div
+                  key={i}
+                  className={`flex flex-1 flex-col items-center gap-0.5 rounded-xl py-2.5 ${fav ? 'bg-accent-soft' : 'bg-surface-2'}`}
+                >
+                  <span className="text-[15px] font-medium text-ink-2">{c.label}</span>
+                  <span className={`tnum text-[17px] font-bold ${fav ? 'text-accent' : ''}`}>
+                    {c.odd.toFixed(2)}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </Card>
+      )}
+
       {/* Salon toujours accessible pendant le match (sinon personne ne peut l'ouvrir). */}
       {started && !finished && (
         <Link

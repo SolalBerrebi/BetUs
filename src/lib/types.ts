@@ -48,6 +48,14 @@ export interface Match {
   goals_timeline: GoalEvent[]
   lineups: MatchLineups | null
   stats: MatchStats | null
+  odds: MatchOdds | null
+}
+
+export interface MatchOdds {
+  home: number
+  draw: number
+  away: number
+  book: string | null // nom du bookmaker
 }
 
 // Statistiques live d'une équipe (API-Football /fixtures/statistics). null = indispo.
