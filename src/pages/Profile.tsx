@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
-import type { LeaderboardRow, MatchPoints } from '../lib/types'
+import type { LeaderboardRow, MatchPoints, Prediction } from '../lib/types'
 import { Badge, Button, Card, Field, PageTitle } from '../components/ui'
 import { disablePush, enablePush, getSubscription, isIOS, isStandalone, pushSupported } from '../lib/push'
 import ShareSheet from '../components/ShareSheet'
 import type { ShareData } from '../components/ShareCard'
-import { computeStreak } from '../lib/share'
+import StatsDashboard from '../components/StatsDashboard'
+import { computeStats, type PersoStats } from '../lib/stats'
 
 function NotificationsCard({ userId }: { userId: string }) {
   const [enabled, setEnabled] = useState<boolean | null>(null)
@@ -69,35 +70,34 @@ function NotificationsCard({ userId }: { userId: string }) {
 }
 
 export default function Profile() {
-  const { profile, profiles, matches, signOut, refresh } = useApp()
+  const { profile, matches, signOut, refresh } = useApp()
   const [name, setName] = useState(profile?.display_name ?? '')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [stats, setStats] = useState<LeaderboardRow | null>(null)
-  const [rank, setRank] = useState<number | null>(null)
-  const [streak, setStreak] = useState<{ kind: 'win' | 'loss'; count: number } | null>(null)
+  const [perso, setPerso] = useState<PersoStats | null>(null)
   const [share, setShare] = useState<ShareData | null>(null)
 
   useEffect(() => {
     if (!profile) return
     setName(profile.display_name)
-    supabase.from('leaderboard').select('*').eq('user_id', profile.id).maybeSingle().then(({ data }) => {
-      if (data) setStats(data as LeaderboardRow)
-    })
-    supabase.from('ranked_leaderboard').select('rank').eq('user_id', profile.id).maybeSingle().then(({ data }) => {
-      if (data) setRank((data as { rank: number }).rank)
-    })
-    // Série en cours : pronos terminés, du plus récent au plus ancien.
-    supabase.from('match_points').select('*').eq('user_id', profile.id).then(({ data }) => {
-      const byId = new Map(matches.map((m) => [m.id, m]))
-      const results = ((data as MatchPoints[]) ?? [])
-        .map((mp) => ({ mp, m: byId.get(mp.match_id) }))
-        .filter((x) => x.m && x.m.status === 'finished')
-        .sort((a, b) => new Date(b.m!.kickoff_at).getTime() - new Date(a.m!.kickoff_at).getTime())
-        .map((x) => ({ points: x.mp.winner_pts + x.mp.scorer_pts + x.mp.assister_pts + x.mp.exact_pts }))
-      setStreak(computeStreak(results))
+    Promise.all([
+      supabase.from('leaderboard').select('*'),
+      supabase.from('predictions').select('*').eq('user_id', profile.id),
+      supabase.from('match_points').select('*').eq('user_id', profile.id),
+    ]).then(([lb, pr, mp]) => {
+      setPerso(
+        computeStats({
+          me: profile.id,
+          myPoints: (mp.data as MatchPoints[]) ?? [],
+          myPreds: (pr.data as Prediction[]) ?? [],
+          matches,
+          board: (lb.data as LeaderboardRow[]) ?? [],
+        }),
+      )
     })
   }, [profile, matches])
+
+  const streak = perso?.currentStreak ?? null
 
   async function saveName() {
     if (!profile || !name.trim()) return
@@ -137,9 +137,9 @@ export default function Profile() {
 
       {profile && <NotificationsCard userId={profile.id} />}
 
-      {stats && (
-        <Card className="mb-4 p-5">
-          <div className="mb-3 flex items-center justify-between">
+      {perso && (
+        <section className="mb-4">
+          <div className="mb-3 flex items-center justify-between px-1">
             <h2 className="text-[17px] font-bold">Mes stats</h2>
             {streak && streak.count >= 2 && (
               <Badge tone={streak.kind === 'win' ? 'positive' : 'warning'}>
@@ -147,22 +147,8 @@ export default function Profile() {
               </Badge>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-3 text-center">
-            {[
-              [stats.total_points, 'points'],
-              [stats.predictions_scored, 'pronos comptés'],
-              [stats.exact_count, 'scores exacts'],
-              [stats.scorer_count, 'buteurs trouvés'],
-              [stats.assister_count, 'passeurs trouvés'],
-              [stats.winner_count, 'vainqueurs trouvés'],
-            ].map(([v, label]) => (
-              <div key={label as string} className="rounded-xl bg-surface-2 px-3 py-3">
-                <p className="tnum text-[24px] font-bold">{v}</p>
-                <p className="text-[12px] text-ink-2">{label}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 flex gap-2">
+          <StatsDashboard stats={perso} />
+          <div className="flex gap-2">
             <Button
               variant="secondary"
               className="flex-1"
@@ -170,13 +156,13 @@ export default function Profile() {
                 setShare({
                   kind: 'stats',
                   name: profile?.display_name ?? 'Moi',
-                  rank,
-                  totalPlayers: profiles.length || null,
-                  totalPoints: stats.total_points,
-                  exact: stats.exact_count,
-                  scorers: stats.scorer_count,
-                  assisters: stats.assister_count,
-                  winners: stats.winner_count,
+                  rank: perso.rank,
+                  totalPlayers: perso.totalPlayers,
+                  totalPoints: perso.totalPoints,
+                  vsAverage: perso.vsAverage,
+                  hitRate: perso.hitRate,
+                  specialty: perso.specialty?.title ?? null,
+                  bestMatchPoints: perso.bestMatch?.points ?? null,
                 })
               }
             >
@@ -199,7 +185,7 @@ export default function Profile() {
               </Button>
             )}
           </div>
-        </Card>
+        </section>
       )}
 
       {share && <ShareSheet data={share} onClose={() => setShare(null)} />}

@@ -17,13 +17,13 @@ export type ShareData =
   | {
       kind: 'stats'
       name: string
-      rank: number | null
-      totalPlayers: number | null
+      rank: number
+      totalPlayers: number
       totalPoints: number
-      exact: number
-      scorers: number
-      assisters: number
-      winners: number
+      vsAverage: number
+      hitRate: number
+      specialty: string | null
+      bestMatchPoints: number | null
     }
   | { kind: 'streak'; name: string; streakKind: 'win' | 'loss'; count: number }
   | { kind: 'rank'; name: string; rank: number; totalPlayers: number; totalPoints: number }
@@ -111,25 +111,31 @@ const ShareCard = forwardRef<HTMLDivElement, { data: ShareData }>(({ data }, ref
 
       {data.kind === 'stats' && (
         <Frame name={data.name} bg={BRAND_BG}>
-          {data.rank != null && (
-            <p className="mb-1 text-[13px] font-semibold uppercase tracking-wide text-white/70">
-              {data.rank}{data.rank === 1 ? 'ᵉʳ' : 'ᵉ'}{data.totalPlayers ? ` / ${data.totalPlayers}` : ''} au classement
-            </p>
-          )}
-          <p className="tnum text-[56px] font-extrabold leading-none">{data.totalPoints}</p>
-          <p className="-mt-1 text-[15px] font-semibold text-white/80">points</p>
-          <div className="mt-5 grid w-full grid-cols-2 gap-2">
-            {[
-              [data.exact, 'scores exacts'],
-              [data.winners, 'vainqueurs'],
-              [data.scorers, 'buteurs'],
-              [data.assisters, 'passeurs'],
-            ].map(([v, label]) => (
-              <div key={label as string} className="rounded-xl bg-white/12 py-2">
-                <p className="tnum text-[20px] font-bold leading-none">{v}</p>
-                <p className="mt-1 text-[11px] text-white/70">{label}</p>
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-white/70">
+            {data.rank}{data.rank === 1 ? 'ᵉʳ' : 'ᵉ'} / {data.totalPlayers} au classement
+          </p>
+          <p className="tnum mt-1 text-[58px] font-extrabold leading-none">{data.totalPoints}</p>
+          <p className="-mt-1 text-[14px] font-semibold text-white/80">points</p>
+          <span className="tnum mt-2 rounded-full bg-white/15 px-3 py-1 text-[12.5px] font-bold">
+            {data.vsAverage >= 0 ? `+${data.vsAverage}` : data.vsAverage} vs la moyenne
+          </span>
+          <div className="mt-4 w-full space-y-1.5 rounded-2xl bg-white/10 p-3">
+            <div className="flex items-center justify-between text-[13px]">
+              <span className="text-white/75">Réussite</span>
+              <span className="tnum font-bold">{data.hitRate}%</span>
+            </div>
+            {data.specialty && (
+              <div className="flex items-center justify-between gap-2 text-[13px]">
+                <span className="text-white/75">Spécialité</span>
+                <span className="truncate font-bold">{data.specialty}</span>
               </div>
-            ))}
+            )}
+            {data.bestMatchPoints != null && (
+              <div className="flex items-center justify-between text-[13px]">
+                <span className="text-white/75">Meilleur coup</span>
+                <span className="tnum font-bold">+{data.bestMatchPoints}</span>
+              </div>
+            )}
           </div>
         </Frame>
       )}
