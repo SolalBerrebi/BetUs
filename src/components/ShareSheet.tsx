@@ -13,8 +13,19 @@ const CAPTIONS: Record<ShareData['kind'], string> = {
 
 export default function ShareSheet({ data, onClose }: { data: ShareData; onClose: () => void }) {
   const cardRef = useRef<HTMLDivElement>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState<string | null>(null)
+  const [bgImage, setBgImage] = useState<string | undefined>(undefined)
+
+  function pickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => setBgImage(reader.result as string)
+    reader.readAsDataURL(file)
+    e.target.value = '' // permet de re-choisir le même fichier
+  }
 
   async function go() {
     if (!cardRef.current || busy) return
@@ -49,10 +60,31 @@ export default function ShareSheet({ data, onClose }: { data: ShareData; onClose
 
         {/* Aperçu de la carte */}
         <div className="flex justify-center">
-          <ShareCard ref={cardRef} data={data} />
+          <ShareCard ref={cardRef} data={data} bgImage={bgImage} />
         </div>
 
-        <div className="mt-5 space-y-2.5">
+        {/* Photo de fond (façon Strava) */}
+        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={pickPhoto} />
+        <div className="mt-4 flex items-center justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-4 py-2 text-[14px] font-semibold text-ink-2 transition-colors active:bg-line/60"
+          >
+            📷 {bgImage ? 'Changer la photo' : 'Photo de fond'}
+          </button>
+          {bgImage && (
+            <button
+              type="button"
+              onClick={() => setBgImage(undefined)}
+              className="rounded-full bg-surface-2 px-4 py-2 text-[14px] font-semibold text-ink-2 transition-colors active:bg-line/60"
+            >
+              Retirer
+            </button>
+          )}
+        </div>
+
+        <div className="mt-4 space-y-2.5">
           <button
             type="button"
             onClick={go}

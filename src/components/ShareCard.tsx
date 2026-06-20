@@ -11,8 +11,9 @@ export type ShareData =
       away: { code: string | null; name: string }
       homeScore: number
       awayScore: number
-      badge: string
       points: number
+      // Lignes du prono avec ce qui a été validé (✓) ou raté (✗).
+      items: { label: string; pick: string; ok: boolean }[]
     }
   | {
       kind: 'stats'
@@ -71,35 +72,58 @@ function Frame({
   bg,
   accent = 'rgba(10,122,255,0.9)',
   watermark,
+  bgImage,
   children,
 }: {
   name: string
   bg: React.CSSProperties
   accent?: string
   watermark?: React.ReactNode
+  bgImage?: string
   children: React.ReactNode
 }) {
   return (
     <div
       className="relative overflow-hidden rounded-[30px] text-white"
-      style={{ width: W, height: H, ...bg }}
+      style={{ width: W, height: H, ...(bgImage ? { backgroundColor: '#0a1f3c' } : bg) }}
     >
-      {/* Halos lumineux pour la profondeur */}
-      <div
-        className="pointer-events-none absolute -left-20 -top-24 size-64 rounded-full opacity-60"
-        style={{ background: 'radial-gradient(closest-side, rgba(255,255,255,0.45), transparent)' }}
-      />
-      <div
-        className="pointer-events-none absolute -bottom-28 -right-16 size-72 rounded-full opacity-50"
-        style={{ background: `radial-gradient(closest-side, ${accent}, transparent)` }}
-      />
+      {bgImage ? (
+        <>
+          {/* Photo de fond + voile sombre pour la lisibilité (façon Strava) */}
+          <img
+            src={bgImage}
+            alt=""
+            crossOrigin="anonymous"
+            className="absolute inset-0 size-full object-cover"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.12) 32%, rgba(0,0,0,0.55) 72%, rgba(0,0,0,0.80) 100%)',
+            }}
+          />
+        </>
+      ) : (
+        <>
+          {/* Halos lumineux pour la profondeur */}
+          <div
+            className="pointer-events-none absolute -left-20 -top-24 size-64 rounded-full opacity-60"
+            style={{ background: 'radial-gradient(closest-side, rgba(255,255,255,0.45), transparent)' }}
+          />
+          <div
+            className="pointer-events-none absolute -bottom-28 -right-16 size-72 rounded-full opacity-50"
+            style={{ background: `radial-gradient(closest-side, ${accent}, transparent)` }}
+          />
+          {/* Filigrane géant */}
+          {watermark && <div className="pointer-events-none absolute inset-0">{watermark}</div>}
+        </>
+      )}
       {/* Grain */}
       <div
         className="pointer-events-none absolute inset-0 mix-blend-overlay"
         style={{ backgroundImage: GRAIN_DATA_URI, opacity: 0.07 }}
       />
-      {/* Filigrane géant */}
-      {watermark && <div className="pointer-events-none absolute inset-0">{watermark}</div>}
       {/* Liseré intérieur */}
       <div className="pointer-events-none absolute inset-0 rounded-[30px] ring-1 ring-inset ring-white/15" />
 
@@ -131,36 +155,52 @@ function Kicker({ children }: { children: React.ReactNode }) {
   )
 }
 
-const ShareCard = forwardRef<HTMLDivElement, { data: ShareData }>(({ data }, ref) => {
+const ShareCard = forwardRef<HTMLDivElement, { data: ShareData; bgImage?: string }>(
+  ({ data, bgImage }, ref) => {
   return (
     <div ref={ref} className="inline-block">
       {data.kind === 'match' && (
-        <Frame name={data.name} bg={matchGradient(data.home.code, data.away.code)} accent="rgba(0,0,0,0.5)">
-          <Kicker>{data.points > 0 ? 'Mon prono · gagné' : 'Mon prono'}</Kicker>
-          <div className="flex items-center justify-center gap-3">
-            <div className="flex w-20 flex-col items-center gap-1">
-              <span className="text-[38px] leading-none">{teamFlag(data.home.code)}</span>
-              <span className="text-[12px] font-semibold leading-tight">
-                {teamName(data.home.name, data.home.code)}
-              </span>
-            </div>
-            <span className="tnum text-[44px] font-black" style={numberGlow}>
+        <Frame name={data.name} bg={matchGradient(data.home.code, data.away.code)} accent="rgba(0,0,0,0.5)" bgImage={bgImage}>
+          <Kicker>Mon prono</Kicker>
+          {/* Affiche + résultat réel (contexte) */}
+          <div className="flex items-center justify-center gap-2.5">
+            <span className="text-[30px] leading-none">{teamFlag(data.home.code)}</span>
+            <span className="tnum text-[30px] font-black" style={numberGlow}>
               {data.homeScore}<span className="px-1 text-white/55">–</span>{data.awayScore}
             </span>
-            <div className="flex w-20 flex-col items-center gap-1">
-              <span className="text-[38px] leading-none">{teamFlag(data.away.code)}</span>
-              <span className="text-[12px] font-semibold leading-tight">
-                {teamName(data.away.name, data.away.code)}
-              </span>
-            </div>
+            <span className="text-[30px] leading-none">{teamFlag(data.away.code)}</span>
           </div>
-          <p className="mt-5 rounded-full bg-white/15 px-4 py-1.5 text-[13.5px] font-bold ring-1 ring-white/25 backdrop-blur-sm">
-            {data.badge}
+          <p className="mt-1 text-[12px] font-semibold text-white/70">
+            {teamName(data.home.name, data.home.code)} – {teamName(data.away.name, data.away.code)}
           </p>
-          <p className="tnum mt-4 text-[58px] font-black leading-none" style={numberGlow}>
-            {data.points > 0 ? `+${data.points}` : '0'}
-            <span className="ml-1 text-[24px] font-extrabold text-white/80">pts</span>
-          </p>
+          {/* Le prono ligne par ligne, avec ce qui a été validé */}
+          <div className="mt-4 w-full space-y-1.5">
+            {data.items.map((it, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between gap-2 rounded-xl bg-white/12 px-3 py-2 ring-1 ring-white/15 backdrop-blur-sm"
+              >
+                <span className="shrink-0 text-[11.5px] font-medium uppercase tracking-wide text-white/65">
+                  {it.label}
+                </span>
+                <span className="flex min-w-0 items-center gap-2">
+                  <span className={`truncate text-[14px] font-bold ${it.ok ? '' : 'text-white/60 line-through'}`}>
+                    {it.pick}
+                  </span>
+                  <span
+                    className={`grid size-5 shrink-0 place-items-center rounded-full text-[11px] font-black ${
+                      it.ok ? 'bg-[#34c759] text-white' : 'bg-white/20 text-white/70'
+                    }`}
+                  >
+                    {it.ok ? '✓' : '✗'}
+                  </span>
+                </span>
+              </div>
+            ))}
+          </div>
+          {data.points > 0 && (
+            <p className="tnum mt-3 text-[13px] font-bold text-white/80">+{data.points} pts</p>
+          )}
         </Frame>
       )}
 

@@ -477,18 +477,25 @@ export default function MatchDetail() {
           {finished && mine && session && match.home_score !== null && match.away_score !== null && (() => {
             const mp = points.get(session.user.id)
             const total = mp ? mp.winner_pts + mp.scorer_pts + mp.assister_pts + mp.exact_pts : 0
-            // Étiquette de ce qui a été trouvé, pour la carte de partage.
-            const hits: string[] = []
-            if (mp?.exact_pts) hits.push('Score exact 🎯')
-            else if (mp?.winner_pts) hits.push('Vainqueur trouvé')
-            if (mp?.scorer_pts) hits.push('buteur')
-            if (mp?.assister_pts) hits.push('passeur')
-            const badge =
-              total === 0
-                ? 'Raté — on se refait au prochain 😬'
-                : hits.length
-                  ? hits.join(' + ').replace(/^(.)/, (c) => c.toUpperCase())
-                  : `+${total} pts`
+            // Le prono ligne par ligne avec ce qui a été validé, pour la carte de partage.
+            const winnerLabel =
+              mine.winner === 'draw'
+                ? 'Nul'
+                : mine.winner === 'home'
+                  ? teamName(match.home_team, match.home_code)
+                  : mine.winner === 'away'
+                    ? teamName(match.away_team, match.away_code)
+                    : '—'
+            const items: { label: string; pick: string; ok: boolean }[] = [
+              { label: 'Vainqueur', pick: winnerLabel, ok: !!mp?.winner_pts },
+              {
+                label: 'Score',
+                pick: mine.pred_home_score !== null ? `${mine.pred_home_score}–${mine.pred_away_score}` : '—',
+                ok: !!mp?.exact_pts,
+              },
+            ]
+            if (mine.scorer) items.push({ label: 'Buteur', pick: mine.scorer, ok: !!mp?.scorer_pts })
+            if (mine.assister) items.push({ label: 'Passeur', pick: mine.assister, ok: !!mp?.assister_pts })
             return (
               <button
                 type="button"
@@ -500,8 +507,8 @@ export default function MatchDetail() {
                     away: { code: match.away_code, name: match.away_team },
                     homeScore: match.home_score!,
                     awayScore: match.away_score!,
-                    badge,
                     points: total,
+                    items,
                   })
                 }
                 className="mb-3 flex w-full items-center justify-center gap-2 rounded-(--radius-card) bg-accent-soft py-3 text-[15px] font-semibold text-accent transition-transform duration-150 active:scale-[0.98]"
