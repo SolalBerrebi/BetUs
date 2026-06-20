@@ -504,6 +504,7 @@ interface WindowMatch {
   away_code: string | null
   stats: MatchStats | null
   momentum: MomentumSample[] | null
+  goals_timeline: GoalEvent[] | null
 }
 
 // Momentum du match : on dérive la « pression » de l'évolution des stats (tirs,
@@ -690,7 +691,7 @@ async function live(): Promise<Record<string, number>> {
   // Garde-fou quota : n'appelle l'API score que s'il y a un match dans sa fenêtre, non encore validé.
   const { data: windowRows } = await supabase
     .from('matches')
-    .select('id, home_score, away_score, home_team, away_team, home_code, away_code, stats, momentum')
+    .select('id, home_score, away_score, home_team, away_team, home_code, away_code, stats, momentum, goals_timeline')
     .neq('status', 'finished')
     .gte('kickoff_at', new Date(now - 200 * 60_000).toISOString())
     .lte('kickoff_at', new Date(now + 10 * 60_000).toISOString())
@@ -727,10 +728,20 @@ async function live(): Promise<Record<string, number>> {
         period: st,
         status: 'live',
       }
-      // But marqué : on récupère les events (1 appel) pour buteurs/passeurs/remplacements
-      // + timeline en direct → le classement et le fil du salon bougent pendant le match.
+      // Récupération des events (buteurs/passeurs/remplacements + timeline). On re-lit :
+      //  1) à chaque nouveau but (score qui monte) ;
+      //  2) s'il reste un « trou » dans la timeline (buteur non encore nommé par l'API,
+      //     ou but pas encore dans la timeline) — l'API renseigne souvent le nom du
+      //     buteur/passeur quelques secondes APRÈS le but ;
+      //  3) périodiquement (~toutes les 3 min) pour rattraper les passeurs ajoutés
+      //     tardivement par l'API, même quand le score ne bouge plus.
+      // Sans ça, un nom arrivé en retard n'était jamais capté tant que le score était figé.
+      const elapsedMin = (f.fixture.status.elapsed ?? 0) + (f.fixture.status.extra ?? 0)
+      const tl = Array.isArray(m.goals_timeline) ? m.goals_timeline : []
+      const hasHole = tl.length < newTotal || tl.some((g) => g.scorer == null)
+      const reparse = newTotal > oldTotal || hasHole || elapsedMin % 3 === 0
       let parsed: ParsedEvents | null = null
-      if (newTotal > oldTotal) {
+      if (reparse) {
         parsed = parseEvents(
           await apiGet(`/fixtures/events?fixture=${f.fixture.id}`),
           f.teams.home.id,
