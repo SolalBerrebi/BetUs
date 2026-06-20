@@ -158,6 +158,8 @@ export default function Leaderboard() {
         const myIdx = rows.findIndex((r) => r.user_id === session?.user.id)
         if (myIdx < 0) return null
         const me = rows[myIdx]
+        const avg = rows.reduce((s, r) => s + r.total_points, 0) / rows.length
+        const beat = rows.filter((r) => r.total_points < me.total_points).length
         return (
           <button
             type="button"
@@ -168,6 +170,8 @@ export default function Leaderboard() {
                 rank: myIdx + 1,
                 totalPlayers: rows.length,
                 totalPoints: me.total_points,
+                vsAverage: Math.round(me.total_points - avg),
+                beat,
               })
             }
             className="mt-4 w-full rounded-(--radius-card) bg-accent-soft py-3 text-[15px] font-semibold text-accent transition-transform duration-150 active:scale-[0.98]"

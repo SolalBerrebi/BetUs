@@ -25,8 +25,23 @@ export type ShareData =
       specialty: string | null
       bestMatchPoints: number | null
     }
-  | { kind: 'streak'; name: string; streakKind: 'win' | 'loss'; count: number }
-  | { kind: 'rank'; name: string; rank: number; totalPlayers: number; totalPoints: number }
+  | {
+      kind: 'streak'
+      name: string
+      streakKind: 'win' | 'loss'
+      count: number
+      bestStreak: number
+      hitRate: number
+    }
+  | {
+      kind: 'rank'
+      name: string
+      rank: number
+      totalPlayers: number
+      totalPoints: number
+      vsAverage: number
+      beat: number
+    }
 
 // Fond accent BetUs pour les cartes hors-match (dégradé bleu profond → accent).
 const BRAND_BG: React.CSSProperties = {
@@ -161,6 +176,10 @@ const ShareCard = forwardRef<HTMLDivElement, { data: ShareData }>(({ data }, ref
               </span>
             ))}
           </div>
+          <div className="mt-5 flex gap-2 text-[12px] font-semibold">
+            <span className="tnum rounded-full bg-white/15 px-3 py-1">Record : {data.bestStreak}</span>
+            <span className="tnum rounded-full bg-white/15 px-3 py-1">Réussite {data.hitRate}%</span>
+          </div>
         </Frame>
       )}
 
@@ -174,9 +193,17 @@ const ShareCard = forwardRef<HTMLDivElement, { data: ShareData }>(({ data }, ref
             <span className="text-[24px] font-bold text-white/70">/{data.totalPlayers}</span>
           </p>
           <p className="mt-1 text-[15px] font-semibold text-white/80">au classement</p>
-          <p className="tnum mt-4 rounded-full bg-white/15 px-4 py-1.5 text-[15px] font-bold">
-            {data.totalPoints} pts
-          </p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[13px] font-bold">
+            <span className="tnum rounded-full bg-white/15 px-3.5 py-1.5">{data.totalPoints} pts</span>
+            <span className="tnum rounded-full bg-white/15 px-3.5 py-1.5">
+              {data.vsAverage >= 0 ? `+${data.vsAverage}` : data.vsAverage} vs moyenne
+            </span>
+          </div>
+          {data.beat > 0 && (
+            <p className="tnum mt-3 text-[13px] font-medium text-white/75">
+              Tu bats {data.beat} joueur{data.beat > 1 ? 's' : ''} sur {data.totalPlayers - 1}
+            </p>
+          )}
         </Frame>
       )}
     </div>

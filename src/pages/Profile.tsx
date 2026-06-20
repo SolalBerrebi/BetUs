@@ -178,6 +178,8 @@ export default function Profile() {
                     name: profile?.display_name ?? 'Moi',
                     streakKind: streak.kind,
                     count: streak.count,
+                    bestStreak: perso.bestStreak,
+                    hitRate: perso.hitRate,
                   })
                 }
               >
