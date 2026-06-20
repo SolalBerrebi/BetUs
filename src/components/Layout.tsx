@@ -1,5 +1,7 @@
+import { useEffect, useReducer } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useApp } from '../lib/AppContext'
+import { newStatsCount, STATS_SEEN_EVENT } from '../lib/statsBadge'
 import { Powered } from './ui'
 
 /* Icônes façon SF Symbols — stroke 1.7, remplissage partiel à l'état actif */
@@ -74,8 +76,17 @@ const TABS = [
 ]
 
 export default function Layout() {
-  const { profile } = useApp()
+  const { profile, matches, myPredictions } = useApp()
   const tabs = profile?.is_admin ? [...TABS, { to: '/admin', label: 'Admin', Icon: SlidersIcon }] : TABS
+
+  // Pastille « stats à voir » sur l'onglet Profil — se rafraîchit quand le joueur
+  // a consulté ses stats (événement) ou quand un nouveau résultat tombe (contexte).
+  const [, bump] = useReducer((x) => x + 1, 0)
+  useEffect(() => {
+    window.addEventListener(STATS_SEEN_EVENT, bump)
+    return () => window.removeEventListener(STATS_SEEN_EVENT, bump)
+  }, [])
+  const profileDot = newStatsCount(matches, myPredictions) > 0
 
   return (
     <div className="mx-auto min-h-dvh max-w-lg px-4 pb-36 pt-4">
@@ -101,7 +112,12 @@ export default function Layout() {
               >
                 {({ isActive }) => (
                   <>
-                    <t.Icon active={isActive} />
+                    <span className="relative">
+                      <t.Icon active={isActive} />
+                      {t.to === '/profil' && profileDot && (
+                        <span className="absolute -right-1.5 -top-0.5 size-2 rounded-full bg-negative ring-2 ring-white" />
+                      )}
+                    </span>
                     {t.label}
                   </>
                 )}

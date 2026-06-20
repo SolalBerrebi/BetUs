@@ -8,6 +8,7 @@ import ShareSheet from '../components/ShareSheet'
 import type { ShareData } from '../components/ShareCard'
 import StatsDashboard from '../components/StatsDashboard'
 import { computeStats, type PersoStats } from '../lib/stats'
+import { markStatsSeen } from '../lib/statsBadge'
 
 function NotificationsCard({ userId }: { userId: string }) {
   const [enabled, setEnabled] = useState<boolean | null>(null)
@@ -132,6 +133,11 @@ export default function Profile() {
   }, [profile, matches, myPredictions])
 
   const streak = perso?.currentStreak ?? null
+
+  // Le joueur consulte ses stats → on efface la pastille « stats à voir ».
+  useEffect(() => {
+    if (perso) markStatsSeen(matches, myPredictions)
+  }, [perso, matches, myPredictions])
 
   async function saveName() {
     if (!profile || !name.trim()) return
