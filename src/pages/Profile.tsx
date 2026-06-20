@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
-import type { LeaderboardRow, MatchPoints, Prediction } from '../lib/types'
+import type { LeaderboardRow, MatchPoints } from '../lib/types'
 import { Badge, Button, Card, Field, PageTitle } from '../components/ui'
 import { disablePush, enablePush, getSubscription, isIOS, isStandalone, pushSupported } from '../lib/push'
 import ShareSheet from '../components/ShareSheet'
@@ -69,8 +69,41 @@ function NotificationsCard({ userId }: { userId: string }) {
   )
 }
 
+// Squelette affiché pendant le chargement des stats — pour que la section soit
+// visible d'emblée (l'utilisateur sait qu'elle arrive et l'attend).
+function StatsSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <Card className="mb-4 p-5">
+        <div className="flex items-end justify-between">
+          <div>
+            <div className="h-3 w-12 rounded bg-surface-2" />
+            <div className="mt-2 h-10 w-24 rounded-lg bg-surface-2" />
+          </div>
+          <div className="size-12 rounded-full bg-surface-2" />
+        </div>
+        <div className="mt-4 flex gap-2">
+          <div className="h-7 w-32 rounded-full bg-surface-2" />
+          <div className="h-7 w-24 rounded-full bg-surface-2" />
+        </div>
+      </Card>
+      <Card className="mb-4 p-5">
+        <div className="h-5 w-24 rounded bg-surface-2" />
+        <div className="mt-4 space-y-3">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i}>
+              <div className="mb-1.5 h-3 w-full rounded bg-surface-2/70" />
+              <div className="h-2.5 rounded-full bg-surface-2" />
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  )
+}
+
 export default function Profile() {
-  const { profile, matches, signOut, refresh } = useApp()
+  const { profile, matches, myPredictions, signOut, refresh } = useApp()
   const [name, setName] = useState(profile?.display_name ?? '')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -80,22 +113,23 @@ export default function Profile() {
   useEffect(() => {
     if (!profile) return
     setName(profile.display_name)
+    // Les prédictions sont déjà en mémoire (contexte) → on ne charge que classement
+    // + points de match. Deux requêtes au lieu de trois = stats plus rapides.
     Promise.all([
       supabase.from('leaderboard').select('*'),
-      supabase.from('predictions').select('*').eq('user_id', profile.id),
       supabase.from('match_points').select('*').eq('user_id', profile.id),
-    ]).then(([lb, pr, mp]) => {
+    ]).then(([lb, mp]) => {
       setPerso(
         computeStats({
           me: profile.id,
           myPoints: (mp.data as MatchPoints[]) ?? [],
-          myPreds: (pr.data as Prediction[]) ?? [],
+          myPreds: [...myPredictions.values()],
           matches,
           board: (lb.data as LeaderboardRow[]) ?? [],
         }),
       )
     })
-  }, [profile, matches])
+  }, [profile, matches, myPredictions])
 
   const streak = perso?.currentStreak ?? null
 
@@ -112,6 +146,64 @@ export default function Profile() {
   return (
     <div>
       <PageTitle sub={profile?.is_admin ? 'Organisateur' : undefined}>Profil</PageTitle>
+
+      {/* Stats en premier, toujours visibles dès l'ouverture (squelette pendant le chargement) */}
+      <section className="mb-6">
+        <div className="mb-3 flex items-center justify-between px-1">
+          <h2 className="text-[17px] font-bold">Mes stats</h2>
+          {streak && streak.count >= 2 && (
+            <Badge tone={streak.kind === 'win' ? 'positive' : 'warning'}>
+              {streak.kind === 'win' ? '🔥' : '🥶'} {streak.count} d'affilée
+            </Badge>
+          )}
+        </div>
+        {perso ? (
+          <>
+            <StatsDashboard stats={perso} />
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                className="flex-1"
+                onClick={() =>
+                  setShare({
+                    kind: 'stats',
+                    name: profile?.display_name ?? 'Moi',
+                    rank: perso.rank,
+                    totalPlayers: perso.totalPlayers,
+                    totalPoints: perso.totalPoints,
+                    vsAverage: perso.vsAverage,
+                    hitRate: perso.hitRate,
+                    specialty: perso.specialty?.title ?? null,
+                    bestMatchPoints: perso.bestMatch?.points ?? null,
+                  })
+                }
+              >
+                Partager mes stats
+              </Button>
+              {streak && streak.count >= 2 && (
+                <Button
+                  variant="secondary"
+                  className="flex-1"
+                  onClick={() =>
+                    setShare({
+                      kind: 'streak',
+                      name: profile?.display_name ?? 'Moi',
+                      streakKind: streak.kind,
+                      count: streak.count,
+                      bestStreak: perso.bestStreak,
+                      hitRate: perso.hitRate,
+                    })
+                  }
+                >
+                  Partager ma série
+                </Button>
+              )}
+            </div>
+          </>
+        ) : (
+          <StatsSkeleton />
+        )}
+      </section>
 
       <Card className="mb-4 p-5">
         <div className="flex items-end gap-3">
@@ -136,59 +228,6 @@ export default function Profile() {
       </Card>
 
       {profile && <NotificationsCard userId={profile.id} />}
-
-      {perso && (
-        <section className="mb-4">
-          <div className="mb-3 flex items-center justify-between px-1">
-            <h2 className="text-[17px] font-bold">Mes stats</h2>
-            {streak && streak.count >= 2 && (
-              <Badge tone={streak.kind === 'win' ? 'positive' : 'warning'}>
-                {streak.kind === 'win' ? '🔥' : '🥶'} {streak.count} d'affilée
-              </Badge>
-            )}
-          </div>
-          <StatsDashboard stats={perso} />
-          <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              className="flex-1"
-              onClick={() =>
-                setShare({
-                  kind: 'stats',
-                  name: profile?.display_name ?? 'Moi',
-                  rank: perso.rank,
-                  totalPlayers: perso.totalPlayers,
-                  totalPoints: perso.totalPoints,
-                  vsAverage: perso.vsAverage,
-                  hitRate: perso.hitRate,
-                  specialty: perso.specialty?.title ?? null,
-                  bestMatchPoints: perso.bestMatch?.points ?? null,
-                })
-              }
-            >
-              Partager mes stats
-            </Button>
-            {streak && streak.count >= 2 && (
-              <Button
-                variant="secondary"
-                className="flex-1"
-                onClick={() =>
-                  setShare({
-                    kind: 'streak',
-                    name: profile?.display_name ?? 'Moi',
-                    streakKind: streak.kind,
-                    count: streak.count,
-                    bestStreak: perso.bestStreak,
-                    hitRate: perso.hitRate,
-                  })
-                }
-              >
-                Partager ma série
-              </Button>
-            )}
-          </div>
-        </section>
-      )}
 
       {share && <ShareSheet data={share} onClose={() => setShare(null)} />}
 
