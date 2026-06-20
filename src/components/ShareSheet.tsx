@@ -80,9 +80,12 @@ export default function ShareSheet({ data, onClose }: { data: ShareData; onClose
       >
         <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-ink-3/40" />
 
-        {/* Aperçu live (carte à taille réelle, mise à l'échelle pour l'affichage) */}
+        {/* Aperçu live — coins arrondis purement cosmétiques (l'export reste full-bleed) */}
         <div className="flex items-center justify-center" style={{ height: PREVIEW_MAX_H }}>
-          <div style={{ width: dim.w * scale, height: dim.h * scale }}>
+          <div
+            className="overflow-hidden rounded-[22px] shadow-(--shadow-float)"
+            style={{ width: dim.w * scale, height: dim.h * scale }}
+          >
             <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: dim.w, height: dim.h }}>
               <ShareCard ref={cardRef} data={data} style={{ format, themeId: themeId ?? undefined, bgImage, toggles }} />
             </div>

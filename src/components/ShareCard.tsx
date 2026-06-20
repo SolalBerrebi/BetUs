@@ -58,7 +58,7 @@ function Chip({ children, strong = false }: { children: React.ReactNode; strong?
   return (
     <span
       className={`tnum inline-flex items-center rounded-full px-3.5 py-1.5 text-[13px] font-bold ring-1 ${
-        strong ? 'bg-white text-[#0a2540] ring-white' : 'bg-white/15 text-white ring-white/25 backdrop-blur-sm'
+        strong ? 'bg-white text-[#0a2540] ring-white' : 'bg-white/20 text-white ring-white/25'
       }`}
     >
       {children}
@@ -90,8 +90,11 @@ function Frame({
   children: React.ReactNode
 }) {
   return (
+    // Full-bleed (pas de coins arrondis) : l'export PNG remplit tout le cadre, sans
+    // coins transparents → propre sur les stories Insta. L'aperçu in-app est arrondi
+    // par son conteneur. La couleur de fond comble tout sous-pixel résiduel aux bords.
     <div
-      className="relative overflow-hidden rounded-[30px] text-white"
+      className="relative overflow-hidden text-white"
       style={{ width: w, height: h, ...(bgImage ? { backgroundColor: '#0a1f3c' } : bg) }}
     >
       {bgImage ? (
@@ -119,9 +122,8 @@ function Frame({
         </>
       )}
       <div className="pointer-events-none absolute inset-0 mix-blend-overlay" style={{ backgroundImage: GRAIN_DATA_URI, opacity: 0.07 }} />
-      <div className="pointer-events-none absolute inset-0 rounded-[30px] ring-1 ring-inset ring-white/15" />
 
-      <div className="relative flex h-full flex-col p-6">
+      <div className="relative flex h-full flex-col p-7">
         <div className="flex items-center justify-between">
           <span className="text-[19px] font-black tracking-tight">⚽️ BetUs</span>
           <span className="rounded-full bg-white/12 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-white/80 ring-1 ring-white/20">
