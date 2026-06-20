@@ -21,7 +21,7 @@ type ShareResult = 'shared' | 'downloaded' | 'cancelled'
 // (Web Share API, fichier). Sans support fichier : on télécharge l'image en fallback.
 export async function shareNode(
   node: HTMLElement,
-  opts: { filename: string; text?: string; title?: string },
+  opts: { filename: string; text?: string; title?: string; forceDownload?: boolean },
 ): Promise<ShareResult> {
   const blob = await toBlob(node, { pixelRatio: 3, cacheBust: true })
   if (!blob) throw new Error('Génération de l’image impossible')
@@ -30,7 +30,7 @@ export async function shareNode(
   const nav = navigator as Navigator & {
     canShare?: (d: { files: File[] }) => boolean
   }
-  if (nav.canShare?.({ files: [file] })) {
+  if (!opts.forceDownload && nav.canShare?.({ files: [file] })) {
     try {
       await navigator.share({ files: [file], text: opts.text, title: opts.title })
       return 'shared'
