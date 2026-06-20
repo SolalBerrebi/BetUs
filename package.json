@@ -13,6 +13,7 @@
   "type": "module",
   "dependencies": {
     "@supabase/supabase-js": "^2.108.1",
+    "html-to-image": "^1.11.13",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.17.0"

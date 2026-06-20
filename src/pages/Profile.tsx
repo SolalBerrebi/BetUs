@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
-import type { LeaderboardRow } from '../lib/types'
+import type { LeaderboardRow, MatchPoints } from '../lib/types'
 import { Badge, Button, Card, Field, PageTitle } from '../components/ui'
 import { disablePush, enablePush, getSubscription, isIOS, isStandalone, pushSupported } from '../lib/push'
+import ShareSheet from '../components/ShareSheet'
+import type { ShareData } from '../components/ShareCard'
+import { computeStreak } from '../lib/share'
 
 function NotificationsCard({ userId }: { userId: string }) {
   const [enabled, setEnabled] = useState<boolean | null>(null)
@@ -66,11 +69,14 @@ function NotificationsCard({ userId }: { userId: string }) {
 }
 
 export default function Profile() {
-  const { profile, signOut, refresh } = useApp()
+  const { profile, profiles, matches, signOut, refresh } = useApp()
   const [name, setName] = useState(profile?.display_name ?? '')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [stats, setStats] = useState<LeaderboardRow | null>(null)
+  const [rank, setRank] = useState<number | null>(null)
+  const [streak, setStreak] = useState<{ kind: 'win' | 'loss'; count: number } | null>(null)
+  const [share, setShare] = useState<ShareData | null>(null)
 
   useEffect(() => {
     if (!profile) return
@@ -78,7 +84,20 @@ export default function Profile() {
     supabase.from('leaderboard').select('*').eq('user_id', profile.id).maybeSingle().then(({ data }) => {
       if (data) setStats(data as LeaderboardRow)
     })
-  }, [profile])
+    supabase.from('ranked_leaderboard').select('rank').eq('user_id', profile.id).maybeSingle().then(({ data }) => {
+      if (data) setRank((data as { rank: number }).rank)
+    })
+    // Série en cours : pronos terminés, du plus récent au plus ancien.
+    supabase.from('match_points').select('*').eq('user_id', profile.id).then(({ data }) => {
+      const byId = new Map(matches.map((m) => [m.id, m]))
+      const results = ((data as MatchPoints[]) ?? [])
+        .map((mp) => ({ mp, m: byId.get(mp.match_id) }))
+        .filter((x) => x.m && x.m.status === 'finished')
+        .sort((a, b) => new Date(b.m!.kickoff_at).getTime() - new Date(a.m!.kickoff_at).getTime())
+        .map((x) => ({ points: x.mp.winner_pts + x.mp.scorer_pts + x.mp.assister_pts + x.mp.exact_pts }))
+      setStreak(computeStreak(results))
+    })
+  }, [profile, matches])
 
   async function saveName() {
     if (!profile || !name.trim()) return
@@ -120,7 +139,14 @@ export default function Profile() {
 
       {stats && (
         <Card className="mb-4 p-5">
-          <h2 className="mb-3 text-[17px] font-bold">Mes stats</h2>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-[17px] font-bold">Mes stats</h2>
+            {streak && streak.count >= 2 && (
+              <Badge tone={streak.kind === 'win' ? 'positive' : 'warning'}>
+                {streak.kind === 'win' ? '🔥' : '🥶'} {streak.count} d'affilée
+              </Badge>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-3 text-center">
             {[
               [stats.total_points, 'points'],
@@ -136,8 +162,47 @@ export default function Profile() {
               </div>
             ))}
           </div>
+          <div className="mt-4 flex gap-2">
+            <Button
+              variant="secondary"
+              className="flex-1"
+              onClick={() =>
+                setShare({
+                  kind: 'stats',
+                  name: profile?.display_name ?? 'Moi',
+                  rank,
+                  totalPlayers: profiles.length || null,
+                  totalPoints: stats.total_points,
+                  exact: stats.exact_count,
+                  scorers: stats.scorer_count,
+                  assisters: stats.assister_count,
+                  winners: stats.winner_count,
+                })
+              }
+            >
+              Partager mes stats
+            </Button>
+            {streak && streak.count >= 2 && (
+              <Button
+                variant="secondary"
+                className="flex-1"
+                onClick={() =>
+                  setShare({
+                    kind: 'streak',
+                    name: profile?.display_name ?? 'Moi',
+                    streakKind: streak.kind,
+                    count: streak.count,
+                  })
+                }
+              >
+                Partager ma série
+              </Button>
+            )}
+          </div>
         </Card>
       )}
+
+      {share && <ShareSheet data={share} onClose={() => setShare(null)} />}
 
       <Button variant="destructive" onClick={signOut} className="w-full">
         Se déconnecter

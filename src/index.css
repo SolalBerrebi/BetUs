@@ -88,6 +88,12 @@ button, a, label, select, [role="button"], [role="radio"], [role="tab"] {
   animation: imminent-glow 2.2s ease-in-out infinite;
 }
 
+/* Feuille de partage : montée façon iOS */
+@keyframes sheet-up {
+  from { transform: translateY(12%); opacity: 0.6; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;

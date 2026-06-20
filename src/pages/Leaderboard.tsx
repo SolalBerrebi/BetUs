@@ -6,6 +6,8 @@ import { supabase } from '../lib/supabase'
 import type { LeaderboardRow } from '../lib/types'
 import { Card, PageTitle, Segmented, Spinner } from '../components/ui'
 import TopPlayers from '../components/TopPlayers'
+import ShareSheet from '../components/ShareSheet'
+import type { ShareData } from '../components/ShareCard'
 
 function rankSort(a: LeaderboardRow, b: LeaderboardRow): number {
   return (
@@ -28,6 +30,7 @@ export default function Leaderboard() {
   const { session, matches, profiles, myTournamentPrediction } = useApp()
   const [view, setView] = useState<View>('us')
   const [rows, setRows] = useState<LeaderboardRow[] | null>(null)
+  const [share, setShare] = useState<ShareData | null>(null)
   // Rang d'avant le(s) match(s) en cours → delta ▲/▼ pendant le live.
   const [prevRank, setPrevRank] = useState<Map<string, number>>(new Map())
   const rowsRef = useRef<LeaderboardRow[] | null>(null)
@@ -151,6 +154,29 @@ export default function Leaderboard() {
         </Card>
       )}
 
+      {rows && rows.length > 0 && (() => {
+        const myIdx = rows.findIndex((r) => r.user_id === session?.user.id)
+        if (myIdx < 0) return null
+        const me = rows[myIdx]
+        return (
+          <button
+            type="button"
+            onClick={() =>
+              setShare({
+                kind: 'rank',
+                name: me.display_name,
+                rank: myIdx + 1,
+                totalPlayers: rows.length,
+                totalPoints: me.total_points,
+              })
+            }
+            className="mt-4 w-full rounded-(--radius-card) bg-accent-soft py-3 text-[15px] font-semibold text-accent transition-transform duration-150 active:scale-[0.98]"
+          >
+            Partager mon rang 🏆
+          </button>
+        )
+      })()}
+
       <p className="mt-4 px-2 text-center text-[12px] leading-relaxed text-ink-3">
         Touche un participant pour voir le détail de ses points.
         <br />
@@ -159,6 +185,8 @@ export default function Leaderboard() {
         </>
       )}
       </div>
+
+      {share && <ShareSheet data={share} onClose={() => setShare(null)} />}
     </div>
   )
 }

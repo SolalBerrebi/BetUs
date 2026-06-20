@@ -12,6 +12,8 @@ import PlayerInput from '../components/PlayerInput'
 import Lineup from '../components/Lineup'
 import MatchStats from '../components/MatchStats'
 import Momentum from '../components/Momentum'
+import ShareSheet from '../components/ShareSheet'
+import type { ShareData } from '../components/ShareCard'
 
 // Vainqueur déduit d'un score complet. `null` = indéterminé :
 //   - score incomplet → on laisse le joueur choisir le vainqueur seul ;
@@ -25,6 +27,16 @@ function impliedWinner(
   if (hs > as_) return 'home'
   if (hs < as_) return 'away'
   return stage === 'group' ? 'draw' : null
+}
+
+function ShareIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor"
+      strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 15V3M12 3l-3.5 3.5M12 3l3.5 3.5" />
+      <path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1" />
+    </svg>
+  )
 }
 
 function ScoreStepper({ label, value, onChange, disabled }: {
@@ -78,6 +90,7 @@ export default function MatchDetail() {
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState<'resume' | 'momentum' | 'compos' | 'stats'>('resume')
+  const [share, setShare] = useState<ShareData | null>(null)
   const navigate = useNavigate()
 
   const started = match ? hasStarted(match.kickoff_at, now) : false
@@ -461,6 +474,42 @@ export default function MatchDetail() {
         </Card>
       ) : (
         <section>
+          {finished && mine && session && match.home_score !== null && match.away_score !== null && (() => {
+            const mp = points.get(session.user.id)
+            const total = mp ? mp.winner_pts + mp.scorer_pts + mp.assister_pts + mp.exact_pts : 0
+            // Étiquette de ce qui a été trouvé, pour la carte de partage.
+            const hits: string[] = []
+            if (mp?.exact_pts) hits.push('Score exact 🎯')
+            else if (mp?.winner_pts) hits.push('Vainqueur trouvé')
+            if (mp?.scorer_pts) hits.push('buteur')
+            if (mp?.assister_pts) hits.push('passeur')
+            const badge =
+              total === 0
+                ? 'Raté — on se refait au prochain 😬'
+                : hits.length
+                  ? hits.join(' + ').replace(/^(.)/, (c) => c.toUpperCase())
+                  : `+${total} pts`
+            return (
+              <button
+                type="button"
+                onClick={() =>
+                  setShare({
+                    kind: 'match',
+                    name: names.get(session.user.id) ?? 'Moi',
+                    home: { code: match.home_code, name: match.home_team },
+                    away: { code: match.away_code, name: match.away_team },
+                    homeScore: match.home_score!,
+                    awayScore: match.away_score!,
+                    badge,
+                    points: total,
+                  })
+                }
+                className="mb-3 flex w-full items-center justify-center gap-2 rounded-(--radius-card) bg-accent-soft py-3 text-[15px] font-semibold text-accent transition-transform duration-150 active:scale-[0.98]"
+              >
+                <ShareIcon /> Partager mon prono
+              </button>
+            )
+          })()}
           <h2 className="mb-2.5 px-1 text-[15px] font-semibold text-ink-2">
             Les pronos {finished ? 'et les points' : 'du groupe'}
           </h2>
@@ -519,6 +568,8 @@ export default function MatchDetail() {
           )}
         </section>
       ))}
+
+      {share && <ShareSheet data={share} onClose={() => setShare(null)} />}
     </div>
   )
 }
