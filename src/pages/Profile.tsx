@@ -117,7 +117,7 @@ export default function Profile() {
     // Les prédictions sont déjà en mémoire (contexte) → on ne charge que classement
     // + points de match. Deux requêtes au lieu de trois = stats plus rapides.
     Promise.all([
-      supabase.from('leaderboard').select('*'),
+      supabase.from('leaderboard_cache').select('*'),
       supabase.from('match_points').select('*').eq('user_id', profile.id),
     ]).then(([lb, mp]) => {
       setPerso(

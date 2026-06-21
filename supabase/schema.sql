@@ -434,19 +434,30 @@ $$;
 
 create view public.leaderboard
 with (security_invoker = on) as
+-- mp_rows MATERIALIZED : chaque ligne de match_points (winner/scorer/assister/exact
+-- avec ses exists() sur scorers + jsonb subs) n'est évaluée QU'UNE fois. Sans ça,
+-- référencer scorer_pts dans sum() ET dans count(*) filter recalcule les sous-requêtes
+-- deux fois par ligne (c'était le gros du coût : ~3,3 s).
+with mp_rows as materialized (
+  select user_id, winner_pts, scorer_pts, assister_pts, exact_pts
+  from public.match_points
+)
 select
   pr.id as user_id,
   pr.display_name,
   pr.has_paid,
-  coalesce(mp.match_total, 0) + public.tournament_points(pr.id) as total_points,
-  coalesce(mp.match_total, 0)                                   as match_points,
-  public.tournament_points(pr.id)                               as tournament_points,
+  coalesce(mp.match_total, 0) + tp.pts as total_points,
+  coalesce(mp.match_total, 0)          as match_points,
+  tp.pts                               as tournament_points,
   coalesce(mp.exact_count, 0)    as exact_count,     -- départage 1
   coalesce(mp.scorer_count, 0)   as scorer_count,    -- départage 2
   coalesce(mp.assister_count, 0) as assister_count,  -- départage 3
   coalesce(mp.winner_count, 0)   as winner_count,
   coalesce(mp.played, 0)         as predictions_scored
 from public.profiles pr
+-- tournament_points est coûteux (cross join + normalisations) : on l'évalue
+-- UNE fois par profil via le lateral, au lieu de deux fois dans le select.
+cross join lateral (select public.tournament_points(pr.id) as pts) tp
 left join (
   select user_id,
          sum(winner_pts + scorer_pts + assister_pts + exact_pts) as match_total,
@@ -455,7 +466,7 @@ left join (
          count(*) filter (where assister_pts > 0) as assister_count,
          count(*) filter (where winner_pts > 0)   as winner_count,
          count(*)                                  as played
-  from public.match_points
+  from mp_rows
   group by user_id
 ) mp on mp.user_id = pr.id;
 

@@ -38,23 +38,35 @@ export default function Leaderboard() {
   const live = matches.some((m) => m.status === 'live')
 
   useEffect(() => {
-    supabase.from('leaderboard').select('*').then(({ data }) => {
-      if (!data) return
-      const sorted = (data as LeaderboardRow[]).sort(rankSort)
-      const prev = rowsRef.current
-      const apply = () => {
-        rowsRef.current = sorted
-        setRows(sorted)
-      }
-      // Réordonnancement animé façon iOS (View Transitions) quand l'ordre change.
-      const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown }
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (prev && !sameOrder(prev, sorted) && doc.startViewTransition && !reduce) {
-        doc.startViewTransition(() => flushSync(apply))
-      } else {
-        apply()
-      }
-    })
+    let cancelled = false
+    const load = () => {
+      supabase.from('leaderboard_cache').select('*').then(({ data }) => {
+        if (cancelled || !data) return
+        const sorted = (data as LeaderboardRow[]).sort(rankSort)
+        const prev = rowsRef.current
+        const apply = () => {
+          rowsRef.current = sorted
+          setRows(sorted)
+        }
+        // Réordonnancement animé façon iOS (View Transitions) quand l'ordre change.
+        const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown }
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        if (prev && !sameOrder(prev, sorted) && doc.startViewTransition && !reduce) {
+          doc.startViewTransition(() => flushSync(apply))
+        } else {
+          apply()
+        }
+      })
+    }
+    // Premier rendu : on charge tout de suite. Ensuite les events realtime
+    // (matches/profiles) arrivent en rafale pendant le live → on débounce pour
+    // ne lancer qu'une requête leaderboard (coûteuse) par salve.
+    if (rowsRef.current === null) {
+      load()
+      return () => { cancelled = true }
+    }
+    const id = setTimeout(load, 600)
+    return () => { cancelled = true; clearTimeout(id) }
   }, [matches, profiles])
 
   useEffect(() => {
