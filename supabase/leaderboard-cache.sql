@@ -38,7 +38,7 @@ create policy "leaderboard_cache read" on public.leaderboard_cache
 create or replace function public.refresh_leaderboard_cache() returns void
 language plpgsql security definer set search_path = public as $$
 begin
-  delete from public.leaderboard_cache;
+  delete from public.leaderboard_cache where true; -- WHERE obligatoire (garde-fou safe-update du planner Supabase, sinon erreur 21000)
   insert into public.leaderboard_cache (
     user_id, display_name, has_paid, total_points, match_points, tournament_points,
     exact_count, scorer_count, assister_count, winner_count, predictions_scored, rank, updated_at

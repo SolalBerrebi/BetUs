@@ -19,6 +19,16 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
 )
 
+// Fait remonter une erreur d'écriture au lieu de l'avaler : un update/upsert/insert
+// rejeté (RLS, contrainte, trigger) doit faire échouer le tick pour apparaître dans
+// les logs (net._http_response), pas passer inaperçu. Incident du 21 juin 2026 : un
+// trigger leaderboard_cache faisait un DELETE sans WHERE → tout l'UPDATE du score
+// était annulé (erreur 21000), mais la fonction renvoyait quand même `live:1`.
+function mustWrite<T extends { error: unknown }>(label: string, res: T): T {
+  if (res.error) throw new Error(`write ${label}: ${JSON.stringify(res.error)}`)
+  return res
+}
+
 const LIVE_STATUS = new Set(['1H', 'HT', '2H', 'ET', 'BT', 'P', 'LIVE', 'INT', 'SUSP'])
 const DONE_STATUS = new Set(['FT', 'AET', 'PEN'])
 const PUSH_URL = `${Deno.env.get('SUPABASE_URL')}/functions/v1/push`
@@ -456,7 +466,7 @@ async function importDraft(m: WindowMatch, fixtureId: number, f: any): Promise<v
   if (pen && pen.home != null && pen.away != null && f.goals.home === f.goals.away) {
     override = pen.home > pen.away ? 'home' : 'away'
   }
-  await supabase.from('result_draft').upsert({
+  mustWrite('result_draft', await supabase.from('result_draft').upsert({
     match_id: matchId,
     home_score: f.goals.home,
     away_score: f.goals.away,
@@ -466,11 +476,11 @@ async function importDraft(m: WindowMatch, fixtureId: number, f: any): Promise<v
     own_goals: ownGoals,
     fixture_status: f.fixture.status.short,
     fetched_at: new Date().toISOString(),
-  })
+  }))
   // Score + buteurs/passeurs/remplacements finaux : le classement compte le match
   // dès la fin (statut 'live' tant que l'admin n'a pas validé — il reste souverain).
   // winner_override inclus → les pts vainqueur sur un match aux t.a.b. sont justes en live.
-  await supabase
+  mustWrite('match final', await supabase
     .from('matches')
     .update({
       home_score: f.goals.home,
@@ -486,7 +496,7 @@ async function importDraft(m: WindowMatch, fixtureId: number, f: any): Promise<v
       ...(stats ? { stats } : {}),
     })
     .eq('id', matchId)
-    .neq('status', 'finished')
+    .neq('status', 'finished'))
 }
 
 interface MomentumSample {
@@ -765,7 +775,7 @@ async function live(): Promise<Record<string, number>> {
           patch.momentum = nextMomentum(m.momentum, m.stats, stats, elapsed, goalSide)
         }
       } catch { /* stats indispo : prochain tick */ }
-      await supabase.from('matches').update(patch).eq('id', ourId).neq('status', 'finished')
+      mustWrite('live score', await supabase.from('matches').update(patch).eq('id', ourId).neq('status', 'finished'))
       live++
       if (parsed) {
         notified += await liveGoalNotifs(m, f.goals.home, f.goals.away, parsed)
@@ -791,7 +801,7 @@ async function backfillStats(matchId: number): Promise<Record<string, unknown>> 
   if (!map) return { error: 'fixture non mappé', match_id: matchId }
   const stats = parseStats(await apiGet(`/fixtures/statistics?fixture=${map.fixture_id}`), teamKey(m.home_team))
   if (!stats) return { error: 'stats indisponibles', match_id: matchId, fixture_id: map.fixture_id }
-  await supabase.from('matches').update({ stats }).eq('id', matchId)
+  mustWrite('backfill stats', await supabase.from('matches').update({ stats }).eq('id', matchId))
   return { ok: true, match_id: matchId, fixture_id: map.fixture_id, stats }
 }
 
