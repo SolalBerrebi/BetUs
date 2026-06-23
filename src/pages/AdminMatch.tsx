@@ -145,6 +145,10 @@ export default function AdminMatch() {
   const placeholder = isPlaceholder(match.home_code) || isPlaceholder(match.away_code)
   const isDraw = hs !== '' && as_ !== '' && Number(hs) === Number(as_)
   const knockout = match.stage !== 'group'
+  // La fin de match est « tombée » quand l'API a flagué FT/AET/PEN (ou que c'est déjà validé).
+  const matchOver = match.status === 'finished' || ['FT', 'AET', 'PEN'].includes(match.period ?? '')
+  // Match en cours : on bloque la validation tant que le coup de sifflet final n'a pas sonné.
+  const liveInProgress = match.status === 'live' && !matchOver
 
   async function saveTeams() {
     if (!match) return
@@ -167,6 +171,10 @@ export default function AdminMatch() {
 
   async function saveResult(finish: boolean) {
     if (!match) return
+    if (finish && liveInProgress) {
+      setError('Match encore en cours — la validation se fait automatiquement au coup de sifflet final.')
+      return
+    }
     if (finish && (hs === '' || as_ === '')) {
       setError('Renseigne le score final.')
       return
@@ -302,9 +310,20 @@ export default function AdminMatch() {
           {error && <p className="text-[14px] font-medium text-negative">{error}</p>}
 
           <div className="space-y-2.5">
-            <Button onClick={() => saveResult(true)} loading={saving} className="w-full">
+            <Button
+              onClick={() => saveResult(true)}
+              loading={saving}
+              disabled={liveInProgress}
+              className="w-full"
+            >
               {saved ? 'Enregistré ✓' : 'Valider le résultat (calcule les points)'}
             </Button>
+            {liveInProgress && (
+              <p className="text-center text-[12px] text-ink-3">
+                ⏳ Match en cours — la validation est automatique au coup de sifflet final.
+                Tu pourras corriger ici après coup si besoin.
+              </p>
+            )}
             {match.status === 'finished' && (
               <p className="text-center text-[12px] text-ink-3">
                 Le match est déjà marqué terminé — revalider écrase le résultat et recalcule tout.

@@ -1,7 +1,8 @@
 // Edge Function `livescore` — score live + auto-import des résultats via API-Football.
 // - matches.home_score/away_score + status='live' mis à jour pendant le match.
-// - À la fin (FT/AET/PEN) : écrit un BROUILLON (result_draft) ; l'admin valide.
-// Ne marque JAMAIS 'finished' et n'écrase jamais un match déjà validé par l'admin.
+// - À la fin (FT/AET/PEN) : écrit un brouillon (result_draft) ET AUTO-VALIDE le match
+//   (status='finished' → notifs résultat). L'admin peut corriger/revalider après coup.
+//   N'écrase jamais un match déjà validé (.neq('status','finished')).
 //
 // Tâches :
 //   { "task": "map" }   → (re)construit match_api depuis les fixtures CdM 2026 (à relancer pour les phases finales).
@@ -477,9 +478,12 @@ async function importDraft(m: WindowMatch, fixtureId: number, f: any): Promise<v
     fixture_status: f.fixture.status.short,
     fetched_at: new Date().toISOString(),
   }))
-  // Score + buteurs/passeurs/remplacements finaux : le classement compte le match
-  // dès la fin (statut 'live' tant que l'admin n'a pas validé — il reste souverain).
-  // winner_override inclus → les pts vainqueur sur un match aux t.a.b. sont justes en live.
+  // Score + buteurs/passeurs/remplacements finaux. Coup de sifflet final (FT/AET/PEN)
+  // → AUTO-VALIDATION : on passe directement le match à 'finished'. Plus de saisie
+  // manuelle obligatoire ; l'admin peut toujours corriger/revalider après coup via
+  // l'UI (le brouillon result_draft reste dispo pour vérifier les passeurs).
+  // winner_override inclus → les pts vainqueur sur un match aux t.a.b. sont justes.
+  // status='finished' déclenche le trigger DB match_finished_push (notifs résultat/roast).
   mustWrite('match final', await supabase
     .from('matches')
     .update({
@@ -492,7 +496,7 @@ async function importDraft(m: WindowMatch, fixtureId: number, f: any): Promise<v
       winner_override: override,
       minute: null, // match terminé : plus de minute qui tourne
       period: f.fixture.status.short,
-      status: 'live',
+      status: 'finished',
       ...(stats ? { stats } : {}),
     })
     .eq('id', matchId)
@@ -780,9 +784,21 @@ async function live(): Promise<Record<string, number>> {
       if (parsed) {
         notified += await liveGoalNotifs(m, f.goals.home, f.goals.away, parsed)
       }
-    } else if (DONE_STATUS.has(st) && !drafted.has(ourId)) {
-      await importDraft(m, f.fixture.id, f)
-      imported++
+    } else if (DONE_STATUS.has(st)) {
+      if (!drafted.has(ourId)) {
+        // 1er tick après le coup de sifflet final : brouillon + score final + 'finished'.
+        await importDraft(m, f.fixture.id, f)
+        imported++
+      } else {
+        // Brouillon déjà créé mais match encore ouvert (statut 'live') — typiquement
+        // un match rouvert par l'admin. On (re)valide automatiquement à la fin du match.
+        mustWrite('auto-finish', await supabase
+          .from('matches')
+          .update({ status: 'finished' })
+          .eq('id', ourId)
+          .neq('status', 'finished'))
+        imported++
+      }
     }
   }
   return { live, imported, notified, lineupsAdded }
