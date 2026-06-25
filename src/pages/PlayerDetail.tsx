@@ -40,12 +40,12 @@ function commentTime(iso: string): string {
 }
 
 const TOURNAMENT_ITEMS: { slot: number; item: string; max: number; get: (t: TournamentPrediction) => string | null }[] = [
-  { slot: 1, item: 'Meilleur buteur', max: 12, get: (t) => t.top_scorer },
-  { slot: 2, item: 'Meilleur passeur', max: 16, get: (t) => t.top_assister },
-  { slot: 3, item: 'Meilleur gardien', max: 20, get: (t) => t.best_keeper },
-  { slot: 4, item: 'Finale', max: 40, get: (t) => [t.finalist_a, t.finalist_b].filter(Boolean).join(' – ') || null },
-  { slot: 5, item: 'Équipe gagnante', max: 30, get: (t) => t.winner },
-  { slot: 6, item: 'Meilleur joueur', max: 12, get: (t) => t.best_player },
+  { slot: 1, item: 'Meilleur buteur', max: 25, get: (t) => t.top_scorer },
+  { slot: 2, item: 'Meilleur passeur', max: 25, get: (t) => t.top_assister },
+  { slot: 3, item: 'Meilleur gardien', max: 10, get: (t) => t.best_keeper },
+  { slot: 4, item: 'Finale', max: 50, get: (t) => [t.finalist_a, t.finalist_b].filter(Boolean).join(' – ') || null },
+  { slot: 5, item: 'Équipe gagnante', max: 40, get: (t) => t.winner },
+  { slot: 6, item: 'Meilleur joueur', max: 10, get: (t) => t.best_player },
 ]
 
 export default function PlayerDetail() {

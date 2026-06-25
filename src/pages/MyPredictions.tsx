@@ -58,7 +58,7 @@ export default function MyPredictions() {
             </div>
           ) : (
             <p className="mt-2 text-[14px] text-ink-2">
-              {locked ? 'Pas de pronostics envoyés.' : "6 réponses, jusqu'à 130 pts — à remplir avant le 1er match."}
+              {locked ? 'Pas de pronostics envoyés.' : "6 réponses, jusqu'à 160 pts — à remplir avant le 1er match."}
             </p>
           )}
         </Card>
