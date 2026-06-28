@@ -438,9 +438,12 @@ select
         and exists (select 1 from unnest(m.assisters) a where public.name_matches(a, sub->>'in'))
     )
   ) then 4 else 0 end                                                                  as assister_pts,
+  -- Score exact : 8 pts à partir du 28/06/2026 12:00 UTC (8es et au-delà), 6 pts avant
+  -- (phase de groupes déjà jouée — seuil FIGÉ pour ne jamais réécrire le passé).
   case when p.pred_home_score is not null and m.status in ('live', 'finished')
         and p.pred_home_score = m.home_score and p.pred_away_score = m.away_score
-  then 6 else 0 end                                                                    as exact_pts,
+  then case when m.kickoff_at >= timestamptz '2026-06-28 12:00:00+00' then 8 else 6 end
+  else 0 end                                                                           as exact_pts,
   -- Élimination directe : résultat à 90 min (4) + type de qualification (3).
   case when m.stage <> 'group' and p.result_90 is not null
         and m.reg_home_score is not null and m.reg_away_score is not null
