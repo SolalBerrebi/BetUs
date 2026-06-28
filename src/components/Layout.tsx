@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useApp } from '../lib/AppContext'
 import { newStatsCount, STATS_SEEN_EVENT } from '../lib/statsBadge'
 import { Powered } from './ui'
@@ -75,8 +75,17 @@ const TABS = [
   { to: '/profil', label: 'Profil', Icon: PersonIcon },
 ]
 
+// L'onglet parent reste allumé sur ses sous-pages (fiche match, fiche joueur…),
+// pour ne jamais avoir une tab bar « décrochée » sans repère actif.
+function tabIsActive(to: string, pathname: string): boolean {
+  if (to === '/') return pathname === '/' || pathname.startsWith('/match') || pathname.startsWith('/avant-competition')
+  if (to === '/classement') return pathname.startsWith('/classement') || pathname.startsWith('/joueur')
+  return pathname === to || pathname.startsWith(to + '/')
+}
+
 export default function Layout() {
   const { profile, matches, myPredictions } = useApp()
+  const { pathname } = useLocation()
   const tabs = profile?.is_admin ? [...TABS, { to: '/admin', label: 'Admin', Icon: SlidersIcon }] : TABS
 
   // Pastille « stats à voir » sur l'onglet Profil — se rafraîchit quand le joueur
@@ -98,31 +107,27 @@ export default function Layout() {
       >
         <div className="tabbar mx-auto max-w-lg px-4 pb-2.5">
           <div className="liquid-glass flex rounded-[26px] p-1.5">
-            {tabs.map((t) => (
-              <NavLink
-                key={t.to}
-                to={t.to}
-                end={t.to === '/'}
-                className={({ isActive }) =>
-                  `flex flex-1 flex-col items-center gap-0.5 rounded-[20px] py-1.5 text-[10px] font-semibold
+            {tabs.map((t) => {
+              const active = tabIsActive(t.to, pathname)
+              return (
+                <NavLink
+                  key={t.to}
+                  to={t.to}
+                  className={`flex flex-1 flex-col items-center gap-0.5 rounded-[20px] py-1.5 text-[10px] font-semibold
                    transition-all duration-200 active:scale-95 ${
-                     isActive ? 'bg-white/75 text-accent shadow-(--shadow-card)' : 'text-ink-2/80 hover:text-ink'
-                   }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <span className="relative">
-                      <t.Icon active={isActive} />
-                      {t.to === '/profil' && profileDot && (
-                        <span className="absolute -right-1.5 -top-0.5 size-2 rounded-full bg-negative ring-2 ring-white" />
-                      )}
-                    </span>
-                    {t.label}
-                  </>
-                )}
-              </NavLink>
-            ))}
+                     active ? 'bg-white/75 text-accent shadow-(--shadow-card)' : 'text-ink-2/80 hover:text-ink'
+                   }`}
+                >
+                  <span className="relative">
+                    <t.Icon active={active} />
+                    {t.to === '/profil' && profileDot && (
+                      <span className="absolute -right-1.5 -top-0.5 size-2 rounded-full bg-negative ring-2 ring-white" />
+                    )}
+                  </span>
+                  {t.label}
+                </NavLink>
+              )
+            })}
           </div>
         </div>
       </nav>

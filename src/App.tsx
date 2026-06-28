@@ -1,4 +1,4 @@
-import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { HashRouter, Navigate, Route, Routes, useLocation, useNavigationType } from 'react-router-dom'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { AppProvider, useApp } from './lib/AppContext'
@@ -24,19 +24,31 @@ const TOP_LEVEL = new Set(['/', '/classement', '/pronos', '/profil', '/admin'])
 const depth = (p: string) => p.split('/').filter(Boolean).length
 
 /**
- * Anime chaque changement de route façon iOS via la View Transitions API.
- * On retient la location « affichée » et on ne la met à jour qu'à l'intérieur d'une
- * transition → capture push/pop/onglets de façon centralisée (liens, tab bar, retour).
+ * Anime chaque changement de route façon iOS via la View Transitions API + restaure
+ * le scroll au retour. On retient la location « affichée » et on ne la met à jour qu'à
+ * l'intérieur d'une transition → capture push/pop/onglets de façon centralisée.
+ * Direction pilotée par le TYPE de navigation : POP (retour navigateur / navigate(-1))
+ * → slide retour quelle que soit la profondeur ; PUSH → avant (profondeur en secours).
  */
 function useAnimatedLocation() {
   const location = useLocation()
+  const navType = useNavigationType() // 'POP' | 'PUSH' | 'REPLACE'
   const [display, setDisplay] = useState(location)
   const prev = useRef(location)
+  // Scroll mémorisé par entrée d'historique (location.key) → restitué au retour.
+  const scrollByKey = useRef(new Map<string, number>())
 
   useLayoutEffect(() => {
     if (location === display) return
     const from = prev.current.pathname
     const to = location.pathname
+
+    // On quitte une page : on retient sa position de scroll avant de basculer le DOM.
+    scrollByKey.current.set(prev.current.key, window.scrollY)
+    const restoreScroll = () => {
+      window.scrollTo(0, navType === 'POP' ? (scrollByKey.current.get(location.key) ?? 0) : 0)
+    }
+
     const commit = () => {
       prev.current = location
       setDisplay(location)
@@ -45,18 +57,24 @@ function useAnimatedLocation() {
     const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown }
     if (from === to || reduce || !doc.startViewTransition) {
       commit()
+      restoreScroll()
       return
     }
     document.documentElement.dataset.nav =
       TOP_LEVEL.has(from) && TOP_LEVEL.has(to)
         ? 'fade'
-        : depth(to) > depth(from)
-          ? 'forward'
-          : depth(to) < depth(from)
-            ? 'back'
-            : 'fade'
-    doc.startViewTransition(() => flushSync(commit))
-  }, [location, display])
+        : navType === 'POP'
+          ? 'back'
+          : depth(to) > depth(from)
+            ? 'forward'
+            : depth(to) < depth(from)
+              ? 'back'
+              : 'fade'
+    doc.startViewTransition(() => {
+      flushSync(commit)
+      restoreScroll() // après commit : le DOM de la nouvelle page est en place
+    })
+  }, [location, display, navType])
 
   return display
 }
