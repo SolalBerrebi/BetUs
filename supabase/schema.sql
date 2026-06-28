@@ -482,8 +482,11 @@ select
   ) then 4 else 0 end                                                                  as assister_pts,
   -- Score exact : 8 pts à partir du 28/06/2026 12:00 UTC (8es et au-delà), 6 pts avant
   -- (phase de groupes déjà jouée — seuil FIGÉ pour ne jamais réécrire le passé).
+  -- Élimination directe = score À LA FIN DU TEMPS RÉGLEMENTAIRE (avant prolongation) → reg_*.
+  -- Groupes = score final (pas de prolongation ; reg_* nul pour les matchs déjà joués).
   case when p.pred_home_score is not null and m.status in ('live', 'finished')
-        and p.pred_home_score = m.home_score and p.pred_away_score = m.away_score
+        and p.pred_home_score = (case when m.stage = 'group' then m.home_score else m.reg_home_score end)
+        and p.pred_away_score = (case when m.stage = 'group' then m.away_score else m.reg_away_score end)
   then case when m.kickoff_at >= timestamptz '2026-06-28 12:00:00+00' then 8 else 6 end
   else 0 end                                                                           as exact_pts,
   -- Élimination directe : résultat à 90 min (4) + type de qualification (3).

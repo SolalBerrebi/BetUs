@@ -509,7 +509,7 @@ export default function MatchDetail() {
 
             <div>
               <p className="mb-2 text-[13px] font-medium text-ink-2">
-                Score exact · 8 pts{isKO && <span className="font-normal text-ink-3"> (final, prolong. incluse)</span>}
+                Score exact · 8 pts{isKO && <span className="font-normal text-ink-3"> (à 90 min, avant prolongation)</span>}
               </p>
               <div className="flex items-start justify-center gap-8">
                 <ScoreStepper
