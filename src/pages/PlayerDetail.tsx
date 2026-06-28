@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useApp } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
 import type { MatchPoints, PlayerComment, Prediction, TournamentBreakdownRow, TournamentPrediction } from '../lib/types'
@@ -50,6 +50,9 @@ const TOURNAMENT_ITEMS: { slot: number; item: string; max: number; get: (t: Tour
 
 export default function PlayerDetail() {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const goBack = () => (location.key !== 'default' ? navigate(-1) : navigate('/classement'))
   const { matches, profiles, session, refresh } = useApp()
   const [points, setPoints] = useState<MatchPoints[] | null>(null)
   const [preds, setPreds] = useState<Map<number, Prediction>>(new Map())
@@ -171,9 +174,13 @@ export default function PlayerDetail() {
 
   return (
     <div>
-      <Link to="/classement" className="mb-4 inline-flex items-center gap-1 text-[16px] font-medium text-accent">
+      <button
+        type="button"
+        onClick={goBack}
+        className="mb-4 inline-flex items-center gap-1 text-[16px] font-medium text-accent"
+      >
         ‹ Classement
-      </Link>
+      </button>
       <PageTitle
         sub={
           <>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { flushSync } from 'react-dom'
 import { useApp } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
@@ -28,7 +28,10 @@ type View = 'us' | 'scorer' | 'assister'
 
 export default function Leaderboard() {
   const { session, matches, profiles, myTournamentPrediction } = useApp()
-  const [view, setView] = useState<View>('us')
+  // Onglet dans l'URL (?vue=) → préservé au retour depuis une fiche joueur.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const viewParam = searchParams.get('vue')
+  const view: View = viewParam === 'scorer' || viewParam === 'assister' ? viewParam : 'us'
   const [rows, setRows] = useState<LeaderboardRow[] | null>(null)
   const [share, setShare] = useState<ShareData | null>(null)
   // Rang d'avant le(s) match(s) en cours → delta ▲/▼ pendant le live.
@@ -91,7 +94,7 @@ export default function Leaderboard() {
           { value: 'assister', label: 'Passeurs' },
         ]}
         value={view}
-        onChange={setView}
+        onChange={(v) => setSearchParams(v === 'us' ? {} : { vue: v }, { replace: true })}
       />
 
       <div className="mt-4">

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useApp, useNow } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
 import { matchPointsTotal, type MatchPoints, type Prediction } from '../lib/types'
@@ -95,6 +95,10 @@ export default function MatchDetail() {
   const [tab, setTab] = useState<'resume' | 'momentum' | 'compos' | 'stats'>('resume')
   const [share, setShare] = useState<ShareData | null>(null)
   const navigate = useNavigate()
+  const location = useLocation()
+  // Retour = page précédente réelle (onglet Terminés préservé, fiche joueur, bracket…).
+  // Repli sur l'accueil si on est arrivé ici sans historique (deep link).
+  const goBack = () => (location.key !== 'default' ? navigate(-1) : navigate('/'))
 
   const started = match ? hasStarted(match.kickoff_at, now) : false
 
@@ -238,9 +242,13 @@ export default function MatchDetail() {
 
   return (
     <div>
-      <Link to="/" className="mb-4 inline-flex items-center gap-1 text-[16px] font-medium text-accent">
+      <button
+        type="button"
+        onClick={goBack}
+        className="mb-4 inline-flex items-center gap-1 text-[16px] font-medium text-accent"
+      >
         ‹ Matchs
-      </Link>
+      </button>
 
       <div
         className="relative mb-4 overflow-hidden rounded-(--radius-card) p-5 text-white shadow-(--shadow-card)"

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useApp, useNow } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
 import { matchPointsTotal, type MatchPoints } from '../lib/types'
@@ -10,7 +10,10 @@ import { dayKey, dayLabel, countdown } from '../lib/format'
 export default function Matches() {
   const { matches, myPredictions, session, tournamentStart, myTournamentPrediction } = useApp()
   const now = useNow()
-  const [filter, setFilter] = useState<'upcoming' | 'finished'>('upcoming')
+  // Onglet dans l'URL (?tab=finished) → survit au démontage : on revient sur le bon
+  // onglet après avoir consulté une fiche match (cf. retour via navigate(-1)).
+  const [searchParams, setSearchParams] = useSearchParams()
+  const filter: 'upcoming' | 'finished' = searchParams.get('tab') === 'finished' ? 'finished' : 'upcoming'
   const [points, setPoints] = useState<Map<number, number>>(new Map())
 
   useEffect(() => {
@@ -92,7 +95,7 @@ export default function Matches() {
             { value: 'finished', label: 'Terminés' },
           ]}
           value={filter}
-          onChange={setFilter}
+          onChange={(v) => setSearchParams(v === 'finished' ? { tab: 'finished' } : {}, { replace: true })}
         />
       </div>
 
