@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useApp } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
+import { matchPointsTotal } from '../lib/types'
 import type { MatchPoints, PlayerComment, Prediction, TournamentBreakdownRow, TournamentPrediction } from '../lib/types'
 import { teamFlag, teamName } from '../lib/teams'
 import { dayLabel } from '../lib/format'
@@ -157,10 +158,7 @@ export default function PlayerDetail() {
       .sort((a, b) => b.mp.match_id - a.mp.match_id)
   }, [points, preds, matchById])
 
-  const matchTotal = (points ?? []).reduce(
-    (s, p) => s + p.winner_pts + p.scorer_pts + p.assister_pts + p.exact_pts,
-    0,
-  )
+  const matchTotal = (points ?? []).reduce((s, p) => s + matchPointsTotal(p), 0)
   const tournamentTotal = tournament.reduce((s, t) => s + t.points, 0)
   const grandTotal = matchTotal + tournamentTotal
 
@@ -274,14 +272,24 @@ export default function PlayerDetail() {
           <div className="space-y-2.5">
             {scored.map(({ mp, match, pred }) => {
               const m = match!
-              const total = mp.winner_pts + mp.scorer_pts + mp.assister_pts + mp.exact_pts
-              const predWinner = pred?.winner
-                ? pred.winner === 'draw'
+              const total = matchPointsTotal(mp)
+              const ko = m.stage !== 'group'
+              const sideLabel = (s: 'home' | 'draw' | 'away' | null | undefined) =>
+                s === 'draw'
                   ? 'Nul'
-                  : pred.winner === 'home'
+                  : s === 'home'
                     ? teamName(m.home_team, m.home_code)
-                    : teamName(m.away_team, m.away_code)
-                : '—'
+                    : s === 'away'
+                      ? teamName(m.away_team, m.away_code)
+                      : '—'
+              const qtLabel =
+                pred?.qualif_type === 'reg'
+                  ? '90 min'
+                  : pred?.qualif_type === 'et'
+                    ? 'Prolongation'
+                    : pred?.qualif_type === 'pen'
+                      ? 'Tirs au but'
+                      : '—'
               return (
                 <Card key={mp.match_id} className="overflow-hidden">
                   <Link to={`/match/${m.id}`} className="block px-4 pb-3 pt-3.5 transition-colors active:bg-surface-2/60">
@@ -295,17 +303,40 @@ export default function PlayerDetail() {
                     <p className="mb-2 text-[12px] text-ink-3">{dayLabel(m.kickoff_at)}</p>
                     {pred ? (
                       <div className="divide-y divide-line/50 border-t border-line/50">
-                        <PointLine
-                          label="Vainqueur"
-                          detail={predWinner}
-                          won={mp.winner_pts > 0}
-                          max={2}
-                        />
+                        {ko ? (
+                          <>
+                            <PointLine
+                              label="Résultat 90′"
+                              detail={sideLabel(pred.result_90)}
+                              won={mp.result90_pts > 0}
+                              max={4}
+                            />
+                            <PointLine
+                              label="Équipe qualifiée"
+                              detail={sideLabel(pred.winner)}
+                              won={mp.winner_pts > 0}
+                              max={2}
+                            />
+                            <PointLine
+                              label="Qualification"
+                              detail={qtLabel}
+                              won={mp.qualif_type_pts > 0}
+                              max={3}
+                            />
+                          </>
+                        ) : (
+                          <PointLine
+                            label="Vainqueur"
+                            detail={sideLabel(pred.winner)}
+                            won={mp.winner_pts > 0}
+                            max={2}
+                          />
+                        )}
                         <PointLine
                           label="Score exact"
                           detail={pred.pred_home_score !== null ? `${pred.pred_home_score}–${pred.pred_away_score}` : '—'}
                           won={mp.exact_pts > 0}
-                          max={6}
+                          max={ko ? 8 : 6}
                         />
                         <PointLine
                           label="Buteur"

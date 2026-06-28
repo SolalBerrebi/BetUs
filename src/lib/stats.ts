@@ -1,6 +1,7 @@
 // Stats perso « frappantes » dérivées des données existantes (aucun backend) :
 // précision par catégorie, superlatifs (meilleur coup / série / spécialité),
 // comparaison au groupe et répartition des points.
+import { matchPointsTotal } from './types'
 import type { LeaderboardRow, Match, MatchPoints, Prediction } from './types'
 import { teamName } from './teams'
 import { computeStreak } from './share'
@@ -24,7 +25,7 @@ export interface PersoStats {
   breakdown: { exact: number; winner: number; scorer: number; assister: number; tournament: number }
 }
 
-const total = (mp: MatchPoints) => mp.winner_pts + mp.scorer_pts + mp.assister_pts + mp.exact_pts
+const total = (mp: MatchPoints) => matchPointsTotal(mp)
 
 export function computeStats(args: {
   me: string
@@ -111,7 +112,8 @@ export function computeStats(args: {
 
   const breakdown = {
     exact: scored.reduce((s, x) => s + x.mp.exact_pts, 0),
-    winner: scored.reduce((s, x) => s + x.mp.winner_pts, 0),
+    // Inclut les points d'élimination directe (résultat 90' + type de qualif) côté « résultat ».
+    winner: scored.reduce((s, x) => s + x.mp.winner_pts + x.mp.result90_pts + x.mp.qualif_type_pts, 0),
     scorer: scored.reduce((s, x) => s + x.mp.scorer_pts, 0),
     assister: scored.reduce((s, x) => s + x.mp.assister_pts, 0),
     tournament: myRow.tournament_points,

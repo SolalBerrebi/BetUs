@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp, useNow } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
-import type { MatchPoints } from '../lib/types'
+import { matchPointsTotal, type MatchPoints } from '../lib/types'
 import { teamFlag, teamName } from '../lib/teams'
 import { hasStarted, timeLabel, dayLabel } from '../lib/format'
 import { Badge, Card, EmptyState, PageTitle } from '../components/ui'
@@ -75,7 +75,7 @@ export default function MyPredictions() {
           {predicted.map((m) => {
             const p = myPredictions.get(m.id)!
             const pts = points.get(m.id)
-            const total = pts ? pts.winner_pts + pts.scorer_pts + pts.assister_pts + pts.exact_pts : null
+            const total = pts ? matchPointsTotal(pts) : null
             const started = hasStarted(m.kickoff_at, now)
             return (
               <Link key={m.id} to={`/match/${m.id}`} className="block px-4 py-3 transition-colors hover:bg-surface-2/60">
