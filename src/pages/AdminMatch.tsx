@@ -106,6 +106,9 @@ export default function AdminMatch() {
   const [scorers, setScorers] = useState<string[]>(match?.scorers ?? [])
   const [assisters, setAssisters] = useState<string[]>(match?.assisters ?? [])
   const [override, setOverride] = useState<'home' | 'away' | null>(match?.winner_override ?? null)
+  const [regHs, setRegHs] = useState<string>(match?.reg_home_score?.toString() ?? '')
+  const [regAs, setRegAs] = useState<string>(match?.reg_away_score?.toString() ?? '')
+  const [decidedBy, setDecidedBy] = useState<'reg' | 'et' | 'pen' | null>(match?.decided_by ?? null)
   const [homeCode, setHomeCode] = useState(match?.home_code ?? '')
   const [awayCode, setAwayCode] = useState(match?.away_code ?? '')
   const [saving, setSaving] = useState(false)
@@ -131,6 +134,13 @@ export default function AdminMatch() {
     setScorers(draft.scorers)
     setAssisters(draft.assisters)
     setOverride(draft.winner_override)
+    // Type de qualif déduit du statut API ; score à 90 min = score final hors prolongation.
+    const st = draft.fixture_status
+    setDecidedBy(st === 'PEN' ? 'pen' : st === 'AET' ? 'et' : 'reg')
+    if (st !== 'AET' && st !== 'PEN') {
+      setRegHs(draft.home_score?.toString() ?? '')
+      setRegAs(draft.away_score?.toString() ?? '')
+    }
     setApplied(true)
   }
 
@@ -189,6 +199,9 @@ export default function AdminMatch() {
         scorers,
         assisters,
         winner_override: isDraw && knockout ? override : null,
+        reg_home_score: knockout ? (regHs === '' ? null : Number(regHs)) : null,
+        reg_away_score: knockout ? (regAs === '' ? null : Number(regAs)) : null,
+        decided_by: knockout ? decidedBy : null,
         status: finish ? 'finished' : match.status,
       })
       .eq('id', match.id)
@@ -301,6 +314,45 @@ export default function AdminMatch() {
                 value={override}
                 onChange={setOverride}
               />
+            </div>
+          )}
+
+          {knockout && (
+            <div className="space-y-4 rounded-xl bg-surface-2/60 p-4">
+              <div>
+                <p className="mb-2 text-[13px] font-medium text-ink-2">Type de qualification</p>
+                <Segmented
+                  options={[
+                    { value: 'reg', label: '90 min' },
+                    { value: 'et', label: 'Prolongation' },
+                    { value: 'pen', label: 'Tirs au but' },
+                  ]}
+                  value={decidedBy}
+                  onChange={setDecidedBy}
+                />
+              </div>
+              <div>
+                <p className="mb-2 text-[13px] font-medium text-ink-2">Score à 90 min (temps réglementaire)</p>
+                <div className="flex items-center justify-center gap-4">
+                  {[
+                    { v: regHs, set: setRegHs },
+                    { v: regAs, set: setRegAs },
+                  ].map((x, i) => (
+                    <input
+                      key={i}
+                      type="number"
+                      min={0}
+                      inputMode="numeric"
+                      value={x.v}
+                      onChange={(e) => x.set(e.target.value)}
+                      className="tnum h-12 w-14 rounded-xl bg-surface text-center text-[22px] font-bold outline-none focus:ring-2 focus:ring-accent"
+                    />
+                  ))}
+                </div>
+                <p className="mt-1.5 text-center text-[12px] text-ink-3">
+                  Sert au prono « résultat à 90 min ». Auto-rempli par le live au coup de sifflet.
+                </p>
+              </div>
             </div>
           )}
 

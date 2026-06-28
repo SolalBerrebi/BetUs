@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useApp, useNow } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
-import type { MatchPoints, Prediction } from '../lib/types'
+import { matchPointsTotal, type MatchPoints, type Prediction } from '../lib/types'
 import { STAGE_LABELS } from '../lib/types'
 import { teamFlag, teamName } from '../lib/teams'
 import { ambiance, countdown, dayLabel, hasStarted, timeLabel } from '../lib/format'
@@ -86,6 +86,9 @@ export default function MatchDetail() {
   const [as_, setAs] = useState<number | null>(mine?.pred_away_score ?? 0)
   const [scorer, setScorer] = useState(mine?.scorer ?? '')
   const [assister, setAssister] = useState(mine?.assister ?? '')
+  // Élimination directe : résultat à 90 min + type de qualification (cf. règlement phases finales).
+  const [result90, setResult90] = useState<'home' | 'draw' | 'away' | null>(mine?.result_90 ?? null)
+  const [qualifType, setQualifType] = useState<'reg' | 'et' | 'pen' | null>(mine?.qualif_type ?? null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -109,17 +112,25 @@ export default function MatchDetail() {
     }
   }, [match, started, match?.status])
 
-  // Cohérence vainqueur / score : dès qu'un score complet détermine l'issue, on aligne
-  // (et on verrouille côté UI) le vainqueur dessus. Empêche les pronos contradictoires.
+  // Phase de groupes : le vainqueur découle du score complet (verrouillé côté UI).
   useEffect(() => {
-    if (!match) return
+    if (!match || match.stage !== 'group') return
     const imp = impliedWinner(hs, as_, match.stage)
     if (imp !== null && winner !== imp) setWinner(imp)
-    // Nul prédit en élimination : 'draw' n'a pas de sens (départage aux TAB), on le retire.
-    else if (hs !== null && as_ !== null && hs === as_ && match.stage !== 'group' && winner === 'draw') {
-      setWinner(null)
-    }
   }, [hs, as_, match, winner])
+
+  // Élimination directe : le résultat à 90 min pilote l'équipe qualifiée et le type.
+  //   - une équipe gagne en 90 min → qualifié = cette équipe, type = 90 min (auto) ;
+  //   - nul à 90 min → qualifié + type (prolongation / t.a.b.) choisis à la main.
+  useEffect(() => {
+    if (!match || match.stage === 'group') return
+    if (result90 === 'home' || result90 === 'away') {
+      if (winner !== result90) setWinner(result90)
+      if (qualifType !== 'reg') setQualifType('reg')
+    } else if (result90 === 'draw' && qualifType === 'reg') {
+      setQualifType(null) // le nul impose un choix prolongation / t.a.b.
+    }
+  }, [result90, match, winner, qualifType])
 
   // Cohérence buteur / score : un 0-0 prédit n'a ni buteur ni passeur, on efface et on verrouille.
   useEffect(() => {
@@ -164,6 +175,7 @@ export default function MatchDetail() {
     if (!match || !session) return
     setSaving(true)
     setError(null)
+    const ko = match.stage !== 'group'
     const err = await savePrediction({
       user_id: session.user.id,
       match_id: match.id,
@@ -172,6 +184,8 @@ export default function MatchDetail() {
       pred_away_score: as_,
       scorer: scorer.trim() || null,
       assister: assister.trim() || null,
+      result_90: ko ? result90 : null,
+      qualif_type: ko ? qualifType : null,
     })
     setSaving(false)
     if (err) setError(err)
@@ -194,12 +208,33 @@ export default function MatchDetail() {
         ]
 
   const scoreSet = hs !== null && as_ !== null
-  // Score complet qui fixe l'issue → vainqueur verrouillé sur la déduction.
-  const winnerLocked = scoreSet && impliedWinner(hs, as_, match.stage) !== null
-  // Nul prédit en élimination → vainqueur libre (qui passe aux tirs au but).
-  const koTie = scoreSet && hs === as_ && match.stage !== 'group'
+  const isKO = match.stage !== 'group'
+  // Score complet qui fixe l'issue → vainqueur verrouillé sur la déduction (groupes).
+  const winnerLocked = !isKO && scoreSet && impliedWinner(hs, as_, match.stage) !== null
   // 0-0 prédit → aucun but, donc buteur et passeur verrouillés.
   const goalless = hs === 0 && as_ === 0
+
+  const homeLabel = teamName(match.home_team, match.home_code)
+  const awayLabel = teamName(match.away_team, match.away_code)
+  const result90Options: { value: 'home' | 'draw' | 'away'; label: string }[] = [
+    { value: 'home', label: homeLabel },
+    { value: 'draw', label: 'Nul' },
+    { value: 'away', label: awayLabel },
+  ]
+  const qualifiedOptions: { value: 'home' | 'away'; label: string }[] = [
+    { value: 'home', label: homeLabel },
+    { value: 'away', label: awayLabel },
+  ]
+  const qualifTypeOptions: { value: 'et' | 'pen'; label: string }[] = [
+    { value: 'et', label: 'Prolongation' },
+    { value: 'pen', label: 'Tirs au but' },
+  ]
+  // Prono d'élimination complet ? (gère l'auto pour une victoire, le manuel pour un nul.)
+  const koComplete =
+    !isKO ||
+    result90 === 'home' ||
+    result90 === 'away' ||
+    (result90 === 'draw' && !!winner && (qualifType === 'et' || qualifType === 'pen'))
 
   return (
     <div>
@@ -418,20 +453,56 @@ export default function MatchDetail() {
           <p className="mb-5 mt-0.5 text-[13px] text-ink-2">Modifiable jusqu'au coup d'envoi.</p>
 
           <div className="space-y-6">
-            <div>
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <p className="text-[13px] font-medium text-ink-2">Vainqueur · 2 pts</p>
-                {winnerLocked ? (
-                  <span className="text-[12px] font-medium text-ink-3">déduit du score</span>
-                ) : koTie ? (
-                  <span className="text-[12px] font-medium text-ink-3">qui se qualifie aux t.a.b. ?</span>
+            {isKO ? (
+              <>
+                <div>
+                  <p className="mb-2 text-[13px] font-medium text-ink-2">Résultat à 90 min · 4 pts</p>
+                  <Segmented options={result90Options} value={result90} onChange={setResult90} />
+                </div>
+                {result90 === 'home' || result90 === 'away' ? (
+                  <p className="-mt-2 text-[13px] text-ink-2">
+                    → Qualifié :{' '}
+                    <span className="font-semibold text-ink-1">{result90 === 'home' ? homeLabel : awayLabel}</span>{' '}
+                    · Type : <span className="font-semibold text-ink-1">90 minutes</span>{' '}
+                    <span className="text-ink-3">(2 + 3 pts auto)</span>
+                  </p>
+                ) : result90 === 'draw' ? (
+                  <>
+                    <div>
+                      <p className="mb-2 text-[13px] font-medium text-ink-2">Équipe qualifiée · 2 pts</p>
+                      <Segmented
+                        options={qualifiedOptions}
+                        value={winner === 'draw' ? null : winner}
+                        onChange={setWinner}
+                      />
+                    </div>
+                    <div>
+                      <p className="mb-2 text-[13px] font-medium text-ink-2">Type de qualification · 3 pts</p>
+                      <Segmented
+                        options={qualifTypeOptions}
+                        value={qualifType === 'reg' ? null : qualifType}
+                        onChange={setQualifType}
+                      />
+                    </div>
+                  </>
                 ) : null}
+              </>
+            ) : (
+              <div>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <p className="text-[13px] font-medium text-ink-2">Vainqueur · 2 pts</p>
+                  {winnerLocked ? (
+                    <span className="text-[12px] font-medium text-ink-3">déduit du score</span>
+                  ) : null}
+                </div>
+                <Segmented options={winnerOptions} value={winner} onChange={setWinner} disabled={winnerLocked} />
               </div>
-              <Segmented options={winnerOptions} value={winner} onChange={setWinner} disabled={winnerLocked} />
-            </div>
+            )}
 
             <div>
-              <p className="mb-2 text-[13px] font-medium text-ink-2">Score exact · 6 pts</p>
+              <p className="mb-2 text-[13px] font-medium text-ink-2">
+                Score exact · 6 pts{isKO && <span className="font-normal text-ink-3"> (final, prolong. incluse)</span>}
+              </p>
               <div className="flex items-start justify-center gap-8">
                 <ScoreStepper
                   label={teamName(match.home_team, match.home_code)}
@@ -467,7 +538,14 @@ export default function MatchDetail() {
             />
 
             {error && <p className="text-[14px] font-medium text-negative">{error}</p>}
-            <Button onClick={submit} loading={saving} className="w-full">
+            {isKO && !koComplete && (
+              <p className="text-[13px] text-ink-3">
+                {result90 == null
+                  ? 'Choisis le résultat à 90 min pour continuer.'
+                  : 'Sur un nul, choisis l’équipe qualifiée et le type (prolongation / t.a.b.).'}
+              </p>
+            )}
+            <Button onClick={submit} loading={saving} disabled={!koComplete} className="w-full">
               {saved ? 'Enregistré ✓' : mine ? 'Mettre à jour mon prono' : 'Valider mon prono'}
             </Button>
           </div>
@@ -476,24 +554,44 @@ export default function MatchDetail() {
         <section>
           {finished && mine && session && match.home_score !== null && match.away_score !== null && (() => {
             const mp = points.get(session.user.id)
-            const total = mp ? mp.winner_pts + mp.scorer_pts + mp.assister_pts + mp.exact_pts : 0
-            // Le prono ligne par ligne avec ce qui a été validé, pour la carte de partage.
-            const winnerLabel =
-              mine.winner === 'draw'
+            const total = matchPointsTotal(mp)
+            const ko = match.stage !== 'group'
+            const sideLabel = (s: 'home' | 'draw' | 'away' | null | undefined) =>
+              s === 'draw'
                 ? 'Nul'
-                : mine.winner === 'home'
+                : s === 'home'
                   ? teamName(match.home_team, match.home_code)
-                  : mine.winner === 'away'
+                  : s === 'away'
                     ? teamName(match.away_team, match.away_code)
                     : '—'
-            const items: { label: string; pick: string; ok: boolean }[] = [
-              { label: 'Vainqueur', pick: winnerLabel, ok: !!mp?.winner_pts },
-              {
-                label: 'Score',
-                pick: mine.pred_home_score !== null ? `${mine.pred_home_score}–${mine.pred_away_score}` : '—',
-                ok: !!mp?.exact_pts,
-              },
-            ]
+            const qtLabel =
+              mine.qualif_type === 'reg'
+                ? '90 min'
+                : mine.qualif_type === 'et'
+                  ? 'Prolongation'
+                  : mine.qualif_type === 'pen'
+                    ? 'Tirs au but'
+                    : '—'
+            // Le prono ligne par ligne avec ce qui a été validé, pour la carte de partage.
+            const items: { label: string; pick: string; ok: boolean }[] = ko
+              ? [
+                  { label: 'Résultat 90′', pick: sideLabel(mine.result_90), ok: !!mp?.result90_pts },
+                  { label: 'Qualifié', pick: sideLabel(mine.winner), ok: !!mp?.winner_pts },
+                  { label: 'Qualification', pick: qtLabel, ok: !!mp?.qualif_type_pts },
+                  {
+                    label: 'Score',
+                    pick: mine.pred_home_score !== null ? `${mine.pred_home_score}–${mine.pred_away_score}` : '—',
+                    ok: !!mp?.exact_pts,
+                  },
+                ]
+              : [
+                  { label: 'Vainqueur', pick: sideLabel(mine.winner), ok: !!mp?.winner_pts },
+                  {
+                    label: 'Score',
+                    pick: mine.pred_home_score !== null ? `${mine.pred_home_score}–${mine.pred_away_score}` : '—',
+                    ok: !!mp?.exact_pts,
+                  },
+                ]
             if (mine.scorer) items.push({ label: 'Buteur', pick: mine.scorer, ok: !!mp?.scorer_pts })
             if (mine.assister) items.push({ label: 'Passeur', pick: mine.assister, ok: !!mp?.assister_pts })
             return (
@@ -534,16 +632,16 @@ export default function MatchDetail() {
             <Card className="divide-y divide-line/60">
               {others
                 .sort((a, b) => {
-                  const pa = points.get(a.user_id)
-                  const pb = points.get(b.user_id)
-                  const ta = pa ? pa.winner_pts + pa.scorer_pts + pa.assister_pts + pa.exact_pts : 0
-                  const tb = pb ? pb.winner_pts + pb.scorer_pts + pb.assister_pts + pb.exact_pts : 0
+                  const ta = matchPointsTotal(points.get(a.user_id))
+                  const tb = matchPointsTotal(points.get(b.user_id))
                   return tb - ta || (names.get(a.user_id) ?? '').localeCompare(names.get(b.user_id) ?? '')
                 })
                 .map((p) => {
                   const pts = points.get(p.user_id)
-                  const total = pts ? pts.winner_pts + pts.scorer_pts + pts.assister_pts + pts.exact_pts : null
+                  const total = pts ? matchPointsTotal(pts) : null
                   const isMe = p.user_id === session?.user.id
+                  const koTypeLabel =
+                    p.qualif_type === 'et' ? 'prolong.' : p.qualif_type === 'pen' ? 't.a.b.' : null
                   return (
                     <div key={p.user_id} className="px-4 py-3">
                       <div className="flex items-center justify-between">
@@ -564,6 +662,7 @@ export default function MatchDetail() {
                               ? teamName(match.home_team, match.home_code)
                               : teamName(match.away_team, match.away_code)
                           : '—'}
+                        {koTypeLabel && ` (${koTypeLabel})`}
                         {p.pred_home_score !== null && ` · ${p.pred_home_score}-${p.pred_away_score}`}
                         {p.scorer && ` · ⚽️ ${p.scorer}`}
                         {p.assister && ` · 🅰️ ${p.assister}`}

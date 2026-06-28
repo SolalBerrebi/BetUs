@@ -40,6 +40,11 @@ export interface Match {
   status: 'scheduled' | 'live' | 'finished'
   home_score: number | null
   away_score: number | null
+  // Score à la fin du temps réglementaire (90 min) — distinct du score final si prolongation.
+  reg_home_score: number | null
+  reg_away_score: number | null
+  // Comment un match à élimination a été tranché : 90 min / prolongation / tirs au but.
+  decided_by: 'reg' | 'et' | 'pen' | null
   winner_override: 'home' | 'away' | null
   scorers: string[]
   assisters: string[]
@@ -116,11 +121,15 @@ export interface Prediction {
   id?: number
   user_id: string
   match_id: number
+  // Élimination directe : `winner` sert d'« équipe qualifiée » (home/away).
   winner: 'home' | 'draw' | 'away' | null
   pred_home_score: number | null
   pred_away_score: number | null
   scorer: string | null
   assister: string | null
+  // Élimination directe uniquement (null en phase de groupes) :
+  result_90?: 'home' | 'draw' | 'away' | null // résultat après 90 min
+  qualif_type?: 'reg' | 'et' | 'pen' | null // type de qualification
 }
 
 export interface TournamentPrediction {
@@ -159,6 +168,17 @@ export interface MatchPoints {
   scorer_pts: number
   assister_pts: number
   exact_pts: number
+  result90_pts: number
+  qualif_type_pts: number
+}
+
+// Total de points d'un match, tous postes confondus (groupes + élimination directe).
+export function matchPointsTotal(mp: MatchPoints | undefined | null): number {
+  if (!mp) return 0
+  return (
+    mp.winner_pts + mp.scorer_pts + mp.assister_pts + mp.exact_pts +
+    (mp.result90_pts ?? 0) + (mp.qualif_type_pts ?? 0)
+  )
 }
 
 export interface TopPlayer {

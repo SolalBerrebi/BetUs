@@ -467,6 +467,13 @@ async function importDraft(m: WindowMatch, fixtureId: number, f: any): Promise<v
   if (pen && pen.home != null && pen.away != null && f.goals.home === f.goals.away) {
     override = pen.home > pen.away ? 'home' : 'away'
   }
+  // Score à la fin du temps réglementaire (90 min) + comment le match a été tranché.
+  // score.fulltime = score à 90 min (≠ score final si prolongation). FT/AET/PEN → reg/et/pen.
+  const short = f.fixture.status.short
+  const ft = f.score?.fulltime
+  const regHome = ft?.home ?? f.goals.home
+  const regAway = ft?.away ?? f.goals.away
+  const decidedBy: 'reg' | 'et' | 'pen' = short === 'PEN' ? 'pen' : short === 'AET' ? 'et' : 'reg'
   mustWrite('result_draft', await supabase.from('result_draft').upsert({
     match_id: matchId,
     home_score: f.goals.home,
@@ -489,6 +496,9 @@ async function importDraft(m: WindowMatch, fixtureId: number, f: any): Promise<v
     .update({
       home_score: f.goals.home,
       away_score: f.goals.away,
+      reg_home_score: regHome,
+      reg_away_score: regAway,
+      decided_by: decidedBy,
       scorers,
       assisters,
       subs,

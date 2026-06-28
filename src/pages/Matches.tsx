@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp, useNow } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
-import type { MatchPoints } from '../lib/types'
+import { matchPointsTotal, type MatchPoints } from '../lib/types'
 import MatchCard from '../components/MatchCard'
 import { EmptyState, PageTitle, Segmented } from '../components/ui'
 import { dayKey, dayLabel, countdown } from '../lib/format'
@@ -25,7 +25,7 @@ export default function Matches() {
             new Map(
               (data as MatchPoints[]).map((r) => [
                 r.match_id,
-                r.winner_pts + r.scorer_pts + r.assister_pts + r.exact_pts,
+                matchPointsTotal(r),
               ]),
             ),
           )

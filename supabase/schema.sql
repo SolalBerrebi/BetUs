@@ -77,6 +77,9 @@ create table if not exists public.matches (
   status text not null default 'scheduled' check (status in ('scheduled','live','finished')),
   home_score int,
   away_score int,
+  reg_home_score int,                                              -- score à 90 min (temps réglementaire)
+  reg_away_score int,                                              -- ≠ score final si prolongation
+  decided_by text check (decided_by in ('reg','et','pen')),        -- élimination : 90 min / prolong. / t.a.b.
   winner_override text check (winner_override in ('home','away')),  -- vainqueur aux tirs au but
   scorers text[] not null default '{}',
   assisters text[] not null default '{}',
@@ -93,6 +96,9 @@ alter table public.matches add column if not exists minute int;
 alter table public.matches add column if not exists period text;
 alter table public.matches add column if not exists goals_timeline jsonb not null default '[]';
 alter table public.matches add column if not exists stats jsonb;
+alter table public.matches add column if not exists reg_home_score int;
+alter table public.matches add column if not exists reg_away_score int;
+alter table public.matches add column if not exists decided_by text check (decided_by in ('reg','et','pen'));
 
 create table if not exists public.predictions (
   id bigint generated always as identity primary key,
@@ -103,11 +109,16 @@ create table if not exists public.predictions (
   pred_away_score int check (pred_away_score between 0 and 20),
   scorer text,
   assister text,
+  -- Élimination directe uniquement (null en groupes). `winner` y sert d'équipe qualifiée.
+  result_90 text check (result_90 in ('home','draw','away')),  -- résultat après 90 min
+  qualif_type text check (qualif_type in ('reg','et','pen')),   -- type de qualification
   updated_at timestamptz not null default now(),
   unique (user_id, match_id)
 );
 create index if not exists predictions_match_idx on public.predictions (match_id);
 create index if not exists predictions_user_idx on public.predictions (user_id);
+alter table public.predictions add column if not exists result_90 text check (result_90 in ('home','draw','away'));
+alter table public.predictions add column if not exists qualif_type text check (qualif_type in ('reg','et','pen'));
 
 create table if not exists public.tournament_predictions (
   user_id uuid primary key references public.profiles(id) on delete cascade,
@@ -213,41 +224,52 @@ begin
       using errcode = 'check_violation';
   end if;
 
-  -- La suite ne concerne que les pronos avec un score complet.
-  if new.pred_home_score is null or new.pred_away_score is null then
+  select stage into v_stage from public.matches where id = new.match_id;
+
+  -- ÉLIMINATION DIRECTE : résultat 90' / équipe qualifiée / type de qualification.
+  --   - une équipe gagne à 90 min → qualifié = cette équipe, type = 90 min (auto) ;
+  --   - nul à 90 min → qualifié (home/away) + type (prolongation / t.a.b.) choisis à la main.
+  if v_stage <> 'group' then
+    if new.result_90 in ('home','away') then
+      new.winner := new.result_90;
+      new.qualif_type := 'reg';
+    elsif new.result_90 = 'draw' then
+      if new.winner is null or new.winner = 'draw' then
+        raise exception 'Prono incohérent : sur un nul à 90 min, choisis l''équipe qualifiée.'
+          using errcode = 'check_violation';
+      end if;
+      if new.qualif_type is null or new.qualif_type = 'reg' then
+        raise exception 'Prono incohérent : sur un nul à 90 min, choisis prolongation ou tirs au but.'
+          using errcode = 'check_violation';
+      end if;
+    end if;
+    if new.winner = 'draw' then
+      raise exception 'Prono incohérent : en élimination, il faut une équipe qualifiée.'
+        using errcode = 'check_violation';
+    end if;
     return new;
   end if;
 
-  select stage into v_stage from public.matches where id = new.match_id;
-
+  -- PHASE DE GROUPES : le vainqueur découle du score complet.
+  if new.pred_home_score is null or new.pred_away_score is null then
+    return new;
+  end if;
   if new.pred_home_score > new.pred_away_score then
     implied := 'home';
   elsif new.pred_home_score < new.pred_away_score then
     implied := 'away';
   else
-    -- Score nul : en phase de groupes l'issue est « nul » ; en élimination, départage aux
-    -- tirs au but → le vainqueur (qui se qualifie) reste libre (home/away), jamais 'draw'.
-    implied := case when v_stage = 'group' then 'draw' else null end;
+    implied := 'draw';
   end if;
-
-  -- Vainqueur manquant : on le déduit du score plutôt que de laisser un prono incomplet.
-  -- (Nul en élimination : impossible à déduire, le joueur doit choisir qui passe aux t.a.b.)
   if new.winner is null then
     new.winner := implied;
     return new;
   end if;
-
-  if implied is not null and new.winner <> implied then
+  if new.winner <> implied then
     raise exception 'Prono incohérent : le vainqueur (%) ne correspond pas au score %-%.',
       new.winner, new.pred_home_score, new.pred_away_score
       using errcode = 'check_violation';
   end if;
-
-  if implied is null and new.winner = 'draw' then
-    raise exception 'Prono incohérent : en élimination directe, un nul ne peut pas être l''issue.'
-      using errcode = 'check_violation';
-  end if;
-
   return new;
 end $$;
 
@@ -377,6 +399,17 @@ language sql stable as $$
   end
 $$;
 
+-- Issue à 90 min (temps réglementaire) : 'home'/'draw'/'away' depuis reg_home/away_score.
+create or replace function public.actual_result_90(m public.matches) returns text
+language sql stable as $$
+  select case
+    when m.reg_home_score is null or m.reg_away_score is null then null
+    when m.reg_home_score > m.reg_away_score then 'home'
+    when m.reg_home_score < m.reg_away_score then 'away'
+    else 'draw'
+  end
+$$;
+
 drop view if exists public.leaderboard;
 drop view if exists public.match_points;
 
@@ -407,7 +440,15 @@ select
   ) then 4 else 0 end                                                                  as assister_pts,
   case when p.pred_home_score is not null and m.status in ('live', 'finished')
         and p.pred_home_score = m.home_score and p.pred_away_score = m.away_score
-  then 6 else 0 end                                                                    as exact_pts
+  then 6 else 0 end                                                                    as exact_pts,
+  -- Élimination directe : résultat à 90 min (4) + type de qualification (3).
+  case when m.stage <> 'group' and p.result_90 is not null
+        and m.reg_home_score is not null and m.reg_away_score is not null
+        and p.result_90 = public.actual_result_90(m)
+  then 4 else 0 end                                                                    as result90_pts,
+  case when m.stage <> 'group' and p.qualif_type is not null
+        and m.decided_by is not null and p.qualif_type = m.decided_by
+  then 3 else 0 end                                                                    as qualif_type_pts
 from public.predictions p
 join public.matches m on m.id = p.match_id
 where m.status in ('live', 'finished');
@@ -439,7 +480,7 @@ with (security_invoker = on) as
 -- référencer scorer_pts dans sum() ET dans count(*) filter recalcule les sous-requêtes
 -- deux fois par ligne (c'était le gros du coût : ~3,3 s).
 with mp_rows as materialized (
-  select user_id, winner_pts, scorer_pts, assister_pts, exact_pts
+  select user_id, winner_pts, scorer_pts, assister_pts, exact_pts, result90_pts, qualif_type_pts
   from public.match_points
 )
 select
@@ -460,7 +501,7 @@ from public.profiles pr
 cross join lateral (select public.tournament_points(pr.id) as pts) tp
 left join (
   select user_id,
-         sum(winner_pts + scorer_pts + assister_pts + exact_pts) as match_total,
+         sum(winner_pts + scorer_pts + assister_pts + exact_pts + result90_pts + qualif_type_pts) as match_total,
          count(*) filter (where exact_pts > 0)    as exact_count,
          count(*) filter (where scorer_pts > 0)   as scorer_count,
          count(*) filter (where assister_pts > 0) as assister_count,
