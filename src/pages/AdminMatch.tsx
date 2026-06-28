@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { useApp } from '../lib/AppContext'
+import { useApp, useNow } from '../lib/AppContext'
 import { supabase } from '../lib/supabase'
 import { ALL_TEAMS, isPlaceholder, teamName } from '../lib/teams'
 import { STAGE_LABELS } from '../lib/types'
+import { countdown } from '../lib/format'
 import { Badge, Button, Card, PageTitle, Segmented, Spinner } from '../components/ui'
 
 interface ResultDraft {
@@ -99,6 +100,7 @@ function TeamAssign({ label, code, onChange }: {
 export default function AdminMatch() {
   const { id } = useParams()
   const { matches, refresh } = useApp()
+  const now = useNow()
   const match = matches.find((m) => m.id === Number(id))
 
   const [hs, setHs] = useState<string>(match?.home_score?.toString() ?? '')
@@ -159,6 +161,24 @@ export default function AdminMatch() {
   const matchOver = match.status === 'finished' || ['FT', 'AET', 'PEN'].includes(match.period ?? '')
   // Match en cours : on bloque la validation tant que le coup de sifflet final n'a pas sonné.
   const liveInProgress = match.status === 'live' && !matchOver
+
+  // VERROU ANTI-FALSIFICATION (miroir du trigger DB guard_admin_match_edit) :
+  // l'admin ne peut saisir/corriger le score qu'1h après la fin (le temps que l'API ait
+  // tout posé automatiquement). Filet : déverrouillage 4h après le coup d'envoi si jamais
+  // l'auto-validation n'a pas eu lieu. Match déjà fini sans horodatage (ancien) = déverrouillé.
+  const HOUR_MS = 3_600_000
+  const finishedAtMs = match.finished_at ? new Date(match.finished_at).getTime() : null
+  const kickoffMs = new Date(match.kickoff_at).getTime()
+  const adminUnlocked =
+    (match.status === 'finished' && (finishedAtMs === null || now >= finishedAtMs + HOUR_MS)) ||
+    now >= kickoffMs + 4 * HOUR_MS
+  const scoreLocked = !adminUnlocked
+  // Quand le verrou saute (pour le compte à rebours affiché).
+  const unlockAtIso = new Date(
+    match.status === 'finished' && finishedAtMs !== null
+      ? finishedAtMs + HOUR_MS
+      : kickoffMs + 4 * HOUR_MS,
+  ).toISOString()
 
   async function saveTeams() {
     if (!match) return
@@ -275,7 +295,7 @@ export default function AdminMatch() {
               </div>
             )}
           </div>
-          <Button variant="secondary" onClick={applyDraft} className="mt-4 w-full">
+          <Button variant="secondary" onClick={applyDraft} disabled={scoreLocked} className="mt-4 w-full">
             {applied ? 'Proposition chargée ✓' : 'Pré-remplir le formulaire'}
           </Button>
         </Card>
@@ -283,7 +303,17 @@ export default function AdminMatch() {
 
       <Card className="p-5">
         <h2 className="mb-4 text-[17px] font-bold">Résultat</h2>
-        <div className="space-y-5">
+        {scoreLocked && (
+          <div className="mb-4 rounded-xl bg-surface-2 p-3 text-[13px] text-ink-2">
+            🔒 Saisie verrouillée. Le score est rempli{' '}
+            <strong>automatiquement</strong> par l'API au coup de sifflet final.
+            {match.status === 'finished'
+              ? ` Correction possible dans ${countdown(unlockAtIso, now) ?? 'un instant'}.`
+              : ' Tu pourras corriger ici 1 h après la fin du match.'}{' '}
+            <span className="text-ink-3">(anti-erreur / anti-falsification)</span>
+          </div>
+        )}
+        <fieldset disabled={scoreLocked} className="m-0 space-y-5 border-0 p-0 disabled:opacity-60">
           <div className="flex items-center justify-center gap-4">
             {[
               { v: hs, set: setHs, team: teamName(match.home_team, match.home_code) },
@@ -365,24 +395,18 @@ export default function AdminMatch() {
             <Button
               onClick={() => saveResult(true)}
               loading={saving}
-              disabled={liveInProgress}
+              disabled={liveInProgress || scoreLocked}
               className="w-full"
             >
               {saved ? 'Enregistré ✓' : 'Valider le résultat (calcule les points)'}
             </Button>
-            {liveInProgress && (
-              <p className="text-center text-[12px] text-ink-3">
-                ⏳ Match en cours — la validation est automatique au coup de sifflet final.
-                Tu pourras corriger ici après coup si besoin.
-              </p>
-            )}
-            {match.status === 'finished' && (
+            {match.status === 'finished' && !scoreLocked && (
               <p className="text-center text-[12px] text-ink-3">
                 Le match est déjà marqué terminé — revalider écrase le résultat et recalcule tout.
               </p>
             )}
           </div>
-        </div>
+        </fieldset>
       </Card>
     </div>
   )

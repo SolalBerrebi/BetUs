@@ -38,6 +38,7 @@ export interface Match {
   city: string | null
   venue: string | null
   status: 'scheduled' | 'live' | 'finished'
+  finished_at: string | null // horodatage de la fin (validation auto) — déverrouille l'admin 1h après
   home_score: number | null
   away_score: number | null
   // Score à la fin du temps réglementaire (90 min) — distinct du score final si prolongation.

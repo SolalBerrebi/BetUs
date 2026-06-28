@@ -75,6 +75,7 @@ create table if not exists public.matches (
   city text,
   venue text,
   status text not null default 'scheduled' check (status in ('scheduled','live','finished')),
+  finished_at timestamptz,                                         -- horodatage de la fin (auto) → déverrouille l'admin 1h après
   home_score int,
   away_score int,
   reg_home_score int,                                              -- score à 90 min (temps réglementaire)
@@ -99,6 +100,7 @@ alter table public.matches add column if not exists stats jsonb;
 alter table public.matches add column if not exists reg_home_score int;
 alter table public.matches add column if not exists reg_away_score int;
 alter table public.matches add column if not exists decided_by text check (decided_by in ('reg','et','pen'));
+alter table public.matches add column if not exists finished_at timestamptz;
 
 create table if not exists public.predictions (
   id bigint generated always as identity primary key,
@@ -299,6 +301,46 @@ end $$;
 drop trigger if exists tournament_predictions_coherence on public.tournament_predictions;
 create trigger tournament_predictions_coherence before insert or update on public.tournament_predictions
 for each row execute function public.check_tournament_coherence();
+
+-- Verrou anti-saisie/falsification du score par l'admin. Le résultat est posé
+-- AUTOMATIQUEMENT par l'API (livescore = service role, auth.uid() null → autorisé).
+-- Un admin connecté ne peut modifier les champs de score qu'1h après la fin du match
+-- (le temps que l'API ait tout rempli). Filet : déverrouillage 4h après le coup d'envoi
+-- au cas où l'auto-validation n'aurait pas eu lieu. Les champs d'équipe (assignation du
+-- bracket) restent libres pour l'admin à tout moment.
+create or replace function public.guard_admin_match_edit() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is null then
+    return new;  -- service role / scripts : source automatique, autorisée
+  end if;
+  if (new.home_score     is distinct from old.home_score
+      or new.away_score     is distinct from old.away_score
+      or new.reg_home_score is distinct from old.reg_home_score
+      or new.reg_away_score is distinct from old.reg_away_score
+      or new.decided_by     is distinct from old.decided_by
+      or new.winner_override is distinct from old.winner_override
+      or new.scorers        is distinct from old.scorers
+      or new.assisters      is distinct from old.assisters
+      or new.subs           is distinct from old.subs
+      or new.goals_timeline is distinct from old.goals_timeline
+      or new.status         is distinct from old.status)
+     and not (
+       (old.status = 'finished'
+        and (old.finished_at is null or now() >= old.finished_at + interval '1 hour'))
+       or now() >= old.kickoff_at + interval '4 hours'
+     )
+  then
+    raise exception 'Saisie admin verrouillée : le score est géré automatiquement par l''API, modifiable 1h après la fin du match.'
+      using errcode = 'check_violation';
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists guard_admin_match_edit on public.matches;
+create trigger guard_admin_match_edit
+before update on public.matches
+for each row execute function public.guard_admin_match_edit();
 
 -- ---------------------------------------------------------------------------
 -- RLS — le règlement est appliqué par la base

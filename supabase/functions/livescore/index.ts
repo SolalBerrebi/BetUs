@@ -507,6 +507,7 @@ async function importDraft(m: WindowMatch, fixtureId: number, f: any): Promise<v
       minute: null, // match terminé : plus de minute qui tourne
       period: f.fixture.status.short,
       status: 'finished',
+      finished_at: new Date().toISOString(), // horodate la fin (déverrouille l'admin 1h après)
       ...(stats ? { stats } : {}),
     })
     .eq('id', matchId)
